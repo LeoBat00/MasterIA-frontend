@@ -79,7 +79,7 @@ export default function Step1DadosPessoais({ next }: { next: () => void }) {
             <div className="flex justify-end mt-6">
                 <button
                     onClick={handleNext}
-                    className="bg-indigo-600 px-6 py-2 rounded-xl hover:bg-indigo-700 transition"
+                    className="bg-indigo-600 px-6 py-2 rounded-xl hover:bg-indigo-700 transition cursor-pointer"
                 >
                     Próximo
                 </button>

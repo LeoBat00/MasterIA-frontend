@@ -49,7 +49,7 @@ export default function StepSelecao({
                 <button onClick={prev} className="text-gray-400 hover:text-white transition">Voltar</button>
                 <button
                     onClick={onSubmit}
-                    className="bg-green-500 px-6 py-2 rounded-xl hover:bg-green-600 transition"
+                    className="bg-green-500 px-6 py-2 rounded-xl hover:bg-green-600 transition cursor-pointer"
                 >
                     {botaoLabel}
                 </button>

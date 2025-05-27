@@ -20,16 +20,14 @@ export default function Header() {
       </Link>
 
       <div className="flex items-center gap-4">
-        {/* Bolinhas decorativas */}
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500" />
           <div className="w-2 h-2 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500" />
           <div className="w-2 h-2 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500" />
         </div>
 
-        {/* Botão de login */}
         <Link
-          href="/login"
+          href="#href"
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-medium shadow-md transition hover:brightness-110 hover:shadow-lg"
         >
           Login

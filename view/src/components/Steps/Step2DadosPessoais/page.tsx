@@ -75,7 +75,7 @@ export default function Step2PerfilJogador({ next, prev }: { next: () => void; p
 
             <div className="flex justify-between mt-6">
                 <button onClick={prev} className="text-gray-400 hover:text-white transition">Voltar</button>
-                <button onClick={handleNext} className="bg-indigo-600 px-6 py-2 rounded-xl hover:bg-indigo-700 transition">Próximo</button>
+                <button onClick={handleNext} className="bg-indigo-600 px-6 py-2 rounded-xl hover:bg-indigo-700 cursor-pointer transition">Próximo</button>
             </div>
         </div>
     );
