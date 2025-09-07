@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --background-color-1: #12121b;
+  --background-color-2: #161323;
+  --background-color-3: rgba(187, 202, 226, 0.1);
+  --color-purple-1: #951FFB;
+  --color-button-primary: #FDC700;
+
+  --text-color-1: #a6a2ff;
 }
 
 @theme inline {

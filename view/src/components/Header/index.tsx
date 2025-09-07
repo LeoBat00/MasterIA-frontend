@@ -27,7 +27,7 @@ export default function Header() {
         </div>
 
         <Link
-          href="#href"
+          href="/login"
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-medium shadow-md transition hover:brightness-110 hover:shadow-lg"
         >
           Login
