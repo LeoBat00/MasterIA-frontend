@@ -102,7 +102,7 @@ export default function RegistroPage() {
         const payload: Organizador = {
             email: (camposForm.email ?? "").trim(),
             senha: camposForm.senha ?? "",
-            nome: (camposForm.nome ?? "").trim(),
+            razaoSocial: (camposForm.nome ?? "").trim(),
             cpfCnpj: onlyDigits(camposForm.cpfCnpj ?? ""),
             telefone: onlyDigits(camposForm.telefone ?? ""),
         };

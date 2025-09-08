@@ -1,7 +1,7 @@
 import { http, setAccessToken } from "../../api/http";
 import { endpoints } from "../../api/endpoints";
 
-export type LoginPayload = { email: string; password: string };
+export type LoginPayload = { email: string; senha: string };
 export type LoginResponse = { accessToken: string };
 
 export async function login(payload: LoginPayload) {
@@ -31,7 +31,7 @@ export type Organizador = {
     senha: string;
     cpfCnpj: string;
     telefone?: string;
-    nome: string;
+    razaoSocial: string;
     lojas?: Loja[];
 };
 

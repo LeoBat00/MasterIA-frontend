@@ -1,7 +1,8 @@
 import axios from "axios";
 
 export const http = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: 'https://localhost:7226',
   withCredentials: true, // deixe true se seu back usar cookies httpOnly
 });
 
