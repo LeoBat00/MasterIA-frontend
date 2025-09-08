@@ -90,10 +90,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         variant === "default"
             ? clsx(
                 "border",
-                error ? "border-red-500" : "border-[var(--color-purple-1)]",
-                "rounded"
+                error ? "border-red-500" : "border-[var(--color-purple-2)]",
+                "rounded-[8px]"
             )
-            : "border-b " + (error ? "border-red-500" : "border-[var(--color-purple-1)]");
+            : "border-b " + (error ? "border-red-500" : "border-[var(--color-purple-2)]");
 
     const focusStyles =
         variant === "default"
@@ -122,7 +122,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                     htmlFor={id}
                     className="block text-xs font-semibold mb-1"
                 >
-                    {label} {required && <span className="text-red-500">*</span>}
+                    {label} {required && <span className="text-white">*</span>}
                 </label>
             )}
 
@@ -130,6 +130,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                 className={clsx(
                     "relative flex items-center w-full",
                     baseBorder,
+                    "bg-[#12121B] overflow-hidden",
                     focusStyles,
                     disabled && "opacity-60 cursor-not-allowed",
                     heightBySize[size],
@@ -196,7 +197,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                         inputMode={number ? "numeric" : undefined}
                         pattern={number ? "\\d*" : undefined}
                         className={clsx(
-                            "w-full outline-none placeholder-[#868686] bg-transparent",
+                            "w-full outline-none placeholder-[#868686] bg-[#12121B]",
                             paddingsBySize[size],
                             withLeft && iconSpaceBySize[size].left,
                             withRight && iconSpaceBySize[size].right,
