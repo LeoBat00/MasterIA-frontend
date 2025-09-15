@@ -1,46 +1,25 @@
 import { http, setAccessToken } from "../../api/http";
 import { endpoints } from "../../api/endpoints";
+import { useAuthStore } from "../../stores/auth";
+import { Organizador } from "../../stores/organizador";
+import { useOrganizadorStore } from "../../stores/organizador";
 
 export type LoginPayload = { email: string; senha: string };
-export type LoginResponse = { accessToken: string };
+export type LoginResponse = { token: string };
 
 export async function login(payload: LoginPayload) {
     const { data } = await http.post<LoginResponse>(endpoints.auth.login, payload);
-    setAccessToken(data.accessToken); // guarda token
-    return data;
-}
+    setAccessToken(data.token); // guarda token
+    useAuthStore.getState().setToken(data.token);
 
-export type Loja = {
-    id: number;
-    cep: string;
-    logradouro: string;
-    bairro: string;
-    cidade: string;
-    uf: string;
-    complemento?: string;
-    numero?: string;
-    status: string;
-    hrAbertura: string;
-    hrEncerramento: string;
-    organizadorId: number;
+    const claims = useAuthStore.getState().claims;
+    const nameid = claims?.nameid ? Number(claims.nameid) : undefined;
+    if (nameid && Number.isFinite(nameid)) {
+        await useOrganizadorStore.getState().fetchOrganizador(nameid);
+    }
 }
-
-export type Organizador = {
-    id?: number;
-    email: string;
-    senha: string;
-    cpfCnpj: string;
-    telefone?: string;
-    razaoSocial: string;
-    lojas?: Loja[];
-};
 
 export async function register(payload: Organizador) {
-    const { data } = await http.post(endpoints.auth.organizador, payload);
+    const { data } = await http.post(endpoints.organizador.create, payload);
     return data;
-}
-
-export async function getMe() {
-    const { data } = await http.get(endpoints.auth.organizador);
-    return data as Organizador;
 }

@@ -6,10 +6,13 @@
   --background-color-1: #12121b;
   --background-color-2: #161323;
   --background-color-3: rgba(187, 202, 226, 0.1);
+  --background-color-4: #0D0D12;
   --color-purple-1: #951FFB;
   --color-purple-2: #685BFF;
+  --color-purple-3: #7C3FFD;
 
   --color-button-primary: #FDC700;
+  --color-button-secondary: #cfccfc;
 
   --text-color-1: #a6a2ff;
 }

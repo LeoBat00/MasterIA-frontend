@@ -8,34 +8,48 @@ import {
     Settings,
     Plus,
     LogOut,
-    User, 
+    User,
 } from 'lucide-react';
 import LoadingScreen from '@/components/UI/LoadingScreen';
-
-type Loja = {
-    id: string;
-    nome: string;
-};
+import { useOrganizadorStore, Loja } from '../../stores/organizador';
+import FormularioNovaLoja from './formularioNovaLoja';
+import { useLojaStore } from '@/stores/loja';
+import { useAuthStore } from '@/stores/auth';
 
 export default function OrganizadorHome() {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [lojas, setLojas] = useState<Loja[]>([
-        { id: '1', nome: 'Dominaria' },
-    ]);
+    const { logout } = useAuthStore.getState();
+
+    const [loading, setLoading] = useState(false);
+    const [lojas, setLojas] = useState<Loja[]>([]);
+    const { exibirFormularioLoja, setExibirFormularioLoja } = useLojaStore();
+    const { organizador } = useOrganizadorStore();
 
     function handleCadastrarLoja() {
-        const id = String(Date.now());
-        setLojas((prev) => [{ id, nome: 'Nova loja' }, ...prev]);
+        setExibirFormularioLoja(!exibirFormularioLoja);
     }
 
     function handleLogout() {
+        logout();
         router.push('/login');
     }
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000); 
-        return () => clearTimeout(timer);
+        if (!organizador) {
+            router.push('/login');
+            return;
+        }
+        setLojas(organizador?.lojas || []);
+
     }, []);
+
+    useEffect(() => {
+        console.log("Organizador atualizado:", organizador);
+        if (!organizador) {
+            router.push('/login');
+            return;
+        }
+        setLojas(organizador?.lojas || []);
+    }, [organizador]);
 
     if (loading) return <LoadingScreen />;
 
@@ -53,7 +67,7 @@ export default function OrganizadorHome() {
                     >
                         <div className="h-full overflow-y-auto pr-1 pb-32">
                             <div className="mb-4 px-2 text-sm font-semibold tracking-wide text-purple-300">
-                                Organizador
+                                Organizador - {organizador?.razaoSocial || organizador?.email}
                             </div>
 
                             <nav className="space-y-2">
@@ -66,11 +80,11 @@ export default function OrganizadorHome() {
                                         <li key={l.id}>
                                             <button
                                                 className="group flex w-full items-center justify-between rounded-[8px] border border-white/5 bg-gradient-to-b from-[#0C0C12] to-[#0A0A10] px-3 py-2 text-left hover:border-purple-500/40 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
-                                                aria-label={`Abrir ${l.nome}`}
+                                                aria-label={`Abrir ${l.id}`}
                                             >
                                                 <span className="flex items-center gap-2 text-sm text-zinc-200">
                                                     <Store className="h-4 w-4 text-purple-400" />
-                                                    {l.nome}
+                                                    {l.id}
                                                 </span>
                                                 <ChevronRight className="h-4 w-4 text-zinc-500 group-hover:text-zinc-300" />
                                             </button>
@@ -98,7 +112,7 @@ export default function OrganizadorHome() {
 
                                 <div className="mt-3">
                                     <button
-                                        onClick={() => router.push('/login')}
+                                        onClick={handleLogout}
                                         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-yellow-400/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-300 hover:border-yellow-400/60 hover:bg-yellow-500/15 focus:outline-none focus:ring-2 focus:ring-yellow-500/60"
                                         aria-label="Sair da conta"
                                     >
@@ -133,45 +147,50 @@ export default function OrganizadorHome() {
                                     onClick={handleCadastrarLoja}
                                     className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-[#951FFB] to-[#685BFF] px-4 py-1.5 text-sm font-medium text-white shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
                                 >
-                                    <span>Cadastrar loja</span>
-                                    <Plus className="h-4 w-4" />
+                                    <span>{exibirFormularioLoja ? " Exibir Lojas " : "Cadastrar loja"}</span>
+                                    {exibirFormularioLoja ? <Store className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                                 </button>
                             </div>
 
                             <div className="space-y-4">
-                                {lojas.map((l) => (
-                                    <article
-                                        key={l.id}
-                                        className="rounded-[8px] bg-gradient-to-b from-[#0E0E15] to-[#0B0B11] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
-                                        style={{
-                                            borderLeft: '6px solid #616EFF',
-                                            borderBottom: '1px solid #616EFF',
-                                        }}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-zinc-300">
-                                                <div className="text-sm">Nome</div>
-                                                <div className="text-lg font-medium">{l.nome}</div>
-                                            </div>
+                                {exibirFormularioLoja ?
+                                    <div>
+                                        <FormularioNovaLoja />
+                                    </div>
+                                    :
+                                    lojas.map((l) => (
+                                        <article
+                                            key={l.id}
+                                            className="rounded-[8px] bg-gradient-to-b from-[#0E0E15] to-[#0B0B11] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
+                                            style={{
+                                                borderLeft: '6px solid #616EFF',
+                                                borderBottom: '1px solid #616EFF',
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-zinc-300">
+                                                    <div className="text-sm">Nome</div>
+                                                    <div className="text-lg font-medium">{l.id}</div>
+                                                </div>
 
-                                            <button
-                                                className="rounded-lg cursor-pointer border border-white/10 p-2 text-zinc-300 hover:border-purple-500/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
-                                                aria-label={`Configurações da loja ${l.nome}`}
-                                                title="Configurações"
-                                            >
-                                                <Settings className="h-5 w-5" />
-                                            </button>
-                                        </div>
-                                    </article>
-                                ))}
+                                                <button
+                                                    className="rounded-lg cursor-pointer border border-white/10 p-2 text-zinc-300 hover:border-purple-500/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+                                                    aria-label={`Configurações da loja ${l.id}`}
+                                                    title="Configurações"
+                                                >
+                                                    <Settings className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        </article>
+                                    ))}
 
                                 <button
                                     onClick={handleCadastrarLoja}
                                     className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-purple-500/30 bg-purple-700/10 p-8 text-purple-200 hover:border-purple-500/60 hover:bg-purple-700/15 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
                                     aria-label="Adicionar nova loja"
                                 >
-                                    <Plus className="h-5 w-5" />
-                                    Adicionar nova loja
+                                    {exibirFormularioLoja ? <Store className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+                                    {exibirFormularioLoja ? "Exibir Lojas" : "Adicionar nova loja"}
                                 </button>
                             </div>
 

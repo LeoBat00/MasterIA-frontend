@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { login, register, LoginPayload, Organizador } from "../services/auth.service";
+import { login, register, LoginPayload } from "../services/auth.service";
+import { Organizador } from "../../stores/organizador";
 
 export function organizadorAuth() {
   const [loading, setLoading] = useState(false);

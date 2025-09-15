@@ -8,8 +8,7 @@ import Input from "@/components/UI/Input";
 import { isValidCPF, isValidCNPJ, onlyDigits } from "@/utils/validacoes";
 import { useRouter } from "next/navigation";
 import { organizadorAuth } from "@/auth/hooks/organizadorAuth";
-import { Organizador } from "@/auth/services/auth.service";
-
+import { Organizador } from "@/stores/organizador";
 type NovoOrganizadorForm = {
     email?: string;
     senha?: string;
