@@ -29,9 +29,9 @@ export default function LoginPage() {
         setErro(e);
         if (e.login || e.senha) return;
 
+        debugger
         const ok = await doLogin({ email: login, senha: senha });
-        if (ok) router.push("/organizadorHome");    
-        // router.push("/organizadorHome");
+        if (ok) router.push("/organizadorHome");
 
     };
 

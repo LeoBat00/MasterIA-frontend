@@ -25,13 +25,12 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-// limpa em 401 e redireciona para login
+// limpa em 401.
 http.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 401) {
       useAuthStore.getState().logout();
-     window.location.href = "/login";
     }
     return Promise.reject(err);
   }

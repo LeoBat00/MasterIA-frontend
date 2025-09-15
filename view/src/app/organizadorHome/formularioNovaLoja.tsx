@@ -3,13 +3,18 @@ import { useLojaStore } from "@/stores/loja";
 import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";
 import { Eraser, Plus } from "lucide-react";
+import { useEffect } from "react";
 
 export default function FormularioNovaLoja() {
 
-    const { loja, atualizarLoja, setExibirFormularioLoja, validacaoErro, validarFormulario, saveLoja, clear } = useLojaStore();
+    const { loja, atualizarLoja, setExibirFormularioLoja, validacaoErro, validarFormulario, saveLoja, clear, limparValidacao } = useLojaStore();
     const { fetchOrganizador } = useOrganizadorStore();
     const { claims } = useAuthStore();
     const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
+
+    useEffect(() => {
+        limparValidacao();
+    }, [limparValidacao ]);
 
     const hanleChangeCep = (novoCep: string) => {
         const copiaLoja = { ...loja };
@@ -67,6 +72,11 @@ export default function FormularioNovaLoja() {
         setExibirFormularioLoja(false);
     }
 
+    const handleLimparCampos = () => {
+        clear();
+        limparValidacao();
+    }
+
 
     return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-3)] border-l-8 border-l-[var(--color-purple-2)]  ">
 
@@ -78,9 +88,9 @@ export default function FormularioNovaLoja() {
                 handleCadastrarLoja();
             }}
         >
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-8">
 
-                <div className="grid grid-cols-1 gap-8 mb-32">
+                <div className="grid grid-cols-1 gap-8">
                     <div className="grid grid-cols-2 gap-8">
 
                         <Input
@@ -162,11 +172,11 @@ export default function FormularioNovaLoja() {
                         />
                     </div>
                 </div>
-                <div className="justify-self-center  self-end space-x-4">
+                <div className="justify-self-end  self-end space-x-4">
                     <button
                         type="button"
                         // disabled={loading}
-                        onClick={clear}
+                        onClick={handleLimparCampos}
                         className="bg-[var(--color-button-secondary)] cursor-pointer rounded-[8px] text-black py-2 px-8 hover:opacity-90 mt-8 disabled:opacity-60 w-64 text-center"
                     >
                         Limpar campos

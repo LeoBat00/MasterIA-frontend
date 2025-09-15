@@ -34,6 +34,7 @@ type LojaState = {
     atualizarLoja: (l: Loja) => void;
     setExibirFormularioLoja: (v: boolean) => void;
     validarFormulario: () => boolean;
+    limparValidacao: () => void;
     saveLoja: (l: Loja, organizadorId: number) => Promise<{ success: true; data: Loja } | { success: false; error: any }>;
     clear: () => void;
 };
@@ -59,6 +60,7 @@ export const useLojaStore = create<LojaState>()(
 
                 return Object.keys(validacaoErro).length === 0;
             },
+            limparValidacao: () => set({ validacaoErro: undefined }, false, "limparValidacao"),
             saveLoja: async (l: Loja, idOrganizador: number): Promise<{ success: true; data: Loja } | { success: false; error: any }> => {
                 try {
 

@@ -9,9 +9,11 @@ export function organizadorAuth() {
   const doLogin = async (payload: LoginPayload) => {
     setLoading(true); setErrorMsg(null);
     try {
+      debugger
       await login(payload);
       return true;
     } catch (e: any) {
+      debugger
       setErrorMsg(e.response?.data?.message ?? "Falha no login");
       return false;
     } finally { setLoading(false); }
