@@ -1,23 +1,12 @@
+"use client";
+
 import { useState, useEffect, useMemo } from "react";
 import { login, register, LoginPayload } from "../services/auth.service";
-import { Organizador } from "../../stores/organizador";
+import { Organizador, useOrganizadorStore } from "../../stores/organizador";
 import { useAuthStore, JwtPayload } from "../../stores/auth";
 import { jwtDecode } from "jwt-decode";
-import { useOrganizadorStore } from "../../stores/organizador";
 
 const STORAGE_KEY = "auth";
-
-// Função auxiliar para pegar token do localStorage
-function getStoredToken(): string | null {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed.state?.token ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export function organizadorAuth() {
   const [loading, setLoading] = useState(false);
@@ -26,30 +15,47 @@ export function organizadorAuth() {
 
   const { token, claims, setToken, logout } = useAuthStore();
 
-  // inicializa a store com o valor do storage, se precisar
+  // Sincroniza token do localStorage só no client
   useEffect(() => {
-    if (!token) {
-      const stored = getStoredToken();
-      if (stored) {
-        setToken(stored);
+    if (!token && typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const stored = parsed.state?.token ?? null;
 
-        try {
-          const claims = jwtDecode<JwtPayload>(stored);
-          const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
-          if (organizadorId) {
-            useOrganizadorStore.getState().fetchOrganizador(organizadorId);
+          if (stored) {
+            setToken(stored);
+            try {
+              const claims = jwtDecode<JwtPayload>(stored);
+              const organizadorId = claims?.nameid
+                ? Number(claims.nameid)
+                : undefined;
+
+              if (organizadorId) {
+                useOrganizadorStore
+                  .getState()
+                  .fetchOrganizador(organizadorId)
+                  .catch(() => {
+                    logout();
+                    window.location.href = "/login";
+                  });
+              }
+            } catch {
+              logout();
+              window.location.href = "/login";
+            }
           }
-        } catch {
-          console.error("Token inválido no storage");
         }
+      } catch (err) {
+        console.error("Erro ao ler token do storage", err);
       }
     }
     setHydrated(true);
-  }, [token, setToken]);
+  }, [token, setToken, logout]);
 
   const isAuth = useMemo(() => {
-    if (!hydrated) return false; // evita mismatch de SSR
-
+    if (!hydrated) return false;
     if (!token) return false;
 
     try {
@@ -68,11 +74,22 @@ export function organizadorAuth() {
     try {
       const token = await login(payload);
       setToken(token);
+
       const claims = useAuthStore.getState().claims;
-      const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
+      const organizadorId = claims?.nameid
+        ? Number(claims.nameid)
+        : undefined;
+
       if (organizadorId) {
-        await useOrganizadorStore.getState().fetchOrganizador(organizadorId);
+        await useOrganizadorStore
+          .getState()
+          .fetchOrganizador(organizadorId)
+          .catch(() => {
+            logout();
+            window.location.href = "/login";
+          });
       }
+
       return true;
     } catch (e: any) {
       setErrorMsg(e.response?.data?.message ?? "Falha no login");
@@ -105,6 +122,6 @@ export function organizadorAuth() {
     token,
     claims,
     logout,
-    hydrated
+    hydrated,
   };
 }
