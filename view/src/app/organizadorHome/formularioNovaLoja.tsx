@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 export default function FormularioNovaLoja() {
 
-    const { loja, atualizarLoja, setExibirFormularioLoja, validacaoErro, validarFormulario, saveLoja, clear, limparValidacao } = useLojaStore();
+    const { loja, atualizarLoja, setExibirFormularioLoja, validacaoErro, validarFormulario, saveLoja, clear, limparValidacao, updateLoja } = useLojaStore();
     const { fetchOrganizador } = useOrganizadorStore();
     const { claims } = useAuthStore();
     const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
@@ -50,6 +50,12 @@ export default function FormularioNovaLoja() {
         atualizarLoja(copiaLoja);
     }
 
+    const handleSairFormulario = () => {
+        clear();
+        limparValidacao();
+        setExibirFormularioLoja(false);
+    }
+
     const handleCadastrarLoja = async () => {
 
         const formValido = validarFormulario();
@@ -59,16 +65,15 @@ export default function FormularioNovaLoja() {
             return;
         }
 
-        debugger
-        const resultado = await saveLoja(loja!, organizadorId);
+        const resultado = loja?.id ? await updateLoja(loja!) : await saveLoja(loja!, organizadorId);
 
         if (!resultado.success) {
             alert("Erro ao cadastrar loja. Tente novamente.");
             return;
         }
-        debugger
 
         await fetchOrganizador(organizadorId);
+        atualizarLoja({});
         setExibirFormularioLoja(false);
     }
 
@@ -77,10 +82,9 @@ export default function FormularioNovaLoja() {
         limparValidacao();
     }
 
+    return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-2)] border-l-8 border-l-[var(--color-purple-2)]  ">
 
-    return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-3)] border-l-8 border-l-[var(--color-purple-2)]  ">
-
-        <h3 className="text-lg font-semibold mb-4">Cadastrar Nova Loja</h3>
+        <h3 className="text-lg font-semibold mb-4">{loja?.id ? "Atualizar Loja" : "Cadastrar Nova Loja" }</h3>
         <form
             className="flex flex-col gap-2 mt-4 px-8"
             onSubmit={async (e) => {
@@ -176,10 +180,10 @@ export default function FormularioNovaLoja() {
                     <button
                         type="button"
                         // disabled={loading}
-                        onClick={handleLimparCampos}
+                        onClick={handleSairFormulario}
                         className="bg-[var(--color-button-secondary)] cursor-pointer rounded-[8px] text-black py-2 px-8 hover:opacity-90 mt-8 disabled:opacity-60 w-64 text-center"
                     >
-                        Limpar campos
+                        Voltar
                     </button>
 
                     <button

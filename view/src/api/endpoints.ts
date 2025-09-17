@@ -10,5 +10,6 @@ export const endpoints = {
   },
   loja: {
     create: "/Loja",
+    update: "/Loja"
   },
 };

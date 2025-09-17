@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { PrivatePage } from '@/components/PrivatePage';
 import {
     Store,
     ChevronRight,
-    Settings,
     Plus,
     LogOut,
     User,
+    Trash,
+    Pen
 } from 'lucide-react';
 import LoadingScreen from '@/components/UI/LoadingScreen';
 import { useOrganizadorStore, Loja } from '../../stores/organizador';
@@ -19,11 +21,10 @@ import { useAuthStore } from '@/stores/auth';
 export default function OrganizadorHome() {
     const router = useRouter();
     const { logout } = useAuthStore.getState();
-
     const [loading, setLoading] = useState(false);
     const [lojas, setLojas] = useState<Loja[]>([]);
-    const { exibirFormularioLoja, setExibirFormularioLoja } = useLojaStore();
-    const { organizador } = useOrganizadorStore();
+    const { exibirFormularioLoja, setExibirFormularioLoja, atualizarLoja } = useLojaStore();
+    const { organizador, fetchOrganizador } = useOrganizadorStore();
 
     function handleCadastrarLoja() {
         setExibirFormularioLoja(!exibirFormularioLoja);
@@ -34,27 +35,28 @@ export default function OrganizadorHome() {
         router.push('/login');
     }
     useEffect(() => {
-        if (!organizador) {
-            router.push('/login');
-            return;
-        }
+        
         setLojas(organizador?.lojas || []);
 
-    }, []);
+    }, [organizador, fetchOrganizador, router]);
 
-    useEffect(() => {
-        console.log("Organizador atualizado:", organizador);
-        if (!organizador) {
-            router.push('/login');
-            return;
-        }
-        setLojas(organizador?.lojas || []);
-    }, [organizador]);
+    const obterEnderecoCompleto = (loja: Loja) => {
+        return `${loja.logradouro}, ${loja.numero} - ${loja.bairro}, ${loja.cidade} - ${loja.uf}, ${loja.cep}`;
+    }
+
+    const handleEditarLoja = (loja: Loja) => {
+        atualizarLoja(loja);
+        setExibirFormularioLoja(true);
+    }
+
+    const handleAcessarLoja = (loja: Loja) => {
+        router.push(`/loja/${loja.id}`);
+    }
 
     if (loading) return <LoadingScreen />;
 
     return (
-        <>
+        <PrivatePage>
             <div className="relative min-h-screen w-full bg-[#0D0D12] text-white">
                 <div
                     className="absolute inset-0 bg-center bg-cover opacity-10"
@@ -143,13 +145,13 @@ export default function OrganizadorHome() {
                                     Lojas cadastradas
                                 </h2>
 
-                                <button
+                                {!exibirFormularioLoja && <button
                                     onClick={handleCadastrarLoja}
                                     className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-[#951FFB] to-[#685BFF] px-4 py-1.5 text-sm font-medium text-white shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
                                 >
-                                    <span>{exibirFormularioLoja ? " Exibir Lojas " : "Cadastrar loja"}</span>
-                                    {exibirFormularioLoja ? <Store className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                                </button>
+                                    <span>Cadastrar loja</span>
+                                    <Plus className="h-4 w-4" />
+                                </button>}
                             </div>
 
                             <div className="space-y-4">
@@ -160,38 +162,66 @@ export default function OrganizadorHome() {
                                     :
                                     lojas.map((l) => (
                                         <article
+                                            onClick={() => handleAcessarLoja(l)}
                                             key={l.id}
-                                            className="rounded-[8px] bg-gradient-to-b from-[#0E0E15] to-[#0B0B11] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
-                                            style={{
-                                                borderLeft: '6px solid #616EFF',
-                                                borderBottom: '1px solid #616EFF',
-                                            }}
+                                            className="z-10 rounded-[8px] bg-gradient-to-b from-[#0E0E15] to-[#0B0B11] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] hover:cursor-pointer border-l-[6px] border-b border-[var(--color-purple-2)] hover:border-[var(--color-purple-4)]"
                                         >
                                             <div className="flex items-center justify-between">
-                                                <div className="text-zinc-300">
-                                                    <div className="text-sm">Nome</div>
-                                                    <div className="text-lg font-medium">{l.id}</div>
+                                                <div className="">
+                                                    <div className="text-lg font-medium mb-1">{l.id}</div>
+                                                    <div className="text-lg font-medium text-zinc-500">
+                                                        <span className='mr-1'>Endereço:</span>
+                                                        <span>{obterEnderecoCompleto(l)}</span>
+                                                    </div>
+
                                                 </div>
 
-                                                <button
-                                                    className="rounded-lg cursor-pointer border border-white/10 p-2 text-zinc-300 hover:border-purple-500/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
-                                                    aria-label={`Configurações da loja ${l.id}`}
-                                                    title="Configurações"
-                                                >
-                                                    <Settings className="h-5 w-5" />
-                                                </button>
+                                                <div className='flex gap-2'>
+
+                                                    <button
+                                                        className="rounded-lg cursor-pointer border border-white/10 p-2 text-zinc-300 hover:border-purple-500/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+                                                        aria-label={`Editar a loja ${l.id}`}
+                                                        title="Editar loja"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEditarLoja(l);
+                                                        }}                                                    >
+                                                        <Pen className="h-5 w-5" />
+                                                    </button>
+
+                                                    <button
+                                                        className="rounded-lg cursor-pointer border border-white/10 p-2 text-zinc-300 hover:border-purple-500/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+                                                        aria-label={`Excluir a loja ${l.id}`}
+                                                        title="Excluir loja"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            console.log("clicou no botão excluir");
+                                                        }}
+                                                    >
+                                                        <Trash className="h-5 w-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className='flex justify-end mt-4'>
+
+                                                <span className='text-sm text-purple-400 flex items-center gap-1 cursor-pointer'>
+                                                    Acessar loja
+                                                </span>
+                                                <ChevronRight className='h-5 w-5 text-purple-400 ' />
+
                                             </div>
                                         </article>
                                     ))}
 
-                                <button
+                                {!exibirFormularioLoja && <button
                                     onClick={handleCadastrarLoja}
                                     className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-purple-500/30 bg-purple-700/10 p-8 text-purple-200 hover:border-purple-500/60 hover:bg-purple-700/15 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
                                     aria-label="Adicionar nova loja"
                                 >
-                                    {exibirFormularioLoja ? <Store className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-                                    {exibirFormularioLoja ? "Exibir Lojas" : "Adicionar nova loja"}
-                                </button>
+                                    <Plus className="h-5 w-5" />
+                                    Adicionar nova loja"
+                                </button>}
                             </div>
 
 
@@ -199,6 +229,6 @@ export default function OrganizadorHome() {
                     </main>
                 </div>
             </div>
-        </>
+        </PrivatePage>
     );
 }

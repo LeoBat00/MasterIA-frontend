@@ -13,6 +13,50 @@ export type JwtPayload = {
   [k: string]: unknown;
 };
 
+function getStoredToken(): string | null {
+  const raw = localStorage.getItem("auth");
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed.state?.token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function isAuthenticated(): boolean {
+  const store = useAuthStore.getState();
+  let token = store.token;
+
+  // se não tiver na store, tenta no storage
+  if (!token) {
+    token = getStoredToken();
+    if (token) {
+      // repopula a store
+      store.setToken(token);
+    }
+  }
+
+  if (!token) return false;
+
+  // valida expiração
+  try {
+    const { exp } = jwtDecode<JwtPayload>(token);
+    if (!exp) return true;
+    const now = Math.floor(Date.now() / 1000);
+    const valido = now < exp;
+
+    if (!valido) {
+      store.logout(); // limpa se estiver expirado
+    }
+
+    return valido;
+  } catch {
+    store.logout();
+    return false;
+  }
+}
+
 type AuthState = {
   token: string | null;
   claims: JwtPayload | null;

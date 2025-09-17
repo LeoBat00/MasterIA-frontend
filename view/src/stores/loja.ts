@@ -36,6 +36,7 @@ type LojaState = {
     validarFormulario: () => boolean;
     limparValidacao: () => void;
     saveLoja: (l: Loja, organizadorId: number) => Promise<{ success: true; data: Loja } | { success: false; error: any }>;
+    updateLoja: (l: Loja) => Promise<{ success: true; data: Loja } | { success: false; error: any }>;
     clear: () => void;
 };
 
@@ -68,11 +69,21 @@ export const useLojaStore = create<LojaState>()(
                     const { data } = await http.post<Loja>(endpoints.loja.create, payload);
                     console.log("Loja cadastrada com sucesso", data);
                     set({ loja: null, exibirFormularioLoja: false, validacaoErro: undefined }, false, "saveLoja");
-                    debugger
                     return { success: true, data };
                 } catch (error) {
                     console.error("Erro ao salvar loja", error);
                     return { success: false, error }; // <- erro
+                }
+            },
+            updateLoja: async (l: Loja): Promise<{ success: true; data: Loja } | { success: false; error: any }> => {
+                try {
+                    const { data } = await http.put<Loja>(endpoints.loja.update, l);
+                    console.log("Loja atualizada com sucesso", data);
+                    set({ loja: null, exibirFormularioLoja: false, validacaoErro: undefined }, false, "updateLoja");
+                    return { success: true, data };
+                } catch (error) {
+                    console.error("Erro ao atualizar loja", error);
+                    return { success: false, error };
                 }
             },
             clear: () => set({ loja: null }, false, "clearLoja"),
