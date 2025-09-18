@@ -10,6 +10,7 @@ export const endpoints = {
   },
   loja: {
     create: "/Loja",
-    update: "/Loja"
+    update: "/Loja",
+    getById: (id: number) => `/Loja/LojaById?Id=${id}`,
   },
 };

@@ -4,15 +4,18 @@ import { FaStore, FaChevronRight, FaUser, FaDice } from "react-icons/fa"
 import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";
 import Button from "../UI/Button";
+import { useRouter } from "next/navigation";
 
 const MenuLateral = () => {
 
     const { organizador } = useOrganizadorStore();
+    const router = useRouter();
+
 
     const { logout } = useAuthStore();
 
     const handleClickHome = () => {
-        logout();
+        router.push("/organizadorHome");
     }
 
     const handleClickMeuCadastro = () => {
@@ -70,24 +73,12 @@ const MenuLateral = () => {
 
             <div className="pointer-events-auto absolute inset-x-4 bottom-4">
                 <div className="border-t border-white/5 pt-4">
-                    <div className="px-2 text-xs uppercase tracking-wide text-zinc-400">
-                        Configurações
-                    </div>
-
-                    <div className="mt-2">
-                        <button
-                            className="flex w-full items-center gap-2 rounded-[8px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-200 hover:border-purple-500/40 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
-                            aria-label="Abrir perfil"
-                        >
-                            <User className="h-4 w-4 text-zinc-300" />
-                            <span>Perfil</span>
-                        </button>
-                    </div>
 
                     <div className="mt-3">
                         <button
                             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-yellow-400/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-300 hover:border-yellow-400/60 hover:bg-yellow-500/15 focus:outline-none focus:ring-2 focus:ring-yellow-500/60"
                             aria-label="Sair da conta"
+                            onClick={() => logout()}
                         >
                             <span>Sair da conta</span>
                             <LogOut className="h-4 w-4" />

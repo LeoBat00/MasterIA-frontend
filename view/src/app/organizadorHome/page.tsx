@@ -3,25 +3,19 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PrivatePage } from '@/components/PrivatePage';
+import { FaTrash, FaPen } from 'react-icons/fa';
 import {
-    Store,
     ChevronRight,
-    Plus,
-    LogOut,
-    User,
-    Trash,
-    Pen
+    Plus
 } from 'lucide-react';
-import LoadingScreen from '@/components/UI/LoadingScreen';
 import { useOrganizadorStore, Loja } from '../../stores/organizador';
 import FormularioNovaLoja from './formularioNovaLoja';
 import { useLojaStore } from '@/stores/loja';
-import { useAuthStore } from '@/stores/auth';
+import { usePaginaLojaStore } from '@/stores/paginaLoja';
+import { obterEnderecoCompleto } from '../util';
 
 export default function OrganizadorHome() {
     const router = useRouter();
-    const { logout } = useAuthStore.getState();
-    const [loading, setLoading] = useState(false);
     const [lojas, setLojas] = useState<Loja[]>([]);
     const { exibirFormularioLoja, setExibirFormularioLoja, atualizarLoja } = useLojaStore();
     const { organizador, fetchOrganizador } = useOrganizadorStore();
@@ -29,20 +23,11 @@ export default function OrganizadorHome() {
     function handleCadastrarLoja() {
         setExibirFormularioLoja(!exibirFormularioLoja);
     }
-
-    function handleLogout() {
-        logout();
-        router.push('/login');
-    }
     useEffect(() => {
-        
+
         setLojas(organizador?.lojas || []);
 
     }, [organizador, fetchOrganizador, router]);
-
-    const obterEnderecoCompleto = (loja: Loja) => {
-        return `${loja.logradouro}, ${loja.numero} - ${loja.bairro}, ${loja.cidade} - ${loja.uf}, ${loja.cep}`;
-    }
 
     const handleEditarLoja = (loja: Loja) => {
         atualizarLoja(loja);
@@ -52,8 +37,6 @@ export default function OrganizadorHome() {
     const handleAcessarLoja = (loja: Loja) => {
         router.push(`/loja/${loja.id}`);
     }
-
-    if (loading) return <LoadingScreen />;
 
     return (
         <PrivatePage>
@@ -65,17 +48,17 @@ export default function OrganizadorHome() {
                 <div className="relative mx-auto flex gap-6 px-4 py-6 lg:px-8">
                     <main className="flex-1">
                         <div className="mb-6">
-                            <h1 className="text-3xl font-semibold leading-tight text-zinc-100">
-                                Bem vindo ao{' '}
-                                <span className="bg-gradient-to-r from-[#685BFF] via-[#951FFB] to-[#7C3AED] bg-clip-text text-transparent">
-                                    MasterIA
-                                </span>{' '}
-                                !
+                            <h1>
+                                <span className="texto-light text-zinc-200">Bem vindo ao</span>{" "}
+                                <span className="texto-medium bg-gradient-to-r from-[#685BFF] via-[#951FFB] to-[#7C3AED] bg-clip-text text-transparent">
+                                    MasterIA!
+                                </span>{" "}
                             </h1>
-                            <p className="mt-1 text-sm text-zinc-400">Gerencie suas lojas</p>
+                            <p className="mt-1 text-lg text-zinc-400">Gerencie suas lojas</p>
+                            <div className="mt-4 border-b border-zinc-600" />
                         </div>
                         <section aria-labelledby="lojas-cadastradas">
-                            <div className="mb-3 flex items-center gap-3">
+                            <div className="mb-3 flex items-center gap-3 mb-6">
                                 <h2
                                     id="lojas-cadastradas"
                                     className="text-lg font-semibold text-zinc-200"
@@ -85,7 +68,7 @@ export default function OrganizadorHome() {
 
                                 {!exibirFormularioLoja && <button
                                     onClick={handleCadastrarLoja}
-                                    className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-[#951FFB] to-[#685BFF] px-4 py-1.5 text-sm font-medium text-white shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+                                    className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-[#951FFB] to-[#685BFF] px-10 py-1.5 text-sm font-medium text-white shadow hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
                                 >
                                     <span>Cadastrar loja</span>
                                     <Plus className="h-4 w-4" />
@@ -102,7 +85,7 @@ export default function OrganizadorHome() {
                                         <article
                                             onClick={() => handleAcessarLoja(l)}
                                             key={l.id}
-                                            className="z-10 rounded-[8px] bg-gradient-to-b from-[#0E0E15] to-[#0B0B11] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] hover:cursor-pointer border-l-[6px] border-b border-[var(--color-purple-2)] hover:border-[var(--color-purple-4)]"
+                                            className="rounded-[8px] bg-gradient-to-b from-[#0E0E15] to-[#0B0B11] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] hover:cursor-pointer border-l-[6px] border-b border-[var(--color-purple-2)] hover:border-[var(--color-purple-1)]"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="">
@@ -124,7 +107,7 @@ export default function OrganizadorHome() {
                                                             e.stopPropagation();
                                                             handleEditarLoja(l);
                                                         }}                                                    >
-                                                        <Pen className="h-5 w-5" />
+                                                        <FaPen className="h-5 w-5" />
                                                     </button>
 
                                                     <button
@@ -136,7 +119,7 @@ export default function OrganizadorHome() {
                                                             console.log("clicou no botão excluir");
                                                         }}
                                                     >
-                                                        <Trash className="h-5 w-5" />
+                                                        <FaTrash className="h-5 w-5" />
                                                     </button>
                                                 </div>
                                             </div>
