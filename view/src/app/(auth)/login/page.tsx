@@ -16,8 +16,8 @@ export default function LoginPage() {
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
-    const [login, setLogin] = useState("");
-    const [senha, setSenha] = useState("");
+    const [login, setLogin] = useState("cairo@email.com");
+    const [senha, setSenha] = useState("123456");
     const [erro, setErro] = useState<ErroLoginType>({ login: "", senha: "" });
 
     const handleLogin = async () => {
@@ -28,10 +28,8 @@ export default function LoginPage() {
         else if (senha.length < 6) e.senha = "A senha deve ter no mínimo 6 caracteres.";
         setErro(e);
         if (e.login || e.senha) return;
-
         const ok = await doLogin({ email: login, senha: senha });
-        if (ok) router.push("/organizadorHome");    
-        // router.push("/organizadorHome");
+        if (ok) router.push("/organizadorHome");
 
     };
 
