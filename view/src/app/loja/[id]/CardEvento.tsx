@@ -57,7 +57,7 @@ export function CardEvento({ evento, onClick }: CardEventoProps) {
                 </div>
                 <div className="flex justify-end items-center mt-2">
                     <span className='text-sm text-purple-400 flex items-center gap-1 cursor-pointer'>
-                        Acessar loja
+                        Acessar evento
                     </span>
                     <ChevronRight className='h-5 w-5 text-purple-400 ' />
                 </div>
