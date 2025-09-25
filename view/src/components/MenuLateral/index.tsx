@@ -26,6 +26,11 @@ const MenuLateral = () => {
         console.log("Jogos Cadastrados");
     }
 
+    const handleClickLogout = () => {
+        logout();
+        router.push("/");
+    }
+
     return (<div>
         <aside
             className="relative sticky top-0 h-[calc(100vh-48px)] w-64 shrink-0 rounded-[8px] border border-[#53339A] bg-[#040405] p-4"
@@ -78,7 +83,7 @@ const MenuLateral = () => {
                         <button
                             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-yellow-400/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-300 hover:border-yellow-400/60 hover:bg-yellow-500/15 focus:outline-none focus:ring-2 focus:ring-yellow-500/60"
                             aria-label="Sair da conta"
-                            onClick={() => logout()}
+                            onClick={() => handleClickLogout()}
                         >
                             <span>Sair da conta</span>
                             <LogOut className="h-4 w-4" />
