@@ -1,18 +1,12 @@
 'use client';
 
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
-import { FaGear } from "react-icons/fa6";
-import { FaStore, FaChessBoard, FaCalendar } from "react-icons/fa"
 import { CardEvento } from "../loja/[id]/CardEvento";
-import { useEffect } from "react";
-import { useParams } from "next/navigation";
-import { calcularStatus } from "../util";
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
 import { useEventoStore } from "@/stores/evento";
 import FormularioNovoEvento from "./formularioNovoEvento";
 import Select from "@/components/UI/Select";
-import { useState } from "react";
 import Input from "@/components/UI/Input";
 import { statusEvento } from "@/types/evento";
 

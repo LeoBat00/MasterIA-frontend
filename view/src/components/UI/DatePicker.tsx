@@ -18,6 +18,7 @@ export interface DatePickerProps {
   fullWidth?: boolean;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "underline";
+  required?: boolean;
   containerClassName?: string;
   inputClassName?: string;
 }
@@ -45,6 +46,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   fullWidth = true,
   size = "md",
   variant = "default",
+  required = false,
   containerClassName,
   inputClassName,
 }) => {
@@ -136,7 +138,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     >
       {label && (
         <label htmlFor={id} className="block text-xs font-semibold mb-1">
-          {label}
+          {label} {required && <span className="text-white">*</span>}
         </label>
       )}
 

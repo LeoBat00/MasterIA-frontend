@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { organizadorAuth } from "../auth/hooks/organizadorAuth";
-import { useOrganizadorStore } from "../stores/organizador";
 import LoadingScreen from "../components/UI/LoadingScreen";
 
 export function PrivatePage({ children }: { children: React.ReactNode }) {
   const { isAuth, hydrated } = organizadorAuth();
-  const organizador = useOrganizadorStore((s) => s.organizador);
   const router = useRouter();
 
   const [mounted, setMounted] = useState(false);
@@ -16,7 +14,7 @@ export function PrivatePage({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (mounted && hydrated && !isAuth) {
-      router.push("/login");
+      router.replace("/login");
     }
   }, [mounted, hydrated, isAuth, router]);
 
@@ -24,12 +22,8 @@ export function PrivatePage({ children }: { children: React.ReactNode }) {
     return <LoadingScreen />;
   }
 
-  if (isAuth && !organizador) {
-    return <LoadingScreen />;
-  }
-
   if (!isAuth) {
-    return null; // já vai redirecionar
+    return null; // enquanto redireciona
   }
 
   return <>{children}</>;

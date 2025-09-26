@@ -11,6 +11,7 @@ export type novoEvento = {
 export type Evento = {
     id: number;
     nmEvento: string;
+    cdEvento: string;
     dtInicio: string;
     dtFim: string;
     status: statusEvento;
@@ -21,7 +22,7 @@ export type validacaoNovoEvento = {
     nomeEvento?: string;
     dataInicio?: string;
     dataFim?: string;
-    descricao?: string;
+    quantidadeMaximaParticipantes?: string;
 }
 
 export type filtroEvento = {

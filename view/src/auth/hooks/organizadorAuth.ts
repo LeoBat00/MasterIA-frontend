@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { login, register, LoginPayload } from "../services/auth.service";
-import { Organizador, useOrganizadorStore } from "../../stores/organizador";
+import { Organizador } from "../../stores/organizador";
 import { useAuthStore, JwtPayload } from "../../stores/auth";
 import { jwtDecode } from "jwt-decode";
 
@@ -15,43 +15,26 @@ export function organizadorAuth() {
 
   const { token, claims, setToken, logout } = useAuthStore();
 
-  // Sincroniza token do localStorage só no client
+  // Hidrata token do storage e reconstrói claims
   useEffect(() => {
-    if (!token && typeof window !== "undefined") {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          const stored = parsed.state?.token ?? null;
+    if (typeof window === "undefined") return;
 
-          if (stored) {
-            setToken(stored);
-            try {
-              const claims = jwtDecode<JwtPayload>(stored);
-              const organizadorId = claims?.nameid
-                ? Number(claims.nameid)
-                : undefined;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const storedToken = parsed.state?.token ?? null;
 
-              if (organizadorId) {
-                useOrganizadorStore
-                  .getState()
-                  .fetchOrganizador(organizadorId)
-                  .catch(() => {
-                    logout();
-                    window.location.href = "/login";
-                  });
-              }
-            } catch {
-              logout();
-              window.location.href = "/login";
-            }
-          }
+        if (storedToken && !token) {
+          setToken(storedToken);
+
         }
-      } catch (err) {
-        console.error("Erro ao ler token do storage", err);
       }
+    } catch (err) {
+      console.error("Erro ao ler token do storage", err);
+    } finally {
+      setHydrated(true);
     }
-    setHydrated(true);
   }, [token, setToken, logout]);
 
   const isAuth = useMemo(() => {
@@ -72,23 +55,8 @@ export function organizadorAuth() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const token = await login(payload);
-      setToken(token);
-
-      const claims = useAuthStore.getState().claims;
-      const organizadorId = claims?.nameid
-        ? Number(claims.nameid)
-        : undefined;
-
-      if (organizadorId) {
-        await useOrganizadorStore
-          .getState()
-          .fetchOrganizador(organizadorId)
-          .catch(() => {
-            logout();
-            window.location.href = "/login";
-          });
-      }
+      const newToken = await login(payload);
+      setToken(newToken);
 
       return true;
     } catch (e: any) {

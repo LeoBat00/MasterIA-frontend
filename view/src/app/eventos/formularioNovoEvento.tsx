@@ -3,11 +3,27 @@ import { FaCalendar } from "react-icons/fa";
 import { useEffect } from "react";
 import { useEventoStore } from "@/stores/evento";
 import Button from "@/components/UI/Button";
-import {DatePicker} from "@/components/UI/DatePicker";
+import { DatePicker } from "@/components/UI/DatePicker";
+import { usePaginaLojaStore } from "@/stores/paginaLoja";
+import { set } from "date-fns";
+import { useRouter } from "next/navigation";
 
 
 export default function FormularioNovoEvento() {
-    const { evento, setExibirFormularioEvento, validacaoErro, atualizarEvento, validarFormulario, clear, limparValidacao } = useEventoStore();
+    const { evento, setExibirFormularioEvento, validacaoErro, atualizarEvento, validarFormulario, clear, limparValidacao, salvarEvento } = useEventoStore();
+    const { lojaSelecionada } = usePaginaLojaStore();
+    const router = useRouter();
+
+    const lojaId = lojaSelecionada?.id;
+
+    useEffect(() => {
+        limparValidacao();
+    }, [evento]);
+
+    if (!lojaId) {
+        setExibirFormularioEvento(false);
+        return null;
+    }
 
     useEffect(() => {
         limparValidacao();
@@ -19,32 +35,10 @@ export default function FormularioNovoEvento() {
         atualizarEvento(copiaEvento);
     }
 
-    const hanleChangeCidade = (novaCidade: string) => {
-        // const copiaLoja = { ...loja };
-        // copiaLoja.cidade = novaCidade;
-        // atualizarLoja(copiaLoja);
-    }
-
-    const hanleChangeUf = (novoUf: string) => {
-        // const copiaLoja = { ...loja };
-        // copiaLoja.uf = novoUf;
-        // atualizarLoja(copiaLoja);
-    }
-    const hanleChangeLogradouro = (novoLogradouro: string) => {
-        // const copiaLoja = { ...loja };
-        // copiaLoja.logradouro = novoLogradouro;
-        // atualizarLoja(copiaLoja);
-    }
-    const hanleChangeBairro = (novoBairro: string) => {
-        // const copiaLoja = { ...loja };
-        // copiaLoja.bairro = novoBairro;
-        // atualizarLoja(copiaLoja);
-    }
-
-    const handleChangeNumero = (novoNumero: string) => {
-        // const copiaLoja = { ...loja };
-        // copiaLoja.numero = novoNumero;
-        // atualizarLoja(copiaLoja);
+    const hanleChangeQuantidadeParticipantes = (valor: string) => {
+        const copiaEvento = { ...evento };
+        copiaEvento.qtdLimite = Number(valor);
+        atualizarEvento(copiaEvento);
     }
 
     const handleSairFormulario = () => {
@@ -54,14 +48,30 @@ export default function FormularioNovoEvento() {
         setExibirFormularioEvento(false);
     }
 
-    const handleCadastrarEvento = () => {
-        clear();
+    const handleCadastrarEvento = async () => {
         limparValidacao();
+        if (validarFormulario()) {
+            const resultado = await salvarEvento(evento!, lojaId!);
+
+            if (!resultado.success) {
+                return;
+            }
+
+            setExibirFormularioEvento(false);
+            router.push(`/loja/${lojaId}`);
+        }
+
     }
 
     const handleChangeDataInicio = (novaData: Date | undefined) => {
         const copiaEvento = { ...evento };
         copiaEvento.dtInicio = novaData ? novaData.toISOString() : "";
+        atualizarEvento(copiaEvento);
+    }
+
+    const handleChangeDataTermino = (novaData: Date | undefined) => {
+        const copiaEvento = { ...evento };
+        copiaEvento.dtFim = novaData ? novaData.toISOString() : "";
         atualizarEvento(copiaEvento);
     }
 
@@ -92,18 +102,6 @@ export default function FormularioNovoEvento() {
                         // disabled={loading}
                         />
                     </div>
-                    <div className=" grid grid-cols-2 gap-8">
-
-                        <Input
-                            label="Descrição do Evento"
-                            autoComplete="descEvento"
-                            value={evento?.nmEvento}
-                            onChange={hanleChangeNomeEvento}
-                            error={validacaoErro?.nomeEvento}
-                        // disabled={loading}
-                        />
-
-                    </div>
 
                     <div className=" grid grid-cols-4 gap-8">
 
@@ -112,46 +110,30 @@ export default function FormularioNovoEvento() {
                             placeholder="início"
                             value={evento?.dtInicio ? new Date(evento.dtInicio) : undefined}
                             onChange={handleChangeDataInicio}
-                            error="TESTE"
-                            disabled={true}
+                            error={validacaoErro?.dataInicio}
+                            required
                         />
 
-                        {/* <Input
-                            label="Endereço ou Logradouro"
-                            autoComplete="logradouro"
-                            placeholder="insira o endereço"
-                            value={loja?.logradouro}
-                            onChange={hanleChangeLogradouro}
-                            containerClassName="col-span-3"
+                        <DatePicker
+                            label="Data Término"
+                            placeholder="término"
+                            value={evento?.dtFim ? new Date(evento.dtFim) : undefined}
+                            onChange={handleChangeDataTermino}
+                            error={validacaoErro?.dataFim}
                             required
-                            error={validacaoErro?.logradouro}
-                        // disabled={loading}
                         />
 
                         <Input
-                            label="Numero"
-                            autoComplete="numero"
-                            placeholder="insira o numero"
-                            value={loja?.numero}
-                            onChange={handleChangeNumero}
-                            containerClassName="col-span-1"
+                            label="Quanditade máxima de Participantes"
                             number
-                        // error={validacaoErro?.num}
-                        // disabled={loading}
-                        /> */}
-                    </div>
-
-                    <div className="">
-                        {/* <Input
-                            label="Bairro"
-                            autoComplete="bairro"
-                            placeholder="insira o bairro"
-                            value={loja?.bairro}
-                            onChange={hanleChangeBairro}
+                            autoComplete="quantidadeMaximaParticipantes"
+                            value={evento?.qtdLimite?.toString() || "0"}
+                            onChange={hanleChangeQuantidadeParticipantes}
                             required
-                            error={validacaoErro?.bairro}
+                            error={validacaoErro?.quantidadeMaximaParticipantes}
                         // disabled={loading}
-                        /> */}
+                        />
+
                     </div>
                 </div>
                 <div className="justify-self-end  self-end space-x-4">

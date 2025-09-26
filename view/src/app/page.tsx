@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FiCpu, FiSmile, FiClipboard, FiZap } from "react-icons/fi";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+import GlobalMessage from "@/components/GlobalMessage";
 
 import CidadeModal from "@/components/ModalPrincipal"; // Certifique-se de usar a letra maiúscula
 import { useState } from "react";
@@ -54,7 +55,7 @@ export default function Home() {
                 </button>
 
                 <Link
-                    href="#"
+                  href="#"
                   className="border cursor-not-allowed border-indigo-400 text-indigo-200 px-6 py-2 rounded-xl transition hover:bg-indigo-600 hover:text-white"
                 >
                   Criar Conta
@@ -66,7 +67,7 @@ export default function Home() {
                 </Link>
               </motion.div>
             </div>
-            
+
             <motion.div
               animate={{
                 y: [0, -10, 0],
