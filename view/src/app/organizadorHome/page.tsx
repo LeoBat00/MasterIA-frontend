@@ -11,23 +11,50 @@ import {
 import { useOrganizadorStore, Loja } from '../../stores/organizador';
 import FormularioNovaLoja from './formularioNovaLoja';
 import { useLojaStore } from '@/stores/loja';
-import { usePaginaLojaStore } from '@/stores/paginaLoja';
 import { obterEnderecoCompleto } from '../util';
+import { useAuthStore } from '@/stores/auth';
 
 export default function OrganizadorHome() {
     const router = useRouter();
     const [lojas, setLojas] = useState<Loja[]>([]);
+    const { claims, logout } = useAuthStore();
+
     const { exibirFormularioLoja, setExibirFormularioLoja, atualizarLoja } = useLojaStore();
     const { organizador, fetchOrganizador } = useOrganizadorStore();
 
     function handleCadastrarLoja() {
         setExibirFormularioLoja(!exibirFormularioLoja);
     }
-    useEffect(() => {
 
+    const buscarOrganizador = async (organizadorId: number) => {
+        console.log('Buscando organizador com ID:', organizadorId);
+        await fetchOrganizador(organizadorId).catch(() => {
+            logout();
+            window.location.href = "/";
+        });
+    }
+
+    useEffect(() => {
+        const run = async () => {
+            const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
+            if (organizadorId && !organizador ) {
+                try {
+                    await buscarOrganizador(organizadorId);
+                } catch {
+                    logout();
+                    window.location.href = "/";
+                }
+            }
+        };
+
+        run();
+    }, [claims]);
+
+    useEffect(() => {
         setLojas(organizador?.lojas || []);
 
-    }, [organizador, fetchOrganizador, router]);
+    }, [organizador]);
+
 
     const handleEditarLoja = (loja: Loja) => {
         atualizarLoja(loja);

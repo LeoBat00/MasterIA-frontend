@@ -28,7 +28,6 @@ export const usePaginaLojaStore = create<LojaState>()(
 
             fetchLoja: async (id: number) => {
                 try {
-                    // 👀 se a ideia for buscar, o correto seria GET, não PUT
                     const { data } = await http.get<Loja>(
                         endpoints.loja.getById(id)
                     );

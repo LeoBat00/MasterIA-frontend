@@ -55,6 +55,10 @@ export function CardEvento({ evento, onClick }: CardEventoProps) {
                     <p>Máximo de jogadores</p>
                     <span>{evento.qtdLimite}</span>
                 </div>
+                <div className="mb-4">
+                    <p>Código</p>
+                    <span>{evento.cdEvento}</span>
+                </div>
                 <div className="flex justify-end items-center mt-2">
                     <span className='text-sm text-purple-400 flex items-center gap-1 cursor-pointer'>
                         Acessar evento

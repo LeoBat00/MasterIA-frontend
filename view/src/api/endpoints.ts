@@ -13,4 +13,9 @@ export const endpoints = {
     update: "/Loja",
     getById: (id: number) => `/Loja/LojaById?Id=${id}`,
   },
+  evento: {
+    create: "/Evento",
+    update: "/Evento", 
+    getById: (id: number) => `/Evento/EventoById?Id=${id}`,
+  },
 };
