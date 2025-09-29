@@ -1,6 +1,6 @@
 'use client';
 import { PrivatePage } from '@/components/PrivatePage';
-import Table, { Column } from '@/components/UI/Table';
+import Table, { Column, FetchParams } from '@/components/UI/Table';
 import { Jogo } from '@/types/jogo';
 
 
@@ -82,19 +82,31 @@ export default function JogosCadastrados() {
         { Header: "Ano", accessor: "anoPublicacao" },
         { Header: "Tipo", accessor: "tpJogo" },
         { Header: "Jogadores", accessor: (row) => `${row.qtJogadoresMin} - ${row.qtJogadoresMax}` },
-        { Header: "Categorias", accessor: (row) => row.categorias.map((c) => c.nmCategoria).join(", ") },
-        { Header: "Mecânicas", accessor: (row) => row.mecanicas.map((m) => m.nmMecanica).join(", ") },
-        { Header: "Temas", accessor: (row) => row.temas.map((t) => t.nmTema).join(", ") },
+        { Header: "Categorias", accessor: (row) => (row.categorias || []).map((c) => c.nmCategoria).join(", ") },
+        { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
+        { Header: "Temas", accessor: (row) => (row.temas || []).map((t) => t.nmTema).join(", ") },
     ];
+
+    async function simularConsulta({ page, pageSize }: FetchParams) {
+        const all = Array.from({ length: 123 }).map((_, i) => ({
+            id: i + 1,
+            nmJogo: `Jogo ${i + 1}`,
+        }));
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        await new Promise((res) => setTimeout(res, 400)); // simula delay
+        return { items: all.slice(start, end), total: all.length };
+    }
 
     return (
         <PrivatePage>
             <div>
-                <Table<Jogo>
+                <Table<any>
                     title="Jogos de Tabuleiro"
                     columns={columns}
                     data={mockJogos}
                     containerClassName="bg-[#12121B] p-4 rounded-lg"
+                    fetchData={simularConsulta}
                 />
             </div>
         </PrivatePage>
