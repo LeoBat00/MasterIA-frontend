@@ -15,6 +15,7 @@
   --color-purple-2: #616EFF;
   --color-purple-3: #7C3FFD;
   --color-purple-4: #5a0ffc;
+  --color-purple-5: #685BFF;
 
   --color-border-cinza: #6E737F;
 
@@ -87,4 +88,29 @@ body {
 .bg-card-cinza:hover {
   background-color: var(--background-card-cinza-hover);
   cursor: pointer;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;   /* largura vertical */
+  height: 8px;  /* altura horizontal */
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #12121B; /* cor do fundo */
+  border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-purple-5); /* cor do polegar */
+  border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-purple-3);
+}
+
+/* Firefox */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-purple-5) #12121B;
 }

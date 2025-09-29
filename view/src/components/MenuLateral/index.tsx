@@ -23,7 +23,7 @@ const MenuLateral = () => {
     }
 
     const handleClickJogosCadastrados = () => {
-        console.log("Jogos Cadastrados");
+        router.push("/jogosCadastratos");
     }
 
     const handleClickLogout = () => {
