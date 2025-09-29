@@ -4,7 +4,8 @@ import clsx from "clsx";
 
 export interface Column<T> {
     Header: string | React.ReactNode;
-    accessor: keyof T | ((row: T) => React.ReactNode);
+    accessor?: keyof T | ((row: T) => React.ReactNode);
+    Cell?: (row: T) => React.ReactNode;
     cellClassName?: string;
 }
 
@@ -20,7 +21,7 @@ export type FetchResult<T> = {
 
 export interface TableProps<T> extends React.TableHTMLAttributes<HTMLTableElement> {
     columns: Column<T>[];
-    data?: T[]; // opcional se for usar fetchData
+    data?: T[];
     fetchData?: (params: FetchParams) => Promise<FetchResult<T>>;
     title?: string;
     containerClassName?: string;
@@ -28,6 +29,9 @@ export interface TableProps<T> extends React.TableHTMLAttributes<HTMLTableElemen
     emptyMessage?: string;
     initialPageSize?: number;
     pageSizeOptions?: number[];
+    overlay?: "x" | "y" | "both" | "none";
+    maxHeight?: string | number;
+    maxWidth?: string | number;
 }
 
 function TableInner<T extends object>(
@@ -41,6 +45,9 @@ function TableInner<T extends object>(
         emptyMessage = "Nenhum dado encontrado",
         initialPageSize = 5,
         pageSizeOptions = [5, 10, 20, 50],
+        overlay = "none",
+        maxHeight,
+        maxWidth,
         ...rest
     }: TableProps<T>,
     ref: React.Ref<HTMLTableElement>
@@ -74,7 +81,20 @@ function TableInner<T extends object>(
         <div className={clsx("w-full relative", containerClassName)}>
             {title && <h2 className="text-sm font-semibold mb-2">{title}</h2>}
 
-            <div className="overflow-x-auto relative">
+            {/* Wrapper scrollável */}
+            <div
+                className={clsx(
+                    "relative custom-scroll",
+                    overlay === "x" && "overflow-x-auto",
+                    overlay === "y" && "overflow-y-auto",
+                    overlay === "both" && "overflow-auto",
+                    loading && "overflow-hidden" // bloqueia scroll durante loading
+                )}
+                style={{
+                    ...(overlay === "y" || overlay === "both" ? { maxHeight: maxHeight ?? "70vh" } : {}),
+                    ...(overlay === "x" || overlay === "both" ? { maxWidth: maxWidth ?? "100%" } : {}),
+                }}
+            >
                 <table
                     ref={ref}
                     className={clsx("min-w-full divide-y divide-gray-700 text-sm", tableClassName)}
@@ -94,11 +114,14 @@ function TableInner<T extends object>(
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700 text-gray-300 bg-[#12121B]">
-                        {currentPageData.length === 0 && !loading ? (
+                        {loading ? (
+                            // Enquanto carrega, não renderizamos linhas
+                            null
+                        ) : currentPageData.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan={columns.length}
-                                    className="px-4 py-3 text-center text-gray-500 italic"
+                                    className="px-4 py-6 text-center text-gray-500 italic"
                                 >
                                     {emptyMessage}
                                 </td>
@@ -110,10 +133,15 @@ function TableInner<T extends object>(
                                     className="hover:bg-gray-700/30 border-l-2 border-l-[var(--color-purple-2)]"
                                 >
                                     {columns.map((col, colIndex) => {
-                                        const value =
-                                            typeof col.accessor === "function"
-                                                ? col.accessor(row)
-                                                : (row[col.accessor] as React.ReactNode);
+                                        let value: React.ReactNode = null;
+
+                                        if (col.Cell) {
+                                            value = col.Cell(row);
+                                        } else if (typeof col.accessor === "function") {
+                                            value = col.accessor(row);
+                                        } else if (col.accessor) {
+                                            value = row[col.accessor] as React.ReactNode;
+                                        }
 
                                         return (
                                             <td key={colIndex} className={clsx("px-4 py-2", col.cellClassName)}>
@@ -126,14 +154,14 @@ function TableInner<T extends object>(
                         )}
                     </tbody>
                 </table>
-
-                {/* Overlay de loading */}
-                {loading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#12121B]/70">
-                        <div className="w-10 h-10 border-4 border-[var(--color-purple-5)] border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                )}
             </div>
+
+            {/* Overlay de loading - cobre apenas viewport da tabela */}
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#12121B]/70">
+                    <div className="w-10 h-10 border-4 border-[var(--color-purple-5)] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            )}
 
             {/* Footer de paginação */}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-4 text-sm text-gray-300 gap-3">
@@ -195,14 +223,13 @@ function TableInner<T extends object>(
 
                     <button
                         onClick={() => setPageIndex((i) => Math.min(pageCount - 1, i + 1))}
-                        disabled={pageIndex === pageCount - 1 || loading} // 🔒
+                        disabled={pageIndex === pageCount - 1 || loading}
                         className="px-2 py-1 rounded disabled:opacity-40 text-[var(--color-purple-5)] hover:cursor-pointer hover:text-white flex items-center justify-center gap-2"
                     >
                         Próximo <FaChevronRight />
                     </button>
                 </div>
             </div>
-
         </div>
     );
 }

@@ -2,6 +2,7 @@
 import { PrivatePage } from '@/components/PrivatePage';
 import Table, { Column, FetchParams } from '@/components/UI/Table';
 import { Jogo } from '@/types/jogo';
+import { FaPlus } from 'react-icons/fa';
 
 
 export default function JogosCadastrados() {
@@ -77,6 +78,7 @@ export default function JogosCadastrados() {
         },
     ];
 
+
     const columns: Column<Jogo>[] = [
         { Header: "Nome", accessor: "nmJogo" },
         { Header: "Ano", accessor: "anoPublicacao" },
@@ -85,29 +87,52 @@ export default function JogosCadastrados() {
         { Header: "Categorias", accessor: (row) => (row.categorias || []).map((c) => c.nmCategoria).join(", ") },
         { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
         { Header: "Temas", accessor: (row) => (row.temas || []).map((t) => t.nmTema).join(", ") },
+        {
+            Header: "Ações",
+            Cell: (row) => (
+                <button
+                    className="px-2 py-1 text-xs rounded bg-[var(--color-purple-5)] text-white hover:opacity-90 flex items-center gap-1"
+                    onClick={() => alert(`Adicionar ${row.nmJogo}`)}
+                >
+                    <FaPlus /> Adicionar
+                </button>
+            ),
+        },
+
     ];
 
     async function simularConsulta({ page, pageSize }: FetchParams) {
         const all = Array.from({ length: 123 }).map((_, i) => ({
             id: i + 1,
             nmJogo: `Jogo ${i + 1}`,
+            anoPublicacao: 2000 + (i % 24),
+            idadeMinima: 8 + (i % 10),
+            qtJogadoresMin: 1 + (i % 4),
+            qtJogadoresMax: 4 + (i % 6),
+            vlTempoJogo: 30 + (i % 120),
+            tpJogo: ["Estratégia", "Família", "Abstrato", "Aventura"][i % 4],
+            thumb: `https://cf.geekdo-images.com/jogo${i + 1}.jpg`,
         }));
         const start = (page - 1) * pageSize;
         const end = start + pageSize;
-        await new Promise((res) => setTimeout(res, 4000)); // simula delay
+        await new Promise((res) => setTimeout(res, 1000)); // simula delay
         return { items: all.slice(start, end), total: all.length };
     }
 
     return (
         <PrivatePage>
-            <div>
+            <div className=' w-full w-max-[calc(100vw-2rem)]'>
                 <Table<any>
                     title="Jogos de Tabuleiro"
                     columns={columns}
                     data={mockJogos}
                     containerClassName="bg-[#12121B] p-4 rounded-lg"
                     fetchData={simularConsulta}
-                />
+                    pageSizeOptions={[5, 10, 20, 50,100]}
+                    initialPageSize={10}
+                    overlay='y'
+                    maxHeight="70vh"
+/>
             </div>
         </PrivatePage>
     );
