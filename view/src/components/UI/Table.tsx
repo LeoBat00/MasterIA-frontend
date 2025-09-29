@@ -49,8 +49,8 @@ function TableInner<T extends object>(
     const [pageIndex, setPageIndex] = useState(0);
     const [rows, setRows] = useState<T[]>(data);
     const [total, setTotal] = useState(data.length);
+    const [loading, setLoading] = useState(false);
 
-    // Se não tiver fetchData, usa client-side
     const pageCount = Math.ceil(total / pageSize);
 
     const currentPageData = useMemo(() => {
@@ -59,20 +59,22 @@ function TableInner<T extends object>(
         return data.slice(start, start + pageSize);
     }, [data, pageIndex, pageSize, rows, fetchData]);
 
-    // Chamada à "API"
     useEffect(() => {
         if (!fetchData) return;
-        fetchData({ page: pageIndex + 1, pageSize }).then((res) => {
-            setRows(res.items);
-            setTotal(res.total);
-        });
+        setLoading(true);
+        fetchData({ page: pageIndex + 1, pageSize })
+            .then((res) => {
+                setRows(res.items);
+                setTotal(res.total);
+            })
+            .finally(() => setLoading(false));
     }, [pageIndex, pageSize, fetchData]);
 
     return (
-        <div className={clsx("w-full", containerClassName)}>
+        <div className={clsx("w-full relative", containerClassName)}>
             {title && <h2 className="text-sm font-semibold mb-2">{title}</h2>}
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto relative">
                 <table
                     ref={ref}
                     className={clsx("min-w-full divide-y divide-gray-700 text-sm", tableClassName)}
@@ -92,7 +94,7 @@ function TableInner<T extends object>(
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700 text-gray-300 bg-[#12121B]">
-                        {currentPageData.length === 0 ? (
+                        {currentPageData.length === 0 && !loading ? (
                             <tr>
                                 <td
                                     colSpan={columns.length}
@@ -124,11 +126,17 @@ function TableInner<T extends object>(
                         )}
                     </tbody>
                 </table>
+
+                {/* Overlay de loading */}
+                {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#12121B]/70">
+                        <div className="w-10 h-10 border-4 border-[var(--color-purple-5)] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                )}
             </div>
 
             {/* Footer de paginação */}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-4 text-sm text-gray-300 gap-3">
-                {/* Seletor de número de linhas */}
                 <div className="flex items-center gap-2">
                     <span className="text-xs">Número de linhas</span>
                     <select
@@ -137,7 +145,8 @@ function TableInner<T extends object>(
                             setPageSize(Number(e.target.value));
                             setPageIndex(0);
                         }}
-                        className="bg-[#12121B] border border-[var(--color-purple-2)] rounded px-2 py-1 text-xs"
+                        disabled={loading}
+                        className="bg-[#12121B] border border-[var(--color-purple-2)] rounded px-2 py-1 text-xs disabled:opacity-40"
                     >
                         {pageSizeOptions.map((size) => (
                             <option key={size} value={size}>
@@ -147,32 +156,27 @@ function TableInner<T extends object>(
                     </select>
                 </div>
 
-                {/* Navegação */}
                 <div className="flex items-center gap-1">
                     <button
                         onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
-                        disabled={pageIndex === 0}
+                        disabled={pageIndex === 0 || loading}
                         className="px-2 py-1 rounded disabled:opacity-40 text-[var(--color-purple-5)] hover:cursor-pointer hover:text-white flex items-center justify-center gap-2"
                     >
-                        <span> <FaChevronLeft /> </span>
-                        Anterior
+                        <FaChevronLeft /> Anterior
                     </button>
 
                     {Array.from({ length: pageCount }).map((_, i) => {
-                        if (
-                            i === 0 ||
-                            i === pageCount - 1 ||
-                            (i >= pageIndex - 1 && i <= pageIndex + 1)
-                        ) {
+                        if (i === 0 || i === pageCount - 1 || (i >= pageIndex - 1 && i <= pageIndex + 1)) {
                             return (
                                 <button
                                     key={i}
                                     onClick={() => setPageIndex(i)}
+                                    disabled={loading}
                                     className={clsx(
-                                        "mx-1 w-8 h-8 rounded-full flex items-center justify-center disabled:opacity-40 hover:bg-[var(--color-purple-3)] border border-[var(--color-purple-5)] text-[var(--color-purple-5)] text-[var(--color-purple-5)]",
+                                        "mx-1 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--color-purple-5)] disabled:opacity-40",
                                         i === pageIndex
                                             ? "bg-[var(--color-purple-5)] text-white"
-                                            : "hover:bg-[var(--color-purple-3)] hover:text-white"
+                                            : "text-[var(--color-purple-5)] hover:bg-[var(--color-purple-3)] hover:text-white"
                                     )}
                                 >
                                     {i + 1}
@@ -191,15 +195,15 @@ function TableInner<T extends object>(
 
                     <button
                         onClick={() => setPageIndex((i) => Math.min(pageCount - 1, i + 1))}
-                        disabled={pageIndex === pageCount - 1}
+                        disabled={pageIndex === pageCount - 1 || loading} // 🔒
                         className="px-2 py-1 rounded disabled:opacity-40 text-[var(--color-purple-5)] hover:cursor-pointer hover:text-white flex items-center justify-center gap-2"
                     >
-                        Próximo
-                        <span> <FaChevronRight /> </span>
+                        Próximo <FaChevronRight />
                     </button>
                 </div>
             </div>
-        </div >
+
+        </div>
     );
 }
 

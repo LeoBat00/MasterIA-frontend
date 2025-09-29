@@ -94,7 +94,7 @@ export default function JogosCadastrados() {
         }));
         const start = (page - 1) * pageSize;
         const end = start + pageSize;
-        await new Promise((res) => setTimeout(res, 400)); // simula delay
+        await new Promise((res) => setTimeout(res, 4000)); // simula delay
         return { items: all.slice(start, end), total: all.length };
     }
 
