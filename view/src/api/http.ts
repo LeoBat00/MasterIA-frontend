@@ -29,7 +29,7 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (res) => {
     // dispara mensagem de sucesso se for POST/PUT/DELETE (opcional)
-    if (["post", "put", "delete"].includes(res.config.method ?? "")) {
+    if (["put", "delete"].includes(res.config.method ?? "")) {
       useMessageStore
         .getState()
         .addMessage({

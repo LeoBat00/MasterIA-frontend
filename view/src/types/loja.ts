@@ -1,4 +1,5 @@
 import { Evento } from "./evento";
+import { Jogo } from "./jogo";
 
 export type Loja = {
     id?: number;
@@ -14,4 +15,5 @@ export type Loja = {
     hrEncerramento?: string;
     organizadorId?: number;
     eventos?: Evento[];
+    jogos?: Jogo[];
 };

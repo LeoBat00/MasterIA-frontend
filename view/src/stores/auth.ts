@@ -31,6 +31,7 @@ export function isAuthenticated(): boolean {
   // se não tiver na store, tenta no storage
   if (!token) {
     token = getStoredToken();
+    debugger
     if (token) {
       // repopula a store
       store.setToken(token);
@@ -98,7 +99,10 @@ export const useAuthStore = create<AuthState>()(
           }
         },
 
-        logout: () => set({ token: null, claims: null }, false, "logout"),
+        logout: () => {
+          //remover do storage e limpar store
+          localStorage.removeItem("auth");
+          set({ token: null, claims: null }, false, "logout")},
       }),
       {
         name: "auth", // chave no localStorage

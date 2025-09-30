@@ -44,6 +44,10 @@ export default function PageLoja() {
         router.push(`/eventos`);
     }
 
+    const handleClickCadastroJogos = () => {
+        router.push(`/jogosLoja`);
+    }
+
     return (
         <div className="page">
 
@@ -86,7 +90,7 @@ export default function PageLoja() {
                                 label="Gerenciar Eventos"
                             />
                             <CardAtalho
-                                onClick={() => console.log("Cadastro de jogos")}
+                                onClick={handleClickCadastroJogos}
                                 icon={<FaChessBoard />}
                                 label="Cadastro de Jogos"
                             />
