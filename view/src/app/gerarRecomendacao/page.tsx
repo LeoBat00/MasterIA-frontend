@@ -16,7 +16,7 @@ export default function GerarRecomendacao() {
   const totalSteps = 4;
   const router = useRouter();
   const { setResumo, setJogos } = useRecomendacaoStore();
-  const { perfil, setPerfil } = usePerfilUsuarioStore();
+  const { perfil } = usePerfilUsuarioStore();
 
   const [todasMecanicas, setTodasMecanicas] = useState([]);
   const [todosTemas, setTodosTemas] = useState([]);

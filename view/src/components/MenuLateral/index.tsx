@@ -1,5 +1,5 @@
 "use client";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { FaStore, FaChevronRight, FaUser, FaDice } from "react-icons/fa"
 import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";

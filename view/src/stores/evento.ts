@@ -5,7 +5,6 @@ import { filtroEvento, novoEvento } from "../types/evento"
 import { validacaoNovoEvento } from "../types/evento";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
-import { useMessageStore } from "./useMessageStore";
 
 type EventoState = {
     evento: novoEvento | null;
@@ -78,6 +77,7 @@ export const useEventoStore = create<EventoState>()(
                     set({ evento: null, exibirFormularioEvento: false, validacaoErro: undefined }, false, "salvarEvento");
                     return { success: true };
                 } catch (error) {
+                    console.error("Erro ao salvar evento", error);
                     return { success: false };
                 }
             },

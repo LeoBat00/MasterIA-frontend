@@ -1,8 +1,6 @@
-import { http, setAccessToken } from "../../api/http";
+import { http } from "../../api/http";
 import { endpoints } from "../../api/endpoints";
-import { useAuthStore } from "../../stores/auth";
 import { Organizador } from "../../stores/organizador";
-import { useOrganizadorStore } from "../../stores/organizador";
 
 export type LoginPayload = { email: string; senha: string };
 export type LoginResponse = { token: string };

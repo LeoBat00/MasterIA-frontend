@@ -1,4 +1,3 @@
-import { create } from "domain";
 
 export const endpoints = {
   auth: {

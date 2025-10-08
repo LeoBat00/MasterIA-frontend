@@ -168,7 +168,7 @@ export default function OrganizadorHome() {
                                     aria-label="Adicionar nova loja"
                                 >
                                     <Plus className="h-5 w-5" />
-                                    Adicionar nova loja"
+                                    Adicionar nova loja
                                 </button>}
                             </div>
 

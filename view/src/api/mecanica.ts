@@ -5,6 +5,7 @@ export const getMecanicas = async () => {
     const response = await axios.get('https://localhost:7226/Mecanica');
     return response.data; // array de { id, nmMecanica }
   } catch (error) {
+    console.error('Erro ao buscar mecânicas:', error);
     return [];
   }
 };

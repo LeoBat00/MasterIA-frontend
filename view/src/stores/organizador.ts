@@ -52,7 +52,7 @@ export const useOrganizadorStore = create<OrganizadorState>()(
                     );
                     set({ organizador: data, loading: false }, false, "fetchOrganizador");
                 } catch (error) {
-                    set({ loading: false, error: "Erro ao buscar organizador" });
+                    set({ loading: false, error: "Erro ao buscar organizador: " + error });
                 }
             },
             setOrnanizador: (o) =>

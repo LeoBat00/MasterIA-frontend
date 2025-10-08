@@ -1,11 +1,9 @@
 import Input from "@/components/UI/Input";
-import { FaCalendar } from "react-icons/fa";
 import { useEffect } from "react";
 import { useEventoStore } from "@/stores/evento";
 import Button from "@/components/UI/Button";
 import { DatePicker } from "@/components/UI/DatePicker";
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
-import { set } from "date-fns";
 import { useRouter } from "next/navigation";
 
 
@@ -20,14 +18,6 @@ export default function FormularioNovoEvento() {
         limparValidacao();
     }, [evento]);
 
-    if (!lojaId) {
-        setExibirFormularioEvento(false);
-        return null;
-    }
-
-    useEffect(() => {
-        limparValidacao();
-    }, [limparValidacao]);
 
     const hanleChangeNomeEvento = (novoNome: string) => {
         const copiaEvento = { ...evento };
@@ -73,6 +63,11 @@ export default function FormularioNovoEvento() {
         const copiaEvento = { ...evento };
         copiaEvento.dtFim = novaData ? novaData.toISOString() : "";
         atualizarEvento(copiaEvento);
+    }
+
+    if (!lojaId) {
+        setExibirFormularioEvento(false);
+        return null;
     }
 
     return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-2)] border-l-8 border-l-[var(--color-purple-2)]  ">

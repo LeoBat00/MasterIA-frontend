@@ -8,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 
 const STORAGE_KEY = "auth";
 
-export function organizadorAuth() {
+export function useOrganizadorAuth() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
