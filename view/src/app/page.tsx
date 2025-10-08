@@ -6,7 +6,6 @@ import Image from "next/image";
 import { FiCpu, FiSmile, FiClipboard, FiZap } from "react-icons/fi";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import GlobalMessage from "@/components/GlobalMessage";
 
 import CidadeModal from "@/components/ModalPrincipal"; // Certifique-se de usar a letra maiúscula
 import { useState } from "react";

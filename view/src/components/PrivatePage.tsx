@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { organizadorAuth } from "../auth/hooks/organizadorAuth";
+import { useOrganizadorAuth } from "../auth/hooks/organizadorAuth";
 import LoadingScreen from "../components/UI/LoadingScreen";
 
 export function PrivatePage({ children }: { children: React.ReactNode }) {
-  const { isAuth, hydrated } = organizadorAuth();
+  const { isAuth, hydrated } = useOrganizadorAuth();
   const router = useRouter();
 
   const [mounted, setMounted] = useState(false);

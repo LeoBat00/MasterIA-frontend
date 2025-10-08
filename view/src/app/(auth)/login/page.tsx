@@ -6,13 +6,13 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { RxAvatar } from "react-icons/rx";
 import Input from "@/components/UI/Input";
 import { useRouter } from "next/navigation";
-import { organizadorAuth } from "@/auth/hooks/organizadorAuth";
+import { useOrganizadorAuth } from "@/auth/hooks/organizadorAuth";
 
 type ErroLoginType = { login: string; senha: string };
 
 export default function LoginPage() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { doLogin, loading, errorMsg } = organizadorAuth();
+    const { doLogin, loading, errorMsg } = useOrganizadorAuth();
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);

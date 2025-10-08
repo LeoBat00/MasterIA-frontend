@@ -2,7 +2,6 @@ import Input from "@/components/UI/Input";
 import { useLojaStore } from "@/stores/loja";
 import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";
-import { Eraser, Plus } from "lucide-react";
 import { useEffect } from "react";
 
 export default function FormularioNovaLoja() {
@@ -77,10 +76,10 @@ export default function FormularioNovaLoja() {
         setExibirFormularioLoja(false);
     }
 
-    const handleLimparCampos = () => {
-        clear();
-        limparValidacao();
-    }
+    // const handleLimparCampos = () => {
+    //     clear();
+    //     limparValidacao();
+    // }
 
     return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-2)] border-l-8 border-l-[var(--color-purple-2)]  ">
 

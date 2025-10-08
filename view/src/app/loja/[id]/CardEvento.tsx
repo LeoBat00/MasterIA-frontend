@@ -18,7 +18,7 @@ type CardEventoProps = {
 
 
 export function CardEvento({ evento, onClick }: CardEventoProps) {
-    const { nmEvento, dtInicio, dtFim, status } = evento;
+    const { nmEvento, dtInicio } = evento;
     const statusAtual = calcularStatus(evento);
     const config = tipoStatusEvento[statusAtual];
     // cor da borda dependendo do status

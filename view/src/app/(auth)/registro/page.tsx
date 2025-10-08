@@ -7,7 +7,7 @@ import { RxAvatar } from "react-icons/rx";
 import Input from "@/components/UI/Input";
 import { isValidCPF, isValidCNPJ, onlyDigits } from "@/utils/validacoes";
 import { useRouter } from "next/navigation";
-import { organizadorAuth } from "@/auth/hooks/organizadorAuth";
+import { useOrganizadorAuth } from "@/auth/hooks/organizadorAuth";
 import { Organizador } from "@/stores/organizador";
 type NovoOrganizadorForm = {
     email?: string;
@@ -24,7 +24,7 @@ const MIN_SIZE_SENHA = 6;
 export default function RegistroPage() {
     const [step, setStep] = useState<1 | 2>(1);
     const [showPassword, setShowPassword] = useState(false);
-    const { doRegister, loading, errorMsg } = organizadorAuth();
+    const { doRegister, loading, errorMsg } = useOrganizadorAuth();
     const router = useRouter();
 
     const [camposForm, setCamposForm] = useState({} as NovoOrganizadorForm);

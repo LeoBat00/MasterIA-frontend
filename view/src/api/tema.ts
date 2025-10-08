@@ -5,6 +5,7 @@ export const getTemas = async () => {
     const response = await axios.get('https://localhost:7226/Tema');
     return response.data; // array de { id, nmTema }
   } catch (error) {
+    console.error('Erro ao buscar temas:', error);
     return [];
   }
 };
