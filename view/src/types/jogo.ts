@@ -29,3 +29,17 @@ export interface Jogo {
   mecanicas: Mecanica[];
   temas: Tema[];
 }
+
+export interface jogoLoja {
+  jogoId: number;
+  nomeJogo: string;
+  codigoJogo: string;
+  lojaId: number;
+  anoPublicacao?: number;
+  qtdDisponivel: number;
+  copias: number;
+  categorias: Categoria[];
+  mecanicas: Mecanica[];
+  qtdJogadoresMin?: number;
+  qtdJogadoresMax?: number;
+}

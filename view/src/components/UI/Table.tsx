@@ -14,15 +14,11 @@ export type FetchParams = {
     pageSize: number;
 };
 
-export type FetchResult<T> = {
-    items: T[];
-    total: number;
-};
-
 export interface TableProps<T> extends React.TableHTMLAttributes<HTMLTableElement> {
     columns: Column<T>[];
-    data?: T[];
-    fetchData?: (params: FetchParams) => Promise<FetchResult<T>>;
+    data: T[];
+    total?: number;
+    fetchData?: (params: FetchParams) => void; 
     title?: string;
     containerClassName?: string;
     tableClassName?: string;
@@ -32,12 +28,14 @@ export interface TableProps<T> extends React.TableHTMLAttributes<HTMLTableElemen
     overlay?: "x" | "y" | "both" | "none";
     maxHeight?: string | number;
     maxWidth?: string | number;
+    loading?: boolean; 
 }
 
 function TableInner<T extends object>(
     {
         columns,
-        data = [],
+        data,
+        total = data.length,
         fetchData,
         title,
         containerClassName,
@@ -48,34 +46,27 @@ function TableInner<T extends object>(
         overlay = "none",
         maxHeight,
         maxWidth,
+        loading = false,
         ...rest
     }: TableProps<T>,
     ref: React.Ref<HTMLTableElement>
 ) {
     const [pageSize, setPageSize] = useState(initialPageSize);
     const [pageIndex, setPageIndex] = useState(0);
-    const [rows, setRows] = useState<T[]>(data);
-    const [total, setTotal] = useState(data.length);
-    const [loading, setLoading] = useState(false);
 
     const pageCount = Math.ceil(total / pageSize);
 
+    useEffect(() => {
+        if (fetchData) {
+            fetchData({ page: pageIndex + 1, pageSize });
+        }
+    }, [pageIndex, pageSize, fetchData]);
+
     const currentPageData = useMemo(() => {
-        if (fetchData) return rows;
+        if (fetchData) return data; 
         const start = pageIndex * pageSize;
         return data.slice(start, start + pageSize);
-    }, [data, pageIndex, pageSize, rows, fetchData]);
-
-    useEffect(() => {
-        if (!fetchData) return;
-        setLoading(true);
-        fetchData({ page: pageIndex + 1, pageSize })
-            .then((res) => {
-                setRows(res.items);
-                setTotal(res.total);
-            })
-            .finally(() => setLoading(false));
-    }, [pageIndex, pageSize, fetchData]);
+    }, [data, pageIndex, pageSize, fetchData]);
 
     return (
         <div className={clsx("w-full relative", containerClassName)}>
@@ -88,7 +79,7 @@ function TableInner<T extends object>(
                     overlay === "x" && "overflow-x-auto",
                     overlay === "y" && "overflow-y-auto",
                     overlay === "both" && "overflow-auto",
-                    loading && "overflow-hidden" // bloqueia scroll durante loading
+                    loading && "overflow-hidden"
                 )}
                 style={{
                     ...(overlay === "y" || overlay === "both" ? { maxHeight: maxHeight ?? "70vh" } : {}),
@@ -114,10 +105,7 @@ function TableInner<T extends object>(
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700 text-gray-300 bg-[#12121B]">
-                        {loading ? (
-                            // Enquanto carrega, não renderizamos linhas
-                            null
-                        ) : currentPageData.length === 0 ? (
+                        {loading ? null : currentPageData.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan={columns.length}
@@ -156,7 +144,7 @@ function TableInner<T extends object>(
                 </table>
             </div>
 
-            {/* Overlay de loading - cobre apenas viewport da tabela */}
+            {/* Overlay de loading */}
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#12121B]/70">
                     <div className="w-10 h-10 border-4 border-[var(--color-purple-5)] border-t-transparent rounded-full animate-spin"></div>

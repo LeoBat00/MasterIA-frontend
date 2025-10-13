@@ -114,3 +114,7 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--color-purple-5) #12121B;
 }
+
+.linha-tabela-verde tr:nth-child(even) {
+  background-color: green;
+}
