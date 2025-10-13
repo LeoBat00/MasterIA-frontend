@@ -16,8 +16,8 @@ export default function LoginPage() {
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
-    const [login, setLogin] = useState();
-    const [senha, setSenha] = useState();
+    const [login, setLogin] = useState("");
+    const [senha, setSenha] = useState("");
     const [erro, setErro] = useState<ErroLoginType>({ login: "", senha: "" });
 
     const handleLogin = async () => {
