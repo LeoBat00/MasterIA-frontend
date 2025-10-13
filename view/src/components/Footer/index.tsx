@@ -36,6 +36,9 @@ export default function Footer() {
           <FiArrowUp size={20} />
         </button>
       )}
+      <div className="text-center text-xs text-gray-500 mt-2">
+        Versão {process.env.NEXT_PUBLIC_VERSION || "teste"}
+      </div>
     </footer>
   );
 }
