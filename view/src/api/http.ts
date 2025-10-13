@@ -3,7 +3,7 @@ import { useAuthStore } from "../stores/auth";
 import { useMessageStore } from "../stores/useMessageStore";
 
 export const http = axios.create({
-  baseURL: "https://localhost:7226",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,
 });
 
