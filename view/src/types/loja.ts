@@ -1,9 +1,10 @@
 import { Evento } from "./evento";
-import { Jogo } from "./jogo";
+import { jogoLoja } from "./jogo";
 
 export type Loja = {
     id?: number;
     cep?: string;
+    nmLoja?: string;
     logradouro?: string;
     bairro?: string;
     cidade?: string;
@@ -15,5 +16,5 @@ export type Loja = {
     hrEncerramento?: string;
     organizadorId?: number;
     eventos?: Evento[];
-    jogos?: Jogo[];
+    jogos?: jogoLoja[];
 };

@@ -22,6 +22,12 @@ export default function FormularioNovaLoja() {
         atualizarLoja(copiaLoja);
     }
 
+    const handleChandeNome = (novoNome: string) => {
+        const copiaLoja = { ...loja };
+        copiaLoja.nmLoja = novoNome;
+        atualizarLoja(copiaLoja);
+    }
+
     const hanleChangeCidade = (novaCidade: string) => {
         const copiaLoja = { ...loja };
         copiaLoja.cidade = novaCidade;
@@ -95,7 +101,20 @@ export default function FormularioNovaLoja() {
             <div className="grid grid-cols-1 gap-8">
 
                 <div className="grid grid-cols-1 gap-8">
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-4 gap-8">
+
+                        <Input
+                            label="Nome da Loja"
+                            autoComplete="nomeLoja"
+                            placeholder="insira o nome da loja"
+                            value={loja?.nmLoja}
+                            onChange={handleChandeNome}
+                            required
+                            maxLength={100}
+                            containerClassName="col-span-3"
+                            error={validacaoErro?.nmLoja}
+                        // disabled={loading}
+                        />
 
                         <Input
                             label="Cep"
@@ -105,12 +124,15 @@ export default function FormularioNovaLoja() {
                             onChange={hanleChangeCep}
                             mask="00000-000"
                             required
+                            containerClassName="col-span-1"
+
                             number
                             error={validacaoErro?.cep}
                         // disabled={loading}
                         />
+
                     </div>
-                    <div className=" grid grid-cols-2 gap-8">
+                    <div className=" grid grid-cols-6 gap-8">
 
                         <Input
                             label="Cidade"
@@ -118,19 +140,21 @@ export default function FormularioNovaLoja() {
                             placeholder="insira a cidade"
                             value={loja?.cidade}
                             onChange={hanleChangeCidade}
+                            containerClassName="col-span-5"
                             required
                             error={validacaoErro?.cidade}
                         // disabled={loading}
                         />
 
-
                         <Input
                             label="Estado"
                             autoComplete="estado"
-                            placeholder="insira o estado"
-                            value={loja?.uf}
+                            placeholder="Estado"
+                            value={loja?.uf ? String(loja?.uf).toUpperCase() : loja?.uf}
                             onChange={hanleChangeUf}
                             required
+                            maxLength={2}
+                            containerClassName="grid-cols-1"
                             error={validacaoErro?.uf}
                         // disabled={loading}
                         />
@@ -189,7 +213,7 @@ export default function FormularioNovaLoja() {
                     <Button
                         type="submit">
                         <span className="px-8">
-                            Cadastrar Loja
+                            {loja?.id ?  "Atualizar Loja" : "Cadastrar Loja"}
                         </span>
                     </Button>
                 </div>

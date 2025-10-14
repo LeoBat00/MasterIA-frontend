@@ -8,11 +8,12 @@ import {
     ChevronRight,
     Plus
 } from 'lucide-react';
-import { useOrganizadorStore, Loja } from '../../stores/organizador';
+import { useOrganizadorStore } from '../../stores/organizador';
 import FormularioNovaLoja from './formularioNovaLoja';
 import { useLojaStore } from '@/stores/loja';
 import { obterEnderecoCompleto } from '../util';
 import { useAuthStore } from '@/stores/auth';
+import { Loja } from '@/types/loja';
 
 export default function OrganizadorHome() {
     const router = useRouter();
@@ -116,7 +117,7 @@ export default function OrganizadorHome() {
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="">
-                                                    <div className="text-lg font-medium mb-1">{l.id}</div>
+                                                    <div className="text-lg font-medium mb-1">{l.nmLoja}</div>
                                                     <div className="text-lg font-medium text-zinc-500">
                                                         <span className='mr-1'>Endereço:</span>
                                                         <span>{obterEnderecoCompleto(l)}</span>
