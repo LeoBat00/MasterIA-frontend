@@ -24,6 +24,7 @@ export interface Jogo {
   thumb?: string;
   tpJogo?: string;
   vlTempoJogo?: number;
+  CodigoJogo?: string;
 
   categorias: Categoria[];
   mecanicas: Mecanica[];
@@ -40,6 +41,6 @@ export interface jogoLoja {
   copias: number;
   categorias: Categoria[];
   mecanicas: Mecanica[];
-  qtdJogadoresMin?: number;
-  qtdJogadoresMax?: number;
+  qtJogadoresMin?: number;
+  qtJogadoresMax?: number;
 }

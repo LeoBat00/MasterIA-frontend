@@ -56,9 +56,9 @@ export default function PageEvento() {
 
         // Filtrar por status
         if (filtroEvento.status && filtroEvento.status !== 'todos') {
-            eventosFiltrados = eventosFiltrados.filter(evento => {
-                calcularStatus(evento) === filtroEvento.status
-            });
+            eventosFiltrados = eventosFiltrados.filter(
+                evento => calcularStatus(evento) === filtroEvento.status
+            );
         }
 
         // Ordenar
@@ -99,7 +99,7 @@ export default function PageEvento() {
         atualizarFiltroEvento({ ...filtroEvento, nomeEvento: novoNome });
     }
 
-     const handleChangeCódigoEvento = (novoCodigo: string) => {
+    const handleChangeCódigoEvento = (novoCodigo: string) => {
         atualizarFiltroEvento({ ...filtroEvento, codigoEvento: novoCodigo });
     }
     return (

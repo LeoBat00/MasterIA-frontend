@@ -2,13 +2,12 @@
 import { PrivatePage } from '@/components/PrivatePage';
 import Table, { Column, FetchParams } from '@/components/UI/Table';
 import { Jogo } from '@/types/jogo';
-import { FaPlus } from 'react-icons/fa';
 import { useJogosCadastradoStore } from '@/stores/jogosCadastrados';
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 
 export default function JogosCadastrados() {
 
-    const { jogos, fetchJogosPaginado, paginaAtual, tamanhoPagina, totalItens } = useJogosCadastradoStore();
+    const { jogos, fetchJogosPaginado, tamanhoPagina, totalItens } = useJogosCadastradoStore();
 
 
     const columns: Column<Jogo>[] = [
@@ -19,17 +18,6 @@ export default function JogosCadastrados() {
         { Header: "Categorias", accessor: (row) => (row.categorias || []).map((c) => c.nmCategoria).join(", ") },
         { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
         { Header: "Temas", accessor: (row) => (row.temas || []).map((t) => t.nmTema).join(", ") },
-        {
-            Header: "Ações",
-            Cell: (row) => (
-                <button
-                    className="px-2 py-1 text-xs rounded bg-[var(--color-purple-5)] text-white hover:opacity-90 flex items-center gap-1"
-                    onClick={() => alert(`Adicionar ${row.nmJogo}`)}
-                >
-                    <FaPlus /> Adicionar
-                </button>
-            ),
-        },
 
     ];
 
@@ -44,7 +32,7 @@ export default function JogosCadastrados() {
     return (
         <PrivatePage>
             <div className=' w-full w-max-[calc(100vw-2rem)]'>
-                <Table<Jogo>
+                <Table<any>
                     title="Jogos de Tabuleiro"
                     columns={columns}
                     data={jogos || []}

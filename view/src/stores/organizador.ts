@@ -3,20 +3,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
-
-export type Loja = {
-    id: number;
-    cep: string;
-    logradouro: string;
-    bairro: string;
-    cidade: string;
-    uf: string;
-    complemento?: string;
-    numero?: string;
-    status: string;
-    hrAbertura?: string;
-    hrEncerramento?: string;
-};
+import { Loja } from "@/types/loja";
 
 export type Organizador = {
     id?: number;

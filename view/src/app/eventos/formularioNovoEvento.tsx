@@ -16,7 +16,7 @@ export default function FormularioNovoEvento() {
 
     useEffect(() => {
         limparValidacao();
-    }, [evento]);
+    }, [evento, limparValidacao]);
 
 
     const hanleChangeNomeEvento = (novoNome: string) => {
