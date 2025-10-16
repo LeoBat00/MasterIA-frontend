@@ -3,14 +3,8 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
-import { Jogo } from "../types/jogo";
+import { filtroBuscaPaginadaJogo, Jogo } from "../types/jogo";
 
-type filtroBusca = {
-    nmJogo?: string;
-    categoria?: string;
-    tema?: string;
-    mecanica?: string;
-};
 
 type PaginacaoResponse<T> = {
     totalItens: number;
@@ -25,10 +19,11 @@ type jogosCadastradoState = {
     tamanhoPagina: number;
     totalItens: number;
     totalPaginas: number;
-    filtroBusca?: filtroBusca;
+    filtroBusca?: filtroBuscaPaginadaJogo;
     fetchJogosPaginado: (
         page: number,
-        pageSize: number
+        pageSize: number,
+        filtro?: filtroBuscaPaginadaJogo
     ) => Promise<{ success: true; data: Jogo[] } | { success: false; error: any }>;
     clear: () => void;
 };
@@ -41,12 +36,15 @@ export const useJogosCadastradoStore = create<jogosCadastradoState>()(
             tamanhoPagina: 10,
             totalItens: 0,
             totalPaginas: 0,
-            async fetchJogosPaginado(page: number, pageSize: number) {
+            async fetchJogosPaginado(page: number, pageSize: number, filtro?: filtroBuscaPaginadaJogo) {
                 try {
-                    const filtroFinal = { ...get().filtroBusca }
+                    
+                    const filtroFinal = filtro ? filtro : { ...get().filtroBusca }
+
+                    const endPointFinal = filtroFinal?.lojaId ? endpoints.jogo.getPaginadoComLoja : endpoints.jogo.getPaginado
 
                     const { data } = await http.post<PaginacaoResponse<Jogo>>(
-                        `${endpoints.jogo.getPaginado}?pagina=${page}&tamanhoPagina=${pageSize}`,
+                        `${endPointFinal}?pagina=${page}&tamanhoPagina=${pageSize}`,
                         filtroFinal
                     );
 

@@ -18,6 +18,7 @@ export const endpoints = {
     getById: (id: number) => `/Evento/EventoById?Id=${id}`,
   },
   jogo: {
-    getPaginado:"Jogo/ListarPaginado"
+    getPaginado: "/Jogo/ListarPaginado",
+    getPaginadoComLoja:"Jogo/ListarPaginadoNotInLoja"
   }
 };

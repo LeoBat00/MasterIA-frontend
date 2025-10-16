@@ -1,13 +1,13 @@
 'use client';
 
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
-import { obterEnderecoCompleto } from "../../util";
+import { obterEnderecoCompleto } from "../../../util";
 import { FaStore, FaChessBoard, FaCalendar } from "react-icons/fa"
 import { CardAtalho } from "./CardAtalho";
 import { CardEvento } from "./CardEvento";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { calcularStatus } from "../../util";
+import { calcularStatus } from "../../../util";
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
 
@@ -40,11 +40,11 @@ export default function PageLoja() {
     }
 
     const handleClickGerenciarEventos = () => {
-        router.push(`/eventos`);
+        router.push(`/organizadorHome/loja/${lojaId}/eventos`);
     }
 
     const handleClickCadastroJogos = () => {
-        router.push(`/jogosLoja`);
+        router.push(`/organizadorHome/loja/${lojaId}/jogosLoja`);
     }
 
     return (
@@ -53,11 +53,13 @@ export default function PageLoja() {
             {lojaSelecionada ?
                 <div className="min-h-screen flex flex-col pb-8">
                     <div className="flex-1">
-                        <div id="tituloPaginaLoja" className="mb-6">
+                        {/* <div id="tituloPaginaLoja" className="mb-6">
                             <span className="texto-light">{lojaSelecionada.nmLoja}</span>
                             <p className="mt-1 text-lg text-zinc-400">Gerencie suas lojas</p>
                             <div className="mt-4 border-b border-zinc-600" />
-                        </div>
+                        </div> */}
+                        <p className="mt-1 text-lg text-zinc-400">Gerencie sua loja</p>
+                        <div className="mt-4 border-b border-zinc-600" />
 
                         <div className="flex items-center p-2 rounded-[8px] justify-between border border-[var(--color-purple-1)] px-4 mb-6">
                             <div className="text-lg font-medium text-zinc-500">
@@ -98,7 +100,7 @@ export default function PageLoja() {
                                     evento={evento}
                                     onClick={(e) => console.log("Evento clicado:", e)}
                                 />
-                            )) : <span className="text-zinc-400">Nenhum evento ativo</span> 
+                            )) : <span className="text-zinc-400">Nenhum evento ativo</span>
                             }
                         </div>
                     </div>
