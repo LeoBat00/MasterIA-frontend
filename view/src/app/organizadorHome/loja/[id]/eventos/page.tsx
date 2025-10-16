@@ -1,7 +1,7 @@
 'use client';
 
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
-import { CardEvento } from "../loja/[id]/CardEvento";
+import { CardEvento } from "../CardEvento";
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
 import { useEventoStore } from "@/stores/evento";
@@ -9,7 +9,7 @@ import FormularioNovoEvento from "./formularioNovoEvento";
 import Select from "@/components/UI/Select";
 import Input from "@/components/UI/Input";
 import { filtroEvento, statusEvento, Evento } from "@/types/evento";
-import { calcularStatus } from "../util";
+import { calcularStatus } from "../../../../util";
 
 
 export default function PageEvento() {
@@ -87,11 +87,11 @@ export default function PageEvento() {
         router.back();
     }
 
-    const handleChangeFiltroStatus = (opcao: string) => {
+    const handleChangeFiltroStatus = (opcao: string | number) => {
         atualizarFiltroEvento({ ...filtroEvento, status: opcao as statusEvento });
     }
 
-    const handleChangeFiltroOrdem = (opcao: string) => {
+    const handleChangeFiltroOrdem = (opcao: string | number) => {
         atualizarFiltroEvento({ ...filtroEvento, ordem: opcao as "maisRecente" | "maisAntigo" | "A-Z" | "Z-A" });
     }
 
@@ -108,7 +108,6 @@ export default function PageEvento() {
                 <div className="pb-8">
                     <div className="flex-1">
                         <div id="tituloPaginaLoja" className="mb-6">
-                            <span className="texto-light">{lojaSelecionada.logradouro}</span>
                             <p className="mt-1 text-lg text-zinc-400">Gerencie seus eventos</p>
                             <div className="mt-4 border-b border-zinc-600" />
                         </div>

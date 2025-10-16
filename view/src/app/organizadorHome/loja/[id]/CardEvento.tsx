@@ -1,8 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
-import { Evento, statusEvento } from "../../../types/evento";
-import { calcularStatus, tempoRestante } from "../../util";
+import { Evento, statusEvento } from "../../../../types/evento";
+import { calcularStatus, tempoRestante } from "../../../util";
 
 const tipoStatusEvento: Record<statusEvento, { id: number, label: string; border: string, estilo: string }> = {
     Ativo: { id: 1, label: "Faltam", border: "border-l-4 border-[#A7AEFF]", estilo: "text-2xl font-bold" },

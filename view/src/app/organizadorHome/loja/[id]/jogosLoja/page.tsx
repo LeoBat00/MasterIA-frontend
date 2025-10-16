@@ -5,14 +5,18 @@ import { Jogo, jogoLoja } from '@/types/jogo';
 import { FaPlus } from 'react-icons/fa';
 import { usePaginaLojaStore } from '@/stores/paginaLoja';
 import { useJogosCadastradoStore } from '@/stores/jogosCadastrados';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import Button from '@/components/UI/Button';
 import { useLojaStore } from '@/stores/loja';
 import { useRouter } from 'next/navigation';
+import Select from '@/components/UI/Select';
+import Input from '@/components/UI/Input';
+import Checkbox from '@/components/UI/Checkbox';
+
 
 export default function JogosLoja() {
 
-    const { lojaSelecionada, fetchLoja } = usePaginaLojaStore();
+    const { lojaSelecionada, fetchLoja, filtroBuscaJogosBanco, atualizarFiltroBusca, limparFiltroBusca } = usePaginaLojaStore();
     const { fetchJogosPaginado, tamanhoPagina, totalItens, jogos } = useJogosCadastradoStore();
     const { updateLoja } = useLojaStore();
     const [tamanhoPaginaLoja, setTamanhoPaginaLoja] = useState(10);
@@ -20,6 +24,27 @@ export default function JogosLoja() {
     const [listaDeJogosLoja, setListaDeJogosLoja] = useState<jogoLoja[]>(lojaSelecionada?.jogos?.slice(0, 10) || []);
     const [abaSelecionada, setAbaSelecionada] = useState(0); // 0 = Cadastro de Jogos, 1 = Jogos Cadastrados
     const navigater = useRouter();
+
+    const filtroRef = useRef(filtroBuscaJogosBanco);
+
+    useEffect(() => {
+        filtroRef.current = filtroBuscaJogosBanco;
+    }, [filtroBuscaJogosBanco]);
+
+    const tiposMecanicas = [
+        { value: 1, label: "Todas" },
+        { value: 2, label: "Competitivo" },
+        { value: 3, label: "Solo" },
+        { value: 4, label: "Equipe" },
+    ];
+
+    const tiposCategorias = [
+        { value: 1, label: "Todas" },
+        { value: 2, label: "Competitivo" },
+        { value: 3, label: "Solo" },
+        { value: 4, label: "Equipe" },
+    ];
+
     useEffect(() => {
         if (!lojaSelecionada) {
             navigater.push('/organizadorHome');
@@ -101,7 +126,7 @@ export default function JogosLoja() {
 
         const lojaAtual = { ...lojaSelecionada };
         const jogosAtualizados = (lojaAtual.jogos || []).filter(j => j.codigoJogo !== codigoJogo);
-        debugger
+
         const updateRes = await updateLoja({
             ...lojaAtual,
             jogos: jogosAtualizados,
@@ -120,12 +145,48 @@ export default function JogosLoja() {
 
     };
 
+    const pesquisarJogos = async () => {
+        await fetchJogosPaginado(1, tamanhoPagina, filtroRef.current);
+    }
+
+
     const buscarJogos = useCallback(
         async ({ page, pageSize }: FetchParams) => {
-            await fetchJogosPaginado(page, pageSize);
+
+            await fetchJogosPaginado(page, pageSize, filtroBuscaJogosBanco);
         },
         [fetchJogosPaginado]
     );
+
+    const handleChangeMecanicas = (novaMecanica: string | number) => {
+
+        const novoFiltro = { ...filtroBuscaJogosBanco, mecanicasIds: [Number(novaMecanica)] };
+        atualizarFiltroBusca(novoFiltro);
+    }
+
+    const handleChangeCategorias = (novaCategoria: string | number) => {
+        const novoFiltro = { ...filtroBuscaJogosBanco, categoriasIds: [Number(novaCategoria)] };
+        atualizarFiltroBusca(novoFiltro);
+    }
+
+    const handleChangeNomeJogo = (novoNome: string) => {
+        const novoFiltro = { ...filtroBuscaJogosBanco, nmJogo: novoNome };
+        atualizarFiltroBusca(novoFiltro);
+    }
+
+    const handleChangeCheckboxExibirJogosAdicionados = (valor: string | number, checked: boolean) => {
+        const novoFiltro = { ...filtroBuscaJogosBanco };
+        if (checked) {
+            novoFiltro.lojaId = lojaSelecionada?.id;
+        } else {
+            delete novoFiltro.lojaId;
+        }
+        atualizarFiltroBusca(novoFiltro);
+    }
+
+    const handleLimparCampos = () => {
+        limparFiltroBusca();
+    }
 
     const columnsJogosCadastrados: Column<jogoLoja>[] = [
         { Header: "Nome", accessor: "nomeJogo" },
@@ -152,7 +213,6 @@ export default function JogosLoja() {
         { Header: "Jogadores", accessor: (row) => `${row.qtJogadoresMin} - ${row.qtJogadoresMin}` },
         { Header: "Categorias", accessor: (row) => (row.categorias || []).map((c) => c.nmCategoria).join(", ") },
         { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
-        { Header: "Código", accessor: "CodigoJogo" },
         {
             Header: "Ações",
             Cell: (row) => {
@@ -192,10 +252,73 @@ export default function JogosLoja() {
             </div>
         )
     }
-
     const conteudoAbaCadastroJogos = () => {
         return (
-            <div>
+            <div className='flex flex-col gap-4'>
+                <div id='filtroTabelaCadastroJogos' className=''>
+                    <div className='grid grid-cols-12 gap-4 p-4 justify-start w-fit'>
+                        <div className='col-span-3'>
+                            <Select
+                                label="Mecânicas"
+                                value={filtroBuscaJogosBanco?.mecanicasIds?.[0] ?? ''}
+                                onChange={handleChangeMecanicas}
+                                options={tiposMecanicas}
+                                helperText="Você pode digitar para filtrar, mas só escolhe clicando."
+                            />
+                        </div>
+
+                        <div className='col-span-3'>
+                            <Select
+                                label="Categorias"
+                                value={filtroBuscaJogosBanco?.categoriasIds?.[0] ?? ''}
+                                onChange={handleChangeCategorias}
+                                options={tiposCategorias}
+                                helperText="Você pode digitar para filtrar, mas só escolhe clicando."
+                            />
+                        </div>
+
+                        <div className='col-span-3'>
+                            <Input
+                                label="nome do jogo"
+                                placeholder="Pesquisar jogo"
+                                value={filtroBuscaJogosBanco?.nmJogo || ''}
+                                onChange={handleChangeNomeJogo}
+                            />
+                        </div>
+
+                        <div className='col-span-3 items-center flex'>
+                            <Checkbox
+                                id='checkExibirJogosAdicionados'
+                                values={filtroBuscaJogosBanco?.lojaId ? ['1'] : []}
+                                onChange={handleChangeCheckboxExibirJogosAdicionados}
+                                items={[{ value: '1', label: 'Exibir apenas jogos não adicionados' }]}
+                                columns={1}
+
+                            >
+
+                            </Checkbox>
+                        </div>
+                    </div>
+
+                    <div className='flex justify-end pr-8 gap-4'>
+                        <Button
+                            onClick={handleLimparCampos}
+                            variant="outlineGhost"
+                            size='md'
+                        >
+                            Limpar
+                        </Button>
+
+                        <Button
+                            onClick={() => pesquisarJogos()}
+                            variant="primary"
+                            size='md'
+                        >
+                            Pesquisar
+                        </Button>
+                    </div>
+                </div>
+
                 <Table<any>
                     title="Jogos do Banco de Dados"
                     key="tabela-jogos-banco"
@@ -228,7 +351,7 @@ export default function JogosLoja() {
                         onClick={() => setAbaSelecionada(1)}
                         variant={abaSelecionada === 1 ? 'abaSelecionada' : 'aba'}
                         className={abaSelecionada === 1 ? '' : 'btnAbaNormal'}
-                        >
+                    >
                         Cadastro de Jogos
                     </Button>
                 </div>

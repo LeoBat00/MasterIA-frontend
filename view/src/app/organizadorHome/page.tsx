@@ -63,7 +63,7 @@ export default function OrganizadorHome() {
     }
 
     const handleAcessarLoja = (loja: Loja) => {
-        router.push(`/loja/${loja.id}`);
+        router.push(`organizadorHome/loja/${loja.id}`);
     }
 
     return (

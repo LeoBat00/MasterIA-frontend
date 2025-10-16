@@ -13,6 +13,14 @@ export interface Tema {
   nmTema: string;
 }
 
+export interface filtroBuscaPaginadaJogo {
+    nmJogo?: string;
+    categoriasIds?: number[];
+    temasIds?: number[];
+    mecanicasIds?: number[];
+    lojaId?: number;
+};
+
 export interface Jogo {
   id: number;
   anoNacional?: number;

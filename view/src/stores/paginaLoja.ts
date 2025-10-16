@@ -3,6 +3,7 @@ import { devtools } from "zustand/middleware";
 import { Loja } from "../types/loja";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
+import { filtroBuscaPaginadaJogo } from "../types/jogo";
 
 type LojaResponse =
     | { success: true; data: Loja }
@@ -10,6 +11,9 @@ type LojaResponse =
 
 type LojaState = {
     lojaSelecionada: Loja | null;
+    filtroBuscaJogosBanco?: filtroBuscaPaginadaJogo;
+    atualizarFiltroBusca: (f: filtroBuscaPaginadaJogo) => void;
+    limparFiltroBusca: () => void;
     setLoja: (loja: Loja) => void;
     clearLoja: () => void;
     fetchLoja: (id: number) => Promise<LojaResponse>;
@@ -19,7 +23,11 @@ export const usePaginaLojaStore = create<LojaState>()(
     devtools(
         (set) => ({
             lojaSelecionada: null,
-
+            filtroBuscaJogosBanco: undefined,
+            atualizarFiltroBusca: (f: filtroBuscaPaginadaJogo) =>
+                set({ filtroBuscaJogosBanco: f }, false, "atualizarFiltroBusca"),
+            limparFiltroBusca: () =>
+                set({ filtroBuscaJogosBanco: undefined }, false, "limparFiltroBusca"),
             setLoja: (loja) =>
                 set({ lojaSelecionada: loja }, false, "setLoja"),
 

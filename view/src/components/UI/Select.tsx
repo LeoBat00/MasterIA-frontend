@@ -6,13 +6,13 @@ export type SelectVariant = "default" | "underline";
 
 export interface SelectOption {
   label: string;
-  value: string;
+  value: string | number;
 }
 
 export interface SelectSearchProps {
   label?: string;
-  value?: string; // valor selecionado real
-  onChange?: (value: string) => void;
+  value?: string | number; // valor selecionado real
+  onChange?: (value: string | number) => void;
   error?: string;
   helperText?: string;
   options: SelectOption[];
