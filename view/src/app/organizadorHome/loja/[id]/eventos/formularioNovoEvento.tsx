@@ -48,7 +48,7 @@ export default function FormularioNovoEvento() {
             }
 
             setExibirFormularioEvento(false);
-            router.push(`/loja/${lojaId}`);
+            router.push(`organizadorHome/loja/${lojaId}/eventos`);
         }
 
     }
