@@ -3,6 +3,7 @@ import { useLojaStore } from "@/stores/loja";
 import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";
 import { useEffect } from "react";
+import Button from "@/components/UI/Button";
 
 export default function FormularioNovaLoja() {
 
@@ -13,11 +14,17 @@ export default function FormularioNovaLoja() {
 
     useEffect(() => {
         limparValidacao();
-    }, [limparValidacao ]);
+    }, [limparValidacao]);
 
     const hanleChangeCep = (novoCep: string) => {
         const copiaLoja = { ...loja };
         copiaLoja.cep = novoCep;
+        atualizarLoja(copiaLoja);
+    }
+
+    const handleChandeNome = (novoNome: string) => {
+        const copiaLoja = { ...loja };
+        copiaLoja.nmLoja = novoNome;
         atualizarLoja(copiaLoja);
     }
 
@@ -83,7 +90,7 @@ export default function FormularioNovaLoja() {
 
     return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-2)] border-l-8 border-l-[var(--color-purple-2)]  ">
 
-        <h3 className="text-lg font-semibold mb-4">{loja?.id ? "Atualizar Loja" : "Cadastrar Nova Loja" }</h3>
+        <h3 className="text-lg font-semibold mb-4">{loja?.id ? "Atualizar Loja" : "Cadastrar Nova Loja"}</h3>
         <form
             className="flex flex-col gap-2 mt-4 px-8"
             onSubmit={async (e) => {
@@ -94,7 +101,20 @@ export default function FormularioNovaLoja() {
             <div className="grid grid-cols-1 gap-8">
 
                 <div className="grid grid-cols-1 gap-8">
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-4 gap-8">
+
+                        <Input
+                            label="Nome da Loja"
+                            autoComplete="nomeLoja"
+                            placeholder="insira o nome da loja"
+                            value={loja?.nmLoja}
+                            onChange={handleChandeNome}
+                            required
+                            maxLength={100}
+                            containerClassName="col-span-3"
+                            error={validacaoErro?.nmLoja}
+                        // disabled={loading}
+                        />
 
                         <Input
                             label="Cep"
@@ -104,12 +124,15 @@ export default function FormularioNovaLoja() {
                             onChange={hanleChangeCep}
                             mask="00000-000"
                             required
+                            containerClassName="col-span-1"
+
                             number
                             error={validacaoErro?.cep}
                         // disabled={loading}
                         />
+
                     </div>
-                    <div className=" grid grid-cols-2 gap-8">
+                    <div className=" grid grid-cols-6 gap-8">
 
                         <Input
                             label="Cidade"
@@ -117,19 +140,21 @@ export default function FormularioNovaLoja() {
                             placeholder="insira a cidade"
                             value={loja?.cidade}
                             onChange={hanleChangeCidade}
+                            containerClassName="col-span-5"
                             required
                             error={validacaoErro?.cidade}
                         // disabled={loading}
                         />
 
-
                         <Input
                             label="Estado"
                             autoComplete="estado"
-                            placeholder="insira o estado"
-                            value={loja?.uf}
+                            placeholder="Estado"
+                            value={loja?.uf ? String(loja?.uf).toUpperCase() : loja?.uf}
                             onChange={hanleChangeUf}
                             required
+                            maxLength={2}
+                            containerClassName="grid-cols-1"
                             error={validacaoErro?.uf}
                         // disabled={loading}
                         />
@@ -175,23 +200,22 @@ export default function FormularioNovaLoja() {
                         />
                     </div>
                 </div>
-                <div className="justify-self-end  self-end space-x-4">
-                    <button
-                        type="button"
-                        // disabled={loading}
-                        onClick={handleSairFormulario}
-                        className="bg-[var(--color-button-secondary)] cursor-pointer rounded-[8px] text-black py-2 px-8 hover:opacity-90 mt-8 disabled:opacity-60 w-64 text-center"
-                    >
-                        Voltar
-                    </button>
 
-                    <button
-                        type="submit"
-                        // disabled={loading}
-                        className="bg-[var(--color-button-primary)] cursor-pointer rounded-[8px] text-black py-2 px-8 hover:opacity-90 mt-8 disabled:opacity-60 w-64 text-center"
-                    >
-                        Cadastrar Loja
-                    </button>
+                <div className="justify-self-end  self-end space-x-4">
+                    <Button
+                        id="botaoVoltarFornmularioEvento"
+                        variant="outlineGhost"
+                        onClick={handleSairFormulario}>
+                        <span className="px-18">
+                            voltar
+                        </span>
+                    </Button>
+                    <Button
+                        type="submit">
+                        <span className="px-8">
+                            {loja?.id ?  "Atualizar Loja" : "Cadastrar Loja"}
+                        </span>
+                    </Button>
                 </div>
 
 

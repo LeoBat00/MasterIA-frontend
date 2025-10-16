@@ -2,7 +2,6 @@
 
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
 import { obterEnderecoCompleto } from "../../util";
-import { FaGear } from "react-icons/fa6";
 import { FaStore, FaChessBoard, FaCalendar } from "react-icons/fa"
 import { CardAtalho } from "./CardAtalho";
 import { CardEvento } from "./CardEvento";
@@ -44,6 +43,10 @@ export default function PageLoja() {
         router.push(`/eventos`);
     }
 
+    const handleClickCadastroJogos = () => {
+        router.push(`/jogosLoja`);
+    }
+
     return (
         <div className="page">
 
@@ -51,7 +54,7 @@ export default function PageLoja() {
                 <div className="min-h-screen flex flex-col pb-8">
                     <div className="flex-1">
                         <div id="tituloPaginaLoja" className="mb-6">
-                            <span className="texto-light">{lojaSelecionada.logradouro}</span>
+                            <span className="texto-light">{lojaSelecionada.nmLoja}</span>
                             <p className="mt-1 text-lg text-zinc-400">Gerencie suas lojas</p>
                             <div className="mt-4 border-b border-zinc-600" />
                         </div>
@@ -65,17 +68,7 @@ export default function PageLoja() {
                                     <span className="font-medium">Status</span>
                                     <span>{lojaSelecionada.status ? "Ativo" : "Inativo"}</span>
                                 </div>
-
                             </div>
-
-                            <button
-                                className="rounded-lg cursor-pointer border border-white/10 p-2 text-zinc-300 hover:border-purple-500/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/60"
-                                aria-label={`Editar a loja ${lojaSelecionada.id}`}
-                                title="Editar loja"
-                                onClick={() => console.log("configuração da loja")}
-                            >
-                                <FaGear className="h-5 w-5" />
-                            </button>
                         </div>
 
                         <div className="w-full flex gap-6 justify-between bg-[var(--background-color-6)] rounded-[8px] p-6 mb-6">
@@ -86,7 +79,7 @@ export default function PageLoja() {
                                 label="Gerenciar Eventos"
                             />
                             <CardAtalho
-                                onClick={() => console.log("Cadastro de jogos")}
+                                onClick={handleClickCadastroJogos}
                                 icon={<FaChessBoard />}
                                 label="Cadastro de Jogos"
                             />
@@ -105,7 +98,7 @@ export default function PageLoja() {
                                     evento={evento}
                                     onClick={(e) => console.log("Evento clicado:", e)}
                                 />
-                            )) : <span className="text-zinc-400">Nenhum evento ativo</span>
+                            )) : <span className="text-zinc-400">Nenhum evento ativo</span> 
                             }
                         </div>
                     </div>

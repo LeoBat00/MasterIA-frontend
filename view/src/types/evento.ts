@@ -29,6 +29,7 @@ export type filtroEvento = {
     nomeEvento?: string;
     dataInicio?: Date;
     dataFim?: Date;
-    ordem?: "asc" | "desc";
+    ordem?: "maisRecente" | "maisAntigo" | "A-Z" | "Z-A";
     status?: string;
+    codigoEvento?: string;
 }

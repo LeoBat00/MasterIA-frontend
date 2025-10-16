@@ -4,7 +4,7 @@ export const endpoints = {
     login: "/Auth/Login",
   },
   organizador: {
-    create: "/organizadores",
+    create: "/Organizador",
     getById: (id: number) => `/Organizador/OrganiazadorById?Id=${id}`,
   },
   loja: {
@@ -17,4 +17,7 @@ export const endpoints = {
     update: "/Evento", 
     getById: (id: number) => `/Evento/EventoById?Id=${id}`,
   },
+  jogo: {
+    getPaginado:"Jogo/ListarPaginado"
+  }
 };

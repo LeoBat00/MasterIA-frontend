@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
-import {Loja} from "../types/loja"
+import { Loja } from "../types/loja"
 
 export type validacaoNovaLoja = {
     cep?: string;
@@ -11,6 +11,7 @@ export type validacaoNovaLoja = {
     uf?: string;
     logradouro?: string;
     bairro?: string;
+    nmLoja?: string;
 }
 
 type LojaState = {
@@ -38,9 +39,11 @@ export const useLojaStore = create<LojaState>()(
             validarFormulario: () => {
                 const validacaoErro: validacaoNovaLoja = {};
                 if (!get().loja?.cep) validacaoErro.cep = "CEP é obrigatório";
+                if (!get().loja?.nmLoja) validacaoErro.nmLoja = "Nome da loja é obrigatório";
                 if (get().loja?.cep && get().loja?.cep?.length !== 8) validacaoErro.cep = "CEP inválido";
                 if (!get().loja?.cidade) validacaoErro.cidade = "Cidade é obrigatória";
                 if (!get().loja?.uf) validacaoErro.uf = "UF é obrigatório";
+                if (get().loja?.uf && get().loja?.uf?.length !== 2) validacaoErro.uf = "UF inválido";
                 if (!get().loja?.logradouro) validacaoErro.logradouro = "Logradouro é obrigatório";
                 if (!get().loja?.bairro) validacaoErro.bairro = "Bairro é obrigatório";
                 set({ validacaoErro }, false, "validarFormulario");
@@ -51,24 +54,20 @@ export const useLojaStore = create<LojaState>()(
             saveLoja: async (l: Loja, idOrganizador: number): Promise<{ success: true; data: Loja } | { success: false; error: any }> => {
                 try {
 
-                    const payload = { ...l, organizadorId: idOrganizador, complemento:"obrigatorio" };
+                    const payload = { ...l, organizadorId: idOrganizador, complemento: "obrigatorio" };
                     const { data } = await http.post<Loja>(endpoints.loja.create, payload);
-                    console.log("Loja cadastrada com sucesso", data);
                     set({ loja: null, exibirFormularioLoja: false, validacaoErro: undefined }, false, "saveLoja");
                     return { success: true, data };
                 } catch (error) {
-                    console.error("Erro ao salvar loja", error);
                     return { success: false, error }; // <- erro
                 }
             },
             updateLoja: async (l: Loja): Promise<{ success: true; data: Loja } | { success: false; error: any }> => {
                 try {
                     const { data } = await http.put<Loja>(endpoints.loja.update, l);
-                    console.log("Loja atualizada com sucesso", data);
                     set({ loja: null, exibirFormularioLoja: false, validacaoErro: undefined }, false, "updateLoja");
                     return { success: true, data };
                 } catch (error) {
-                    console.error("Erro ao atualizar loja", error);
                     return { success: false, error };
                 }
             },

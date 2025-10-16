@@ -24,8 +24,23 @@ export interface Jogo {
   thumb?: string;
   tpJogo?: string;
   vlTempoJogo?: number;
+  CodigoJogo?: string;
 
   categorias: Categoria[];
   mecanicas: Mecanica[];
   temas: Tema[];
+}
+
+export interface jogoLoja {
+  jogoId: number;
+  nomeJogo: string;
+  codigoJogo: string;
+  lojaId: number;
+  anoPublicacao?: number;
+  qtdDisponivel: number;
+  copias: number;
+  categorias: Categoria[];
+  mecanicas: Mecanica[];
+  qtJogadoresMin?: number;
+  qtJogadoresMax?: number;
 }

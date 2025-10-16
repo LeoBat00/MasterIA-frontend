@@ -34,7 +34,7 @@ export function tempoRestante(evento: Evento, status: statusEvento): string {
     if (status === "Ativo") {
         const diff = inicio.getTime() - agora.getTime();
         const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
-        return dias === 1 ? "Amanhã" : `Faltam ${dias} dias`;
+        return `${dias} ${dias === 1 ? "Dia" : "Dias"}`;
     }
     return "";
 }
