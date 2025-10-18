@@ -1,5 +1,4 @@
 'use client';
-import { PrivatePage } from '@/components/PrivatePage';
 import Table, { Column, FetchParams } from '@/components/UI/Table';
 import { Jogo } from '@/types/jogo';
 import { useJogosCadastradoStore } from '@/stores/jogosCadastrados';
@@ -30,21 +29,19 @@ export default function JogosCadastrados() {
 
 
     return (
-        <PrivatePage>
-            <div className=' w-full w-max-[calc(100vw-2rem)]'>
-                <Table<any>
-                    title="Jogos de Tabuleiro"
-                    columns={columns}
-                    data={jogos || []}
-                    total={totalItens}   // 🔑 total vem do store
-                    containerClassName="bg-[#12121B] p-4 rounded-lg"
-                    fetchData={buscarJogos}
-                    pageSizeOptions={[5, 10, 20, 50]}
-                    initialPageSize={tamanhoPagina}
-                    overlay="y"
-                    maxHeight="70vh"
-                />
-            </div>
-        </PrivatePage>
+        <div className=' w-full w-max-[calc(100vw-2rem)]'>
+            <Table<any>
+                title="Jogos de Tabuleiro"
+                columns={columns}
+                data={jogos || []}
+                total={totalItens}   // 🔑 total vem do store
+                containerClassName="bg-[#12121B] p-4 rounded-lg"
+                fetchData={buscarJogos}
+                pageSizeOptions={[5, 10, 20, 50]}
+                initialPageSize={tamanhoPagina}
+                overlay="y"
+                maxHeight="70vh"
+            />
+        </div>
     );
 }

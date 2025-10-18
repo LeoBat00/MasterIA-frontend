@@ -1,5 +1,4 @@
 'use client';
-import { PrivatePage } from '@/components/PrivatePage';
 import Table, { Column, FetchParams } from '@/components/UI/Table';
 import { Jogo, jogoLoja } from '@/types/jogo';
 import { FaPlus } from 'react-icons/fa';
@@ -337,29 +336,27 @@ export default function JogosLoja() {
     }
 
     return (
-        <PrivatePage>
-            <div className='page'>
-                <div className='flex space-x-4'>
-                    <Button id='btnAbaJogosCadastrados'
-                        variant={abaSelecionada === 0 ? 'abaSelecionada' : 'aba'}
-                        onClick={() => setAbaSelecionada(0)}
-                        className={abaSelecionada === 0 ? 'btnAbaSelecionada' : 'btnAbaNormal'}>
-                        Jogos Cadastrados
-                    </Button>
+        <div className='page'>
+            <div className='flex space-x-4'>
+                <Button id='btnAbaJogosCadastrados'
+                    variant={abaSelecionada === 0 ? 'abaSelecionada' : 'aba'}
+                    onClick={() => setAbaSelecionada(0)}
+                    className={abaSelecionada === 0 ? 'btnAbaSelecionada' : 'btnAbaNormal'}>
+                    Jogos Cadastrados
+                </Button>
 
-                    <Button id='btnAbaCadastroJogos'
-                        onClick={() => setAbaSelecionada(1)}
-                        variant={abaSelecionada === 1 ? 'abaSelecionada' : 'aba'}
-                        className={abaSelecionada === 1 ? '' : 'btnAbaNormal'}
-                    >
-                        Cadastro de Jogos
-                    </Button>
-                </div>
-
-                <div className='border-2 border-[var(--color-purple-1)]'>
-                    {abaSelecionada === 0 ? conteudoAbaJogosCadastrados() : conteudoAbaCadastroJogos()}
-                </div>
+                <Button id='btnAbaCadastroJogos'
+                    onClick={() => setAbaSelecionada(1)}
+                    variant={abaSelecionada === 1 ? 'abaSelecionada' : 'aba'}
+                    className={abaSelecionada === 1 ? '' : 'btnAbaNormal'}
+                >
+                    Cadastro de Jogos
+                </Button>
             </div>
-        </PrivatePage>
+
+            <div className='border-2 border-[var(--color-purple-1)]'>
+                {abaSelecionada === 0 ? conteudoAbaJogosCadastrados() : conteudoAbaCadastroJogos()}
+            </div>
+        </div>
     );
 }

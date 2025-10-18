@@ -1,14 +1,15 @@
 'use client';
 
 import Link from "next/link";
-import { useState } from "react";
+import { use, useState } from "react";
 import { FiEye, FiEyeOff, FiPhone } from "react-icons/fi";
 import { RxAvatar } from "react-icons/rx";
 import Input from "@/components/UI/Input";
 import { isValidCPF, isValidCNPJ, onlyDigits } from "@/utils/validacoes";
 import { useRouter } from "next/navigation";
-import { useOrganizadorAuth } from "@/auth/hooks/organizadorAuth";
 import { Organizador } from "@/stores/organizador";
+import { useAuthStore } from "@/stores/auth";
+
 type NovoOrganizadorForm = {
     email?: string;
     senha?: string;
@@ -24,7 +25,7 @@ const MIN_SIZE_SENHA = 6;
 export default function RegistroPage() {
     const [step, setStep] = useState<1 | 2>(1);
     const [showPassword, setShowPassword] = useState(false);
-    const { doRegister, loading, errorMsg } = useOrganizadorAuth();
+    const { register, loading, } = useAuthStore();
     const router = useRouter();
 
     const [camposForm, setCamposForm] = useState({} as NovoOrganizadorForm);
@@ -106,7 +107,7 @@ export default function RegistroPage() {
             telefone: onlyDigits(camposForm.telefone ?? ""),
         };
 
-        const ok = await doRegister(payload);
+        const ok = await register(payload);
         if (ok) router.push("/login");
     };
 
@@ -171,7 +172,7 @@ export default function RegistroPage() {
                             disabled={loading}
                         />
 
-                        {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+                        {/* {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>} */}
 
                         <button
                             type="submit"
@@ -223,7 +224,7 @@ export default function RegistroPage() {
                             disabled={loading}
                         />
 
-                        {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+                        {/* {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>} */}
 
                         <div className="flex gap-3 mt-2">
                             <button
