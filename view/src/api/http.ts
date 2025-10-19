@@ -1,7 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useAuthStore } from "../stores/auth";
-import { useMessageStore } from "../stores/useMessageStore";
+
 
 export const http = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,

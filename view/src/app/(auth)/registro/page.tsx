@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { useState } from "react";
 import { FiEye, FiEyeOff, FiPhone } from "react-icons/fi";
 import { RxAvatar } from "react-icons/rx";
 import Input from "@/components/UI/Input";
