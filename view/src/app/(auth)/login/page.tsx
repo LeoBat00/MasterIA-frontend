@@ -6,29 +6,29 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { RxAvatar } from "react-icons/rx";
 import Input from "@/components/UI/Input";
 import { useRouter } from "next/navigation";
-import { useOrganizadorAuth } from "@/auth/hooks/organizadorAuth";
+import { useAuthStore } from "@/stores/auth";
 
-type ErroLoginType = { login: string; senha: string };
+type ErroLoginType = { loginInput: string; senha: string };
 
 export default function LoginPage() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { doLogin, loading, errorMsg } = useOrganizadorAuth();
     const router = useRouter();
+    const {login, loading} = useAuthStore();
 
     const [showPassword, setShowPassword] = useState(false);
-    const [login, setLogin] = useState("");
+    const [loginInput, setLogin] = useState("");
     const [senha, setSenha] = useState("");
-    const [erro, setErro] = useState<ErroLoginType>({ login: "", senha: "" });
+    const [erro, setErro] = useState<ErroLoginType>({ loginInput: "", senha: "" });
 
     const handleLogin = async () => {
-        const e: ErroLoginType = { login: "", senha: "" };
-        if (!login.trim()) e.login = "O campo login é obrigatório.";
-        else if (!/^\S+@\S+\.\S+$/.test(login)) e.login = "O campo login deve ser um e-mail válido.";
+        const e: ErroLoginType = { loginInput: "", senha: "" };
+        if (!loginInput.trim()) e.loginInput = "O campo loginInput é obrigatório.";
+        else if (!/^\S+@\S+\.\S+$/.test(loginInput)) e.loginInput = "O campo loginInput deve ser um e-mail válido.";
         if (!senha.trim()) e.senha = "O campo senha é obrigatório.";
         else if (senha.length < 6) e.senha = "A senha deve ter no mínimo 6 caracteres.";
         setErro(e);
-        if (e.login || e.senha) return;
-        const ok = await doLogin({ email: login, senha: senha });
+        if (e.loginInput || e.senha) return;
+        const ok = await login(loginInput, senha );
         if (ok) router.push("/organizadorHome");
 
     };
@@ -54,13 +54,13 @@ export default function LoginPage() {
                     type="email"
                     autoComplete="email"
                     placeholder="Digite seu e-mail"
-                    value={login}
+                    value={loginInput}
                     onChange={setLogin}
                     rightIcon={<RxAvatar />}
                     maxLength={50}
                     helperText="Use um e-mail válido."
                     required
-                    error={erro.login || undefined}
+                    error={erro.loginInput || undefined}
                     disabled={loading}
                 />
 
@@ -81,7 +81,7 @@ export default function LoginPage() {
                     disabled={loading}
                 />
 
-                {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+                {/* {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>} */}
 
                 <button
                     type="submit"

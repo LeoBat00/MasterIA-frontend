@@ -12,6 +12,8 @@ type LojaResponse =
 type LojaState = {
     lojaSelecionada: Loja | null;
     filtroBuscaJogosBanco?: filtroBuscaPaginadaJogo;
+    isLoading: boolean;
+    setIsLoading: (loading: boolean) => void;
     atualizarFiltroBusca: (f: filtroBuscaPaginadaJogo) => void;
     limparFiltroBusca: () => void;
     setLoja: (loja: Loja) => void;
@@ -24,6 +26,9 @@ export const usePaginaLojaStore = create<LojaState>()(
         (set) => ({
             lojaSelecionada: null,
             filtroBuscaJogosBanco: undefined,
+            isLoading: false,
+            setIsLoading: (loading: boolean) =>
+                set({ isLoading: loading }, false, "setIsLoading"),
             atualizarFiltroBusca: (f: filtroBuscaPaginadaJogo) =>
                 set({ filtroBuscaJogosBanco: f }, false, "atualizarFiltroBusca"),
             limparFiltroBusca: () =>

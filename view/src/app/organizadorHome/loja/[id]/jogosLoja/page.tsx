@@ -1,5 +1,4 @@
 'use client';
-import { PrivatePage } from '@/components/PrivatePage';
 import Table, { Column, FetchParams } from '@/components/UI/Table';
 import { Jogo, jogoLoja } from '@/types/jogo';
 import { FaPlus } from 'react-icons/fa';
@@ -12,17 +11,21 @@ import { useRouter } from 'next/navigation';
 import Select from '@/components/UI/Select';
 import Input from '@/components/UI/Input';
 import Checkbox from '@/components/UI/Checkbox';
+import { getMecanicas } from '@/api/mecanica';
+import { getTemas } from '@/api/tema';
 
 
 export default function JogosLoja() {
 
-    const { lojaSelecionada, fetchLoja, filtroBuscaJogosBanco, atualizarFiltroBusca, limparFiltroBusca } = usePaginaLojaStore();
+    const { lojaSelecionada, fetchLoja, filtroBuscaJogosBanco, atualizarFiltroBusca, limparFiltroBusca, isLoading, setIsLoading } = usePaginaLojaStore();
     const { fetchJogosPaginado, tamanhoPagina, totalItens, jogos } = useJogosCadastradoStore();
     const { updateLoja } = useLojaStore();
     const [tamanhoPaginaLoja, setTamanhoPaginaLoja] = useState(10);
     const [totalItensLoja, setTotalItensLoja] = useState(0);
     const [listaDeJogosLoja, setListaDeJogosLoja] = useState<jogoLoja[]>(lojaSelecionada?.jogos?.slice(0, 10) || []);
     const [abaSelecionada, setAbaSelecionada] = useState(0); // 0 = Cadastro de Jogos, 1 = Jogos Cadastrados
+    const [todasMecanicas, setTodasMecanicas] = useState([]);
+    const [todosTemas, setTodosTemas] = useState([]);
     const navigater = useRouter();
 
     const filtroRef = useRef(filtroBuscaJogosBanco);
@@ -31,25 +34,35 @@ export default function JogosLoja() {
         filtroRef.current = filtroBuscaJogosBanco;
     }, [filtroBuscaJogosBanco]);
 
-    const tiposMecanicas = [
-        { value: 1, label: "Todas" },
-        { value: 2, label: "Competitivo" },
-        { value: 3, label: "Solo" },
-        { value: 4, label: "Equipe" },
-    ];
-
-    const tiposCategorias = [
-        { value: 1, label: "Todas" },
-        { value: 2, label: "Competitivo" },
-        { value: 3, label: "Solo" },
-        { value: 4, label: "Equipe" },
-    ];
-
     useEffect(() => {
         if (!lojaSelecionada) {
             navigater.push('/organizadorHome');
         }
+        carregarMecanicasETemas();
     }, []);
+
+
+    const carregarMecanicasETemas = async () => {
+
+        try {
+            const [mecanicas, temas] = await Promise.all([getMecanicas(), getTemas()]);
+
+            const mecanicasFormatadas = mecanicas.map((m: any) => ({
+                value: m.id,
+                label: m.nmMecanica,
+            }));
+
+            const temasFormatados = temas.map((t: any) => ({
+                value: t.id,
+                label: t.nmTema,
+            }));
+
+            setTodasMecanicas(mecanicasFormatadas);
+            setTodosTemas(temasFormatados);
+        } catch (error) {
+            console.error("Erro ao carregar mecânicas/temas:", error);
+        }
+    };
 
     const buscarPaginadoJogosLoja = useCallback(
         async ({ page, pageSize }: FetchParams) => {
@@ -115,7 +128,6 @@ export default function JogosLoja() {
                     return;
                 }
 
-                console.log("Loja atualizada com sucesso:", fetchRes.data);
             }
         } catch (err) {
             console.error("Erro inesperado ao adicionar jogo:", err);
@@ -146,14 +158,28 @@ export default function JogosLoja() {
     };
 
     const pesquisarJogos = async () => {
-        await fetchJogosPaginado(1, tamanhoPagina, filtroRef.current);
+        try {
+            setIsLoading(true);
+            await fetchJogosPaginado(1, tamanhoPagina, filtroRef.current);
+        } catch (error) {
+            console.error("Erro ao buscar jogos:", error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
 
     const buscarJogos = useCallback(
         async ({ page, pageSize }: FetchParams) => {
+            try {
+                setIsLoading(true);
+                await fetchJogosPaginado(page, pageSize, filtroBuscaJogosBanco);
 
-            await fetchJogosPaginado(page, pageSize, filtroBuscaJogosBanco);
+            } catch (error) {
+                console.error("Erro ao buscar jogos:", error);
+            } finally {
+                setIsLoading(false);
+            }
         },
         [fetchJogosPaginado]
     );
@@ -164,8 +190,8 @@ export default function JogosLoja() {
         atualizarFiltroBusca(novoFiltro);
     }
 
-    const handleChangeCategorias = (novaCategoria: string | number) => {
-        const novoFiltro = { ...filtroBuscaJogosBanco, categoriasIds: [Number(novaCategoria)] };
+    const handleChangeTemas = (novoTema: string | number) => {
+        const novoFiltro = { ...filtroBuscaJogosBanco, temasIds: [Number(novoTema)] };
         atualizarFiltroBusca(novoFiltro);
     }
 
@@ -191,7 +217,7 @@ export default function JogosLoja() {
     const columnsJogosCadastrados: Column<jogoLoja>[] = [
         { Header: "Nome", accessor: "nomeJogo" },
         { Header: "Jogadores", accessor: (row) => `${row.qtJogadoresMin} - ${row.qtJogadoresMax}` },
-        { Header: "Categorias", accessor: (row) => (row.categorias || []).map((c) => c.nmCategoria).join(", ") },
+        { Header: "Temas", accessor: (row) => (row.temas || []).map((c) => c.nmTema).join(", ") },
         { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
         { Header: "Código", accessor: "codigoJogo" },
         {
@@ -211,7 +237,7 @@ export default function JogosLoja() {
     const columnsJogosDoBanco: Column<Jogo>[] = [
         { Header: "Nome", accessor: "nmJogo" },
         { Header: "Jogadores", accessor: (row) => `${row.qtJogadoresMin} - ${row.qtJogadoresMin}` },
-        { Header: "Categorias", accessor: (row) => (row.categorias || []).map((c) => c.nmCategoria).join(", ") },
+        { Header: "Temas", accessor: (row) => (row.temas || []).map((c) => c.nmTema).join(", ") },
         { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
         {
             Header: "Ações",
@@ -243,11 +269,13 @@ export default function JogosLoja() {
                     data={listaDeJogosLoja || []}
                     total={totalItensLoja}
                     containerClassName="bg-[#12121B] p-4 rounded-lg"
+                    tableClassName='min-h-[60vh]'
                     fetchData={buscarPaginadoJogosLoja}
                     pageSizeOptions={[5, 10, 20, 50]}
                     initialPageSize={tamanhoPaginaLoja}
+                    loading={isLoading}
                     overlay="y"
-                    maxHeight="70vh"
+                    maxHeight="60vh"
                 />
             </div>
         )
@@ -255,25 +283,28 @@ export default function JogosLoja() {
     const conteudoAbaCadastroJogos = () => {
         return (
             <div className='flex flex-col gap-4'>
-                <div id='filtroTabelaCadastroJogos' className=''>
+                <div id='filtroTabelaCadastroJogos' className=' p-4'>
                     <div className='grid grid-cols-12 gap-4 p-4 justify-start w-fit'>
                         <div className='col-span-3'>
                             <Select
                                 label="Mecânicas"
                                 value={filtroBuscaJogosBanco?.mecanicasIds?.[0] ?? ''}
                                 onChange={handleChangeMecanicas}
-                                options={tiposMecanicas}
+                                options={todasMecanicas}
                                 helperText="Você pode digitar para filtrar, mas só escolhe clicando."
+                                containerClassName='z-20'
+
                             />
                         </div>
 
                         <div className='col-span-3'>
                             <Select
-                                label="Categorias"
-                                value={filtroBuscaJogosBanco?.categoriasIds?.[0] ?? ''}
-                                onChange={handleChangeCategorias}
-                                options={tiposCategorias}
+                                label="Temas"
+                                value={filtroBuscaJogosBanco?.temasIds?.[0] ?? ''}
+                                onChange={handleChangeTemas}
+                                options={todosTemas}
                                 helperText="Você pode digitar para filtrar, mas só escolhe clicando."
+                                containerClassName='z-20'
                             />
                         </div>
 
@@ -305,6 +336,7 @@ export default function JogosLoja() {
                             onClick={handleLimparCampos}
                             variant="outlineGhost"
                             size='md'
+                            disabled={isLoading}
                         >
                             Limpar
                         </Button>
@@ -313,6 +345,7 @@ export default function JogosLoja() {
                             onClick={() => pesquisarJogos()}
                             variant="primary"
                             size='md'
+                            disabled={isLoading}
                         >
                             Pesquisar
                         </Button>
@@ -326,8 +359,10 @@ export default function JogosLoja() {
                     data={jogos || []}
                     total={totalItens}
                     containerClassName="{bg-[#12121B]} p-4 rounded-lg"
+                    tableClassName='min-h-[60vh]'
                     fetchData={buscarJogos}
                     pageSizeOptions={[5, 10, 20, 50]}
+                    loading={isLoading}
                     initialPageSize={tamanhoPagina}
                     overlay="y"
                     maxHeight="70vh"
@@ -337,29 +372,27 @@ export default function JogosLoja() {
     }
 
     return (
-        <PrivatePage>
-            <div className='page'>
-                <div className='flex space-x-4'>
-                    <Button id='btnAbaJogosCadastrados'
-                        variant={abaSelecionada === 0 ? 'abaSelecionada' : 'aba'}
-                        onClick={() => setAbaSelecionada(0)}
-                        className={abaSelecionada === 0 ? 'btnAbaSelecionada' : 'btnAbaNormal'}>
-                        Jogos Cadastrados
-                    </Button>
+        <div className='page'>
+            <div className='flex space-x-4'>
+                <Button id='btnAbaJogosCadastrados'
+                    variant={abaSelecionada === 0 ? 'abaSelecionada' : 'aba'}
+                    onClick={() => setAbaSelecionada(0)}
+                    className={abaSelecionada === 0 ? 'btnAbaSelecionada' : 'btnAbaNormal'}>
+                    Jogos Cadastrados
+                </Button>
 
-                    <Button id='btnAbaCadastroJogos'
-                        onClick={() => setAbaSelecionada(1)}
-                        variant={abaSelecionada === 1 ? 'abaSelecionada' : 'aba'}
-                        className={abaSelecionada === 1 ? '' : 'btnAbaNormal'}
-                    >
-                        Cadastro de Jogos
-                    </Button>
-                </div>
-
-                <div className='border-2 border-[var(--color-purple-1)]'>
-                    {abaSelecionada === 0 ? conteudoAbaJogosCadastrados() : conteudoAbaCadastroJogos()}
-                </div>
+                <Button id='btnAbaCadastroJogos'
+                    onClick={() => setAbaSelecionada(1)}
+                    variant={abaSelecionada === 1 ? 'abaSelecionada' : 'aba'}
+                    className={abaSelecionada === 1 ? '' : 'btnAbaNormal'}
+                >
+                    Cadastro de Jogos
+                </Button>
             </div>
-        </PrivatePage>
+
+            <div className='border-2 border-[var(--color-purple-1)] min-h-[400px]'>
+                {abaSelecionada === 0 ? conteudoAbaJogosCadastrados() : conteudoAbaCadastroJogos()}
+            </div>
+        </div>
     );
 }

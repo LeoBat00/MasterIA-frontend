@@ -19,6 +19,7 @@ export default function PageLoja() {
     const lojaId = Number(params?.id);
     const router = useRouter();
 
+
     const listaEventosAtivos =
         (lojaSelecionada?.eventos ?? []).filter((evento) => {
             const statusAtual = calcularStatus(evento);

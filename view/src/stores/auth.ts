@@ -1,6 +1,13 @@
 import { create } from "zustand";
-import { persist, devtools } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
 import { jwtDecode } from "jwt-decode";
+import { http } from "../api/http";
+import Cookies from "js-cookie";
+import { endpoints } from "../api/endpoints";
+import { Organizador } from "./organizador";
+
+export type LoginPayload = { email: string; senha: string };
+export type LoginResponse = { token: string };
 
 export type JwtPayload = {
   nameid?: string;
@@ -13,103 +20,60 @@ export type JwtPayload = {
   [k: string]: unknown;
 };
 
-function getStoredToken(): string | null {
-  const raw = localStorage.getItem("auth");
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed.state?.token ?? null;
-  } catch {
-    return null;
-  }
-}
-
-export function isAuthenticated(): boolean {
-  const store = useAuthStore.getState();
-  let token = store.token;
-
-  // se não tiver na store, tenta no storage
-  if (!token) {
-    token = getStoredToken();
-    debugger
-    if (token) {
-      // repopula a store
-      store.setToken(token);
-    }
-  }
-
-  if (!token) return false;
-
-  // valida expiração
-  try {
-    const { exp } = jwtDecode<JwtPayload>(token);
-    if (!exp) return true;
-    const now = Math.floor(Date.now() / 1000);
-    const valido = now < exp;
-
-    if (!valido) {
-      store.logout(); // limpa se estiver expirado
-    }
-
-    return valido;
-  } catch {
-    store.logout();
-    return false;
-  }
-}
-
-type AuthState = {
-  token: string | null;
+type AuthStore = {
   claims: JwtPayload | null;
-  setToken: (token: string | null) => void;
-  isExpired: () => boolean;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  register: (data: Organizador) => Promise<boolean>;
+  checkAuth: () => void;
 };
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthStore>()(
   devtools(
-    persist(
-      (set, get) => ({
-        token: null,
-        claims: null,
+    (set) => ({
+      claims: null,
+      loading: false,
 
-        setToken: (token) => {
-          if (!token) {
-            set({ token: null, claims: null }, false, "clearToken");
-            return;
-          }
-          try {
-            const claims = jwtDecode<JwtPayload>(token);
-            set({ token, claims }, false, "setToken");
-          } catch {
-            set({ token: null, claims: null }, false, "invalidToken");
-          }
-        },
+      login: async (email: string, senha: string) => {
+        try {
+          set({ loading: true });
+          const { data } = await http.post<{ token: string }>(endpoints.auth.login, { email, senha });
+          const { token } = data;
 
-        isExpired: () => {
-          const { token } = get();
-          if (!token) return true;
-          try {
-            const { exp } = jwtDecode<JwtPayload>(token);
-            if (!exp) return false;
-            const now = Math.floor(Date.now() / 1000);
-            return now >= exp;
-          } catch {
-            return true;
-          }
-        },
+          Cookies.set('token', token, { expires: 7, path: '/' });
+          set({ claims: jwtDecode<JwtPayload>(token), loading: false });
+          return true;
+        } catch (error) {
+          console.error("Login failed:", error);
+          set({ loading: false });
+          return false;
+        }
+      },
 
-        logout: () => {
-          //remover do storage e limpar store
-          localStorage.removeItem("auth");
-          set({ token: null, claims: null }, false, "logout")},
-      }),
-      {
-        name: "auth", // chave no localStorage
-        version: 1,
-        partialize: (s) => ({ token: s.token }),
+      register: async (data: Organizador) => {
+        try {
+          set({ loading: true });
+          await http.post(endpoints.organizador.create, data);
+          set({ loading: false });
+          return true;
+        } catch (error) {
+          console.error("Registration failed:", error);
+          set({ loading: false });
+          return false;
+        }
+      },
+
+      logout: () => {
+        Cookies.remove('token');
+        set({ claims: null });
+      },
+
+      checkAuth: () => {
+        const token = Cookies.get('token');
+        return !!token;
       }
-    ),
-    { name: "Auth" } // <- nome que aparece no Redux DevTools
-  )
+    }),
+    { name: "Auth" }
+  ),
 );
