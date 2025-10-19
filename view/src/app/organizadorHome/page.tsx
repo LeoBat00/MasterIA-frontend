@@ -13,11 +13,15 @@ import { useLojaStore } from '@/stores/loja';
 import { obterEnderecoCompleto } from '../util';
 import { useAuthStore } from '@/stores/auth';
 import { Loja } from '@/types/loja';
+import { usePaginaLojaStore } from '@/stores/paginaLoja';
+
 
 export default function OrganizadorHome() {
     const router = useRouter();
     const [lojas, setLojas] = useState<Loja[]>([]);
     const { claims, logout } = useAuthStore();
+    const { setLoja } = usePaginaLojaStore();
+
 
     const { exibirFormularioLoja, setExibirFormularioLoja, atualizarLoja } = useLojaStore();
     const { organizador, fetchOrganizador } = useOrganizadorStore();
@@ -35,6 +39,11 @@ export default function OrganizadorHome() {
     }
 
     useEffect(() => {
+        setLoja({} as Loja);
+    }, []);
+
+    useEffect(() => {
+        debugger
         const run = async () => {
             const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
             if (organizadorId && !organizador) {

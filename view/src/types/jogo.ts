@@ -49,6 +49,7 @@ export interface jogoLoja {
   copias: number;
   categorias: Categoria[];
   mecanicas: Mecanica[];
+  temas: Tema[];
   qtJogadoresMin?: number;
   qtJogadoresMax?: number;
 }

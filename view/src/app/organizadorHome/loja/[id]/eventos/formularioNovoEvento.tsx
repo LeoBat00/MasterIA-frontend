@@ -32,7 +32,6 @@ export default function FormularioNovoEvento() {
     }
 
     const handleSairFormulario = () => {
-        console.log("Sair Formulario");
         clear();
         limparValidacao();
         setExibirFormularioEvento(false);

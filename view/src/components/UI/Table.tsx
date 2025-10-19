@@ -88,10 +88,10 @@ function TableInner<T extends object>(
             >
                 <table
                     ref={ref}
-                    className={clsx("min-w-full divide-y divide-gray-700 text-sm", tableClassName)}
+                    className={clsx("min-w-full divide-y divide-gray-700 text-sm ", tableClassName)}
                     {...rest}
                 >
-                    <thead className="text-[#D9E8FF]">
+                    <thead className="text-[#D9E8FF] sticky top-0 bg-[#1E1E2F] z-10">
                         <tr>
                             {columns.map((col, idx) => (
                                 <th
