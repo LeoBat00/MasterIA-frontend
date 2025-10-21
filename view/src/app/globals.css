@@ -18,12 +18,21 @@
   --color-purple-5: #685BFF;
 
   --color-border-cinza: #6E737F;
+  --color-border-ligh-purple: #A7AEFF;
 
   --color-button-primary: #FDC700;
   --color-button-secondary: #cfccfc;
 
   --text-color-1: #a6a2ff;
   --text-color-2: #7A19CD;
+  --text-color-info: #969997;
+
+  --cor-status-ativo: #A7AEFF;
+  --cor-status-encerrado: #FFDAA7;
+  --cor-status-desativado: #FF3C26;
+  --cor-status-em-andamento: #26FF3C;
+
+
 }
 
 @theme inline {
@@ -118,3 +127,4 @@ body {
 .linha-tabela-verde tr:nth-child(even) {
   background-color: green;
 }
+

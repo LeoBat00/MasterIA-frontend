@@ -1,7 +1,7 @@
-import LoadingScreen from '@/components/UI/LoadingScreen';
+import LoadingOverlay from '@/components/UI/LoadingOverlay';
 
 export default function Loading() {
     return (
-        <LoadingScreen />
+        <LoadingOverlay />
     );
 }

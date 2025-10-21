@@ -123,7 +123,7 @@ export default function OrganizadorHome() {
                                         <div className="flex items-center justify-between">
                                             <div className="">
                                                 <div className="text-lg font-medium mb-1">{l.nmLoja}</div>
-                                                <div className="text-lg font-medium text-zinc-500">
+                                                <div className="text-lg font-medium text-[var(--text-color-info)]">
                                                     <span className='mr-1'>Endereço:</span>
                                                     <span>{obterEnderecoCompleto(l)}</span>
                                                 </div>

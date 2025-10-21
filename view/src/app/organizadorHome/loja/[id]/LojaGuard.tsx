@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePaginaLojaStore } from '@/stores/paginaLoja';
-import LoadingScreen from '@/components/UI/LoadingScreen';
+import LoadingOverlay from '@/components/UI/LoadingOverlay';
 
 export default function LojaGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function LojaGuard({ children }: { children: React.ReactNode }) {
   }, [lojaSelecionada, router]);
 
   if (!lojaSelecionada) {
-    return <LoadingScreen/>; // ou componente de loading
+    return <LoadingOverlay/>; // ou componente de loading
   }
 
   return <>{children}</>;

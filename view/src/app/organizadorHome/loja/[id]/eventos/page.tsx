@@ -102,6 +102,10 @@ export default function PageEvento() {
     const handleChangeCódigoEvento = (novoCodigo: string) => {
         atualizarFiltroEvento({ ...filtroEvento, codigoEvento: novoCodigo });
     }
+
+    const handleClickCardEvento = (idEvento: number) => {
+        router.push(`/organizadorHome/loja/${lojaSelecionada?.id}/${idEvento}`);
+    }
     return (
         <div className="page">
             {lojaSelecionada ?
@@ -176,7 +180,7 @@ export default function PageEvento() {
                                             <CardEvento
                                                 key={evento.id}
                                                 evento={evento}
-                                                onClick={(e) => console.log("Evento clicado:", e)}
+                                                onClick={(evento) => handleClickCardEvento(evento.id)}
                                             />
                                         ))
                                     ) : (

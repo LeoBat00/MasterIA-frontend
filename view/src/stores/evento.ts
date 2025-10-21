@@ -16,7 +16,7 @@ type EventoState = {
     atualizarFiltroEvento: (f: filtroEvento) => void;
     setExibirFormularioEvento: (v: boolean) => void;
     validarFormulario: () => boolean;
-    salvarEvento: (e: novoEvento, lojaId: number) => Promise<{ success: true} | { success: false }>;
+    salvarEvento: (e: novoEvento, lojaId: number) => Promise<{ success: true } | { success: false }>;
     getEventoById: (id: number) => Promise<Evento | null>;
     limparValidacao: () => void;
     clear: () => void;
@@ -81,7 +81,7 @@ export const useEventoStore = create<EventoState>()(
 
                 return Object.keys(validacaoErro).length === 0;
             },
-            salvarEvento: async (e: novoEvento, lojaId: number): Promise<{ success: true} | { success: false }> => {
+            salvarEvento: async (e: novoEvento, lojaId: number): Promise<{ success: true } | { success: false }> => {
                 try {
                     const payload = { ...e, status: 1, lojaId };
 
@@ -95,7 +95,7 @@ export const useEventoStore = create<EventoState>()(
                 }
             },
             limparValidacao: () => set({ validacaoErro: undefined }, false, "limparValidacao"),
-            clear: () => set({ evento: null }, false, "clear"),
+            clear: () => set({ evento: null, validacaoErro: undefined, exibirFormularioEvento: false, filtroEvento: undefined, eventoSelecionado: undefined }, false, "clear"),
         }),
         { name: "Evento" }
     )
