@@ -27,6 +27,7 @@ type AuthStore = {
   logout: () => void;
   register: (data: Organizador) => Promise<boolean>;
   checkAuth: () => void;
+  initializeAuth: () => void;
 };
 
 export const useAuthStore = create<AuthStore>()(
@@ -72,7 +73,13 @@ export const useAuthStore = create<AuthStore>()(
       checkAuth: () => {
         const token = Cookies.get('token');
         return !!token;
-      }
+      },
+      initializeAuth: () => {
+        const token = Cookies.get('token');
+        if (token) {
+          set({ claims: jwtDecode<JwtPayload>(token) });
+        }
+      },
     }),
     { name: "Auth" }
   ),

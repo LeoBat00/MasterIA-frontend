@@ -48,6 +48,10 @@ export default function PageLoja() {
         router.push(`/organizadorHome/loja/${lojaId}/jogosLoja`);
     }
 
+    const handleClickCardEvento = (idEvento: number) => {
+        router.push(`/organizadorHome/loja/${lojaId}/${idEvento}`);
+    }
+
     return (
         <div className="page">
 
@@ -60,7 +64,7 @@ export default function PageLoja() {
                             <div className="mt-4 border-b border-zinc-600" />
                         </div> */}
                         <p className="mt-1 text-lg text-zinc-400">Gerencie sua loja</p>
-                        <div className="mt-4 border-b border-zinc-600" />
+                        <div className="mt-2 border-b border-zinc-600 mb-8"/>
 
                         <div className="flex items-center p-2 rounded-[8px] justify-between border border-[var(--color-purple-1)] px-4 mb-6">
                             <div className="text-lg font-medium text-zinc-500">
@@ -99,7 +103,7 @@ export default function PageLoja() {
                                 <CardEvento
                                     key={evento.id}
                                     evento={evento}
-                                    onClick={(e) => console.log("Evento clicado:", e)}
+                                    onClick={(evento) => handleClickCardEvento(evento.id)}
                                 />
                             )) : <span className="text-zinc-400">Nenhum evento ativo</span>
                             }

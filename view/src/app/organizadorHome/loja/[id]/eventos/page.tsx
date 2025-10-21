@@ -109,7 +109,7 @@ export default function PageEvento() {
                     <div className="flex-1">
                         <div id="tituloPaginaLoja" className="mb-6">
                             <p className="mt-1 text-lg text-zinc-400">Gerencie seus eventos</p>
-                            <div className="mt-4 border-b border-zinc-600" />
+                            <div className="mt-2 border-b border-zinc-600 mb-8" />
                         </div>
                         {exibirFormularioEvento ?
                             <FormularioNovoEvento />

@@ -2,11 +2,10 @@
 
 import { Breadcrumb } from "@/components/UI/Breadcrumb";
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
+import LojaGuard from "./LojaGuard";
 
 export default function useLojaLayout({ children }: { children: React.ReactNode }) {
-
     const { lojaSelecionada } = usePaginaLojaStore();
-
 
     return (
         <div className="min-h-screen flex flex-col pb-8">
@@ -18,9 +17,9 @@ export default function useLojaLayout({ children }: { children: React.ReactNode 
                 </div>
             </div>
 
-
-
-            <main className="">{children}</main>
+            <LojaGuard>
+                {children}
+            </LojaGuard>
         </div>
     );
 }

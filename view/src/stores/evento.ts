@@ -1,7 +1,6 @@
-// src/store/auth.ts
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { filtroEvento, novoEvento } from "../types/evento"
+import { Evento, filtroEvento, novoEvento } from "../types/evento"
 import { validacaoNovoEvento } from "../types/evento";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
@@ -11,11 +10,14 @@ type EventoState = {
     validacaoErro?: validacaoNovoEvento;
     exibirFormularioEvento: boolean;
     filtroEvento?: filtroEvento;
+    eventoSelecionado?: Evento;
+    setEventoSelecionado: (e: Evento | undefined) => void;
     atualizarEvento: (e: novoEvento) => void;
     atualizarFiltroEvento: (f: filtroEvento) => void;
     setExibirFormularioEvento: (v: boolean) => void;
     validarFormulario: () => boolean;
     salvarEvento: (e: novoEvento, lojaId: number) => Promise<{ success: true} | { success: false }>;
+    getEventoById: (id: number) => Promise<Evento | null>;
     limparValidacao: () => void;
     clear: () => void;
 };
@@ -27,6 +29,17 @@ export const useEventoStore = create<EventoState>()(
             evento: null,
             validacaoErro: undefined,
             exibirFormularioEvento: false,
+            eventoSelecionado: undefined,
+            setEventoSelecionado: (e: Evento | undefined) => set({ eventoSelecionado: e }, false, "setEventoSelecionado"),
+            getEventoById: async (id: number): Promise<Evento | null> => {
+                try {
+                    const response = await http.get<Evento>(endpoints.evento.getById(id));
+                    return response.data;
+                } catch (error) {
+                    console.error("Erro ao buscar evento por ID", error);
+                    return null;
+                }
+            },
             atualizarEvento: (e: novoEvento) => set({ evento: e }, false, "atualizarEvento"),
             atualizarFiltroEvento: (f: filtroEvento) => set({ filtroEvento: f }, false, "atualizarFiltroEvento"),
             setExibirFormularioEvento: (v: boolean) => set({ exibirFormularioEvento: v }, false, "setExibirFormularioEvento"),

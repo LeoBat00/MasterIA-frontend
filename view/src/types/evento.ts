@@ -1,3 +1,5 @@
+import { Jogo } from "./jogo";
+
 export type statusEvento = "Ativo" | "EmAndamento" | "Encerrado" | "Desativado";
 
 export type novoEvento = {
@@ -16,6 +18,8 @@ export type Evento = {
     dtFim: string;
     status: statusEvento;
     qtdLimite?: number;
+    jogos: Jogo[];
+    lojaId: number;
 };
 
 export type validacaoNovoEvento = {

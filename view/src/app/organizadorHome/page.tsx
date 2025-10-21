@@ -31,7 +31,6 @@ export default function OrganizadorHome() {
     }
 
     const buscarOrganizador = async (organizadorId: number) => {
-        console.log('Buscando organizador com ID:', organizadorId);
         await fetchOrganizador(organizadorId).catch(() => {
             logout();
             window.location.href = "/";
@@ -43,7 +42,6 @@ export default function OrganizadorHome() {
     }, []);
 
     useEffect(() => {
-        debugger
         const run = async () => {
             const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
             if (organizadorId && !organizador) {
