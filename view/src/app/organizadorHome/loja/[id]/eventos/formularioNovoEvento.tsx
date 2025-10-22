@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function FormularioNovoEvento() {
     const { evento, setExibirFormularioEvento, validacaoErro, atualizarEvento, validarFormulario, clear, limparValidacao, salvarEvento } = useEventoStore();
-    const { lojaSelecionada } = usePaginaLojaStore();
+    const { lojaSelecionada, fetchLoja } = usePaginaLojaStore();
     const router = useRouter();
 
     const lojaId = lojaSelecionada?.id;
@@ -45,6 +45,8 @@ export default function FormularioNovoEvento() {
             if (!resultado.success) {
                 return;
             }
+
+            await fetchLoja(lojaId!)
 
             setExibirFormularioEvento(false);
             router.push(`/organizadorHome/loja/${lojaId}/eventos`);

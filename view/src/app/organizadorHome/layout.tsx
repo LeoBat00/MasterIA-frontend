@@ -4,7 +4,7 @@ import MenuLateral from "@/components/MenuLateral";
 import { useAuthStore } from "@/stores/auth";
 import { useEffect } from "react";
 
-export default function organizadorHomeLayout({ children }: { children: React.ReactNode }) {
+export default function useOrganizadorHomeLayout({ children }: { children: React.ReactNode }) {
 
     const { initializeAuth } = useAuthStore();
 

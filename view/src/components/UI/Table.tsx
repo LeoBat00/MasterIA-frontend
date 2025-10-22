@@ -81,7 +81,7 @@ function TableInner<T extends object>(
                     overlay === "both" && "overflow-auto",
                     loading && "overflow-hidden"
                 )}
-                style={{
+                style={{minHeight: "60vh",
                     ...(overlay === "y" || overlay === "both" ? { maxHeight: maxHeight ?? "70vh" } : {}),
                     ...(overlay === "x" || overlay === "both" ? { maxWidth: maxWidth ?? "100%" } : {}),
                 }}

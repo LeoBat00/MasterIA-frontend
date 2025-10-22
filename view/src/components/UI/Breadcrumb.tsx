@@ -35,11 +35,6 @@ export function Breadcrumb({ nomeLoja }: BreadcrumbProps) {
                 acc.push('loja')
             }
 
-            // adiciona '(evento)' entre idLoja e idEvento
-            if (segment === idLoja && pathSegments[i + 1] === idEvento) {
-                acc.push('(evento)')
-            }
-
             return acc
         }, [])
 
