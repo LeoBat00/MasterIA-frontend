@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="md:max-w-[290px] lg:maxw-[380px] w-full z-30">
+      <div className="md:max-w-[290px] 2xl:max-w-[380px] w-full z-30">
         <h2 className="text-2xl font-semibold text-center mb-2">BEM-VINDO!</h2>
 
         <div className="flex justify-center">
