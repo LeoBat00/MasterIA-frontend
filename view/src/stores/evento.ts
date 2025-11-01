@@ -4,6 +4,8 @@ import { Evento, filtroEvento, novoEvento } from "../types/evento"
 import { validacaoNovoEvento } from "../types/evento";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
+import { filtroBuscaPaginadaJogo } from "../types/jogo";
+import { Grupo } from "@/types/grupo";
 
 type EventoState = {
     evento: novoEvento | null;
@@ -11,12 +13,20 @@ type EventoState = {
     exibirFormularioEvento: boolean;
     filtroEvento?: filtroEvento;
     eventoSelecionado?: Evento;
+    grupoSelecionado?: Grupo;
+    filtroBuscaJogos?: filtroBuscaPaginadaJogo;
+    isLoading: boolean;
+    setGrupoSelecionado: (g: Grupo | undefined) => void;
+    setIsLoading: (loading: boolean) => void;
+    atualizarFiltroBusca: (f: filtroBuscaPaginadaJogo) => void;
+    limparFiltroBusca: () => void;
     setEventoSelecionado: (e: Evento | undefined) => void;
     atualizarEvento: (e: novoEvento) => void;
     atualizarFiltroEvento: (f: filtroEvento) => void;
     setExibirFormularioEvento: (v: boolean) => void;
     validarFormulario: () => boolean;
     salvarEvento: (e: novoEvento, lojaId: number) => Promise<{ success: true } | { success: false }>;
+    updateEvento: (e: Evento) => Promise<{ success: true } | { success: false }>;
     getEventoById: (id: number) => Promise<Evento | null>;
     limparValidacao: () => void;
     clear: () => void;
@@ -30,6 +40,15 @@ export const useEventoStore = create<EventoState>()(
             validacaoErro: undefined,
             exibirFormularioEvento: false,
             eventoSelecionado: undefined,
+            filtroEvento: undefined,
+            filtroBuscaJogosBanco: undefined,
+            isLoading: false,
+            setIsLoading: (loading: boolean) =>
+                set({ isLoading: loading }, false, "setIsLoading"),
+            atualizarFiltroBusca: (f: filtroBuscaPaginadaJogo) =>
+                set({ filtroBuscaJogos: f }, false, "atualizarFiltroBusca"),
+            limparFiltroBusca: () =>
+                set({ filtroBuscaJogos: undefined }, false, "limparFiltroBusca"),
             setEventoSelecionado: (e: Evento | undefined) => set({ eventoSelecionado: e }, false, "setEventoSelecionado"),
             getEventoById: async (id: number): Promise<Evento | null> => {
                 try {
@@ -94,6 +113,19 @@ export const useEventoStore = create<EventoState>()(
                     return { success: false };
                 }
             },
+            updateEvento: async (e: Evento): Promise<{ success: true } | { success: false }> => {
+                try {
+                    const payload = e;
+                    await http.put(endpoints.evento.update, payload);
+
+                    set({ evento: null, exibirFormularioEvento: false, validacaoErro: undefined }, false, "updateEvento");
+                    return { success: true };
+                } catch (error) {
+                    console.error("Erro ao atualizar evento", error);
+                    return { success: false };
+                }
+            },
+            setGrupoSelecionado: (g: Grupo | undefined) => set({ grupoSelecionado: g }, false, "setGrupoSelecionado"),
             limparValidacao: () => set({ validacaoErro: undefined }, false, "limparValidacao"),
             clear: () => set({ evento: null, validacaoErro: undefined, exibirFormularioEvento: false, filtroEvento: undefined, eventoSelecionado: undefined }, false, "clear"),
         }),

@@ -1,12 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { calcularStatus, formatarData, getCorStatusEvento } from '@/app/util';
 import { useEventoStore } from '@/stores/evento';
 import { CardAtalho } from '@/components/Cards/CardAtalho';
 import { FaUser, FaChessBoard, FaCalendar } from 'react-icons/fa';
 import LoadingOverlay from '@/components/UI/LoadingOverlay';
+import { Grupo } from '@/types/grupo';
+
+const gruposMockados: Grupo[] = [
+    {
+        id: 1,
+        nmGrupo: "Grupo A",
+        qntMaxima: 10,
+        descricao: "Descrição do Grupo A",
+        lojaId: 1,
+        participantes: [],
+        jogosGrupos: [],
+    },
+    {
+        id: 2,
+        nmGrupo: "Grupo B",
+        qntMaxima: 15,
+        descricao: "Descrição do Grupo B",
+        lojaId: 1,
+        participantes: [],
+        jogosGrupos: [],
+    },
+];
 
 export default function DetalhesEventoPage() {
     const EnumStateEvento = {
@@ -16,19 +38,16 @@ export default function DetalhesEventoPage() {
         EmAndamento: 'Em andamento',
     };
 
-    const {
-        eventoSelecionado,
-        getEventoById,
-        setEventoSelecionado,
-        clear,
-    } = useEventoStore();
+    const { eventoSelecionado, getEventoById, setEventoSelecionado, clear, } = useEventoStore();
+
+    const router = useRouter();
 
     const params = useParams();
     const idEventoSelecionado = Number(params?.idEvento);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        let ativo = true;
+        const ativo = true;
         setIsLoading(true);
 
         if (idEventoSelecionado && getEventoById) {
@@ -43,10 +62,6 @@ export default function DetalhesEventoPage() {
                 });
         }
 
-        return () => {
-            ativo = false;
-            clear?.();
-        };
     }, [idEventoSelecionado, getEventoById, setEventoSelecionado, clear]);
 
     if (isLoading) {
@@ -61,11 +76,11 @@ export default function DetalhesEventoPage() {
     const corStatus = getCorStatusEvento(status);
 
     const handleClickGerenciasJogos = () => {
-        console.log("Gerenciar Jogos do Evento");
+        router.push(`/organizadorHome/loja/${eventoSelecionado.lojaId}/${eventoSelecionado.id}/jogos`);
     }
 
     const handleClickParticipantes = () => {
-        console.log("Gerenciar Participantes do Evento");
+        router.push(`/organizadorHome/loja/${eventoSelecionado.lojaId}/${eventoSelecionado.id}/participantes`);
     }
 
     const handleClickDadosDoEvento = () => {
@@ -109,6 +124,8 @@ export default function DetalhesEventoPage() {
                     </div>
                 </div>
 
+                <p className="texto-medium-sm mb-1">Serviços</p>
+
                 <div className="w-full flex gap-6 justify-between bg-[var(--background-color-6)] rounded-[8px] p-6 mb-6">
                     <CardAtalho
                         onClick={handleClickGerenciasJogos}
@@ -126,6 +143,28 @@ export default function DetalhesEventoPage() {
                         label="Dados do Evento"
                     />
                 </div>
+
+                <p className="texto-medium-sm mb-1">Grupos</p>
+
+                {/* {eventoSelecionado.grupos && eventoSelecionado.grupos.length > 0 && ( */}
+                {gruposMockados && gruposMockados.length > 0 && (
+                    <div>
+                        <div className="grid grid-cols-1 gap-4">
+                            {gruposMockados.map((grupo) => (
+                                <div
+                                    key={grupo.id}
+                                    className="p-4 border rounded-lg bg-[var(--background-color-6)]"
+                                >
+                                    <p className="font-semibold text-lg mb-2">{grupo.nmGrupo}</p>
+                                    <p className="text-zinc-400 mb-2">{grupo.descricao}</p>
+                                    <p className="text-sm">
+                                        Participantes: {grupo.participantes.length} / {grupo.qntMaxima}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

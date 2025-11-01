@@ -81,6 +81,13 @@ body {
   line-height: 64px;
 }
 
+.texto-medium-sm {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 64px;
+}
+
 .page {
   width: 100%;
   min-height: 100vh;

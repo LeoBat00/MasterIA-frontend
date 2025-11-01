@@ -33,7 +33,7 @@ export default function OrganizadorHome() {
     const buscarOrganizador = async (organizadorId: number) => {
         await fetchOrganizador(organizadorId).catch(() => {
             logout();
-            window.location.href = "/";
+            router.push('/login');
         });
     }
 
@@ -45,12 +45,7 @@ export default function OrganizadorHome() {
         const run = async () => {
             const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
             if (organizadorId && !organizador) {
-                try {
-                    await buscarOrganizador(organizadorId);
-                } catch {
-                    logout();
-                    window.location.href = "/";
-                }
+                await buscarOrganizador(organizadorId);
             }
         };
 
