@@ -1,6 +1,17 @@
-import MenuLateral  from "@/components/MenuLateral";
+'use client';
 
-export default function organizadorHomeLayout({ children }: { children: React.ReactNode }) {
+import MenuLateral from "@/components/MenuLateral";
+import { useAuthStore } from "@/stores/auth";
+import { useEffect } from "react";
+
+export default function useOrganizadorHomeLayout({ children }: { children: React.ReactNode }) {
+
+    const { initializeAuth } = useAuthStore();
+
+    useEffect(() => {
+        initializeAuth();
+    }, [initializeAuth]);
+
     return (
         <div className="flex min-h-screen p-6">
             <MenuLateral />

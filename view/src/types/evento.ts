@@ -1,3 +1,6 @@
+import { Grupo } from "./grupo";
+import { jogoEvento } from "./jogo";
+
 export type statusEvento = "Ativo" | "EmAndamento" | "Encerrado" | "Desativado";
 
 export type novoEvento = {
@@ -6,6 +9,7 @@ export type novoEvento = {
     dtFim?: string;
     status?: statusEvento;
     qtdLimite?: number;
+    jogosEvento?: jogoEvento[];
 }
 
 export type Evento = {
@@ -16,6 +20,9 @@ export type Evento = {
     dtFim: string;
     status: statusEvento;
     qtdLimite?: number;
+    lojaId: number;
+    jogos: jogoEvento[];
+    grupos: Grupo[];
 };
 
 export type validacaoNovoEvento = {

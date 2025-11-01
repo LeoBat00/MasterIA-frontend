@@ -3,7 +3,7 @@
 import { usePaginaLojaStore } from "@/stores/paginaLoja";
 import { obterEnderecoCompleto } from "../../../util";
 import { FaStore, FaChessBoard, FaCalendar } from "react-icons/fa"
-import { CardAtalho } from "./CardAtalho";
+import { CardAtalho } from "../../../../components/Cards/CardAtalho";
 import { CardEvento } from "./CardEvento";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -48,6 +48,10 @@ export default function PageLoja() {
         router.push(`/organizadorHome/loja/${lojaId}/jogosLoja`);
     }
 
+    const handleClickCardEvento = (idEvento: number) => {
+        router.push(`/organizadorHome/loja/${lojaId}/${idEvento}`);
+    }
+
     return (
         <div className="page">
 
@@ -60,10 +64,10 @@ export default function PageLoja() {
                             <div className="mt-4 border-b border-zinc-600" />
                         </div> */}
                         <p className="mt-1 text-lg text-zinc-400">Gerencie sua loja</p>
-                        <div className="mt-4 border-b border-zinc-600" />
+                        <div className="mt-2 border-b border-zinc-600 mb-8" />
 
                         <div className="flex items-center p-2 rounded-[8px] justify-between border border-[var(--color-purple-1)] px-4 mb-6">
-                            <div className="text-lg font-medium text-zinc-500">
+                            <div className="text-lg font-medium text-[var(--text-color-info)]">
                                 <div className="grid grid-cols-[120px_1fr] gap-y-1 p-3">
                                     <span className="font-medium">Endereço</span>
                                     <span>{obterEnderecoCompleto(lojaSelecionada)}</span>
@@ -94,12 +98,13 @@ export default function PageLoja() {
 
                         </div>
 
+                        <div className="text-lg font-medium text-[var(--text-color-info)] mb-2">Eventos Ativos</div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {listaEventosAtivos.length > 0 ? listaEventosAtivos.map(evento => (
                                 <CardEvento
                                     key={evento.id}
                                     evento={evento}
-                                    onClick={(e) => console.log("Evento clicado:", e)}
+                                    onClick={(evento) => handleClickCardEvento(evento.id)}
                                 />
                             )) : <span className="text-zinc-400">Nenhum evento ativo</span>
                             }

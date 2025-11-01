@@ -236,7 +236,7 @@ export default function JogosLoja() {
 
     const columnsJogosDoBanco: Column<Jogo>[] = [
         { Header: "Nome", accessor: "nmJogo" },
-        { Header: "Jogadores", accessor: (row) => `${row.qtJogadoresMin} - ${row.qtJogadoresMin}` },
+        { Header: "Jogadores", accessor: (row) => `${row.qtJogadoresMin} - ${row.qtJogadoresMax}` },
         { Header: "Temas", accessor: (row) => (row.temas || []).map((c) => c.nmTema).join(", ") },
         { Header: "Mecânicas", accessor: (row) => (row.mecanicas || []).map((m) => m.nmMecanica).join(", ") },
         {
@@ -269,7 +269,6 @@ export default function JogosLoja() {
                     data={listaDeJogosLoja || []}
                     total={totalItensLoja}
                     containerClassName="bg-[#12121B] p-4 rounded-lg"
-                    tableClassName='min-h-[60vh]'
                     fetchData={buscarPaginadoJogosLoja}
                     pageSizeOptions={[5, 10, 20, 50]}
                     initialPageSize={tamanhoPaginaLoja}
@@ -359,7 +358,6 @@ export default function JogosLoja() {
                     data={jogos || []}
                     total={totalItens}
                     containerClassName="{bg-[#12121B]} p-4 rounded-lg"
-                    tableClassName='min-h-[60vh]'
                     fetchData={buscarJogos}
                     pageSizeOptions={[5, 10, 20, 50]}
                     loading={isLoading}

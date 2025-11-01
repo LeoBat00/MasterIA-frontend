@@ -2,59 +2,70 @@
 
 import Link from 'next/link'
 import { usePathname, useParams } from 'next/navigation'
-import {FaChevronRight} from 'react-icons/fa'
+import { FaChevronRight } from 'react-icons/fa'
+import { useEventoStore } from '@/stores/evento'
 
 interface BreadcrumbProps {
-    nomeLoja?: string // nome da loja vem por props
+    nomeLoja?: string
 }
 
 export function Breadcrumb({ nomeLoja }: BreadcrumbProps) {
     const pathname = usePathname()
     const params = useParams()
-    const id = params?.id as string | undefined
+    const idLoja = params?.id as string | undefined
+    const idEvento = params?.idEvento as string | undefined
 
-    // Quebra o path e remove 'loja'
+    const { eventoSelecionado } = useEventoStore()
+
+    // Quebra o path e remove 'loja' e '(evento)' dos segmentos visuais
     const segments = pathname
         .split('/')
         .filter(Boolean)
-        .filter((segment) => segment !== 'loja') // remove o diretório "loja"
-
+        .filter((segment) => segment !== 'loja' && segment !== '(evento)') // remove os diretórios técnicos
 
     const buildPath = (index: number) => {
         const pathSegments = segments.slice(0, index + 1)
 
-        // se existir um id (ex: "123") e antes dele vier "organizadorHome",
-        // precisamos reinserir "loja" entre eles
+        // reconstrói o caminho com 'loja' e '(evento)' onde necessário
         const correctedPath = pathSegments.reduce<string[]>((acc, segment, i) => {
             acc.push(segment)
-            if (segment === 'organizadorHome' && pathSegments[i + 1] === id) {
+
+            // adiciona 'loja' entre organizadorHome e idLoja
+            if (segment === 'organizadorHome' && pathSegments[i + 1] === idLoja) {
                 acc.push('loja')
             }
+
             return acc
         }, [])
 
         return '/' + correctedPath.join('/')
     }
 
-
     const labelMap: Record<string, string> = {
         organizadorHome: 'Início',
+        eventos: 'Gerenciar eventos',
         jogosLoja: 'Cadastro de jogos',
-        evento: 'Gerenciar eventos',
     }
 
     return (
         <nav className="flex items-center space-x-2 text-sm">
             {segments.map((segment, index) => {
                 const isLast = index === segments.length - 1
+
                 const label =
-                    segment === id
+                    segment === idLoja
                         ? nomeLoja || 'Loja'
-                        : labelMap[segment] || decodeURIComponent(segment)
+                        : segment === idEvento
+                            ? eventoSelecionado?.nmEvento || 'Evento'
+                            : labelMap[segment] || decodeURIComponent(segment)
 
                 return (
                     <span key={index} className="flex items-center text-gray-500">
-                        {index > 0 && <span className="mx-2"><FaChevronRight/></span>}
+                        {index > 0 && (
+                            <span className="mx-2">
+                                <FaChevronRight />
+                            </span>
+                        )}
                         {isLast ? (
                             <span className="text-indigo-400 font-medium capitalize">
                                 {label}

@@ -6,6 +6,15 @@ export const obterEnderecoCompleto = (loja: Loja) => {
     return `${loja.logradouro}, ${loja.numero} - ${loja.bairro}, ${loja.cidade} - ${loja.uf}, ${loja.cep}`;
 }
 
+export const formatarData = (dataStr: string): string => {
+    const data = new Date(dataStr);
+    return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
 
 export function calcularStatus(evento: Evento): statusEvento {
     if (!evento.status) return "Desativado";
@@ -16,6 +25,21 @@ export function calcularStatus(evento: Evento): statusEvento {
     if (agora < inicio) return "Ativo";
     if (agora >= inicio && agora <= fim) return "EmAndamento";
     return "Encerrado";
+}
+
+export function getCorStatusEvento(status: statusEvento | undefined): string {
+    switch (status) {
+        case "Ativo":
+            return "var(--cor-status-ativo)";
+        case "EmAndamento":
+            return "var(--cor-status-em-andamento)";
+        case "Encerrado":
+            return "var(--cor-status-encerrado)";
+        case "Desativado":
+            return "var(--cor-status-desativado)";
+        default:
+            return "";
+    }
 }
 
 

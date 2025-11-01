@@ -102,6 +102,10 @@ export default function PageEvento() {
     const handleChangeCódigoEvento = (novoCodigo: string) => {
         atualizarFiltroEvento({ ...filtroEvento, codigoEvento: novoCodigo });
     }
+
+    const handleClickCardEvento = (idEvento: number) => {
+        router.push(`/organizadorHome/loja/${lojaSelecionada?.id}/${idEvento}`);
+    }
     return (
         <div className="page">
             {lojaSelecionada ?
@@ -109,7 +113,7 @@ export default function PageEvento() {
                     <div className="flex-1">
                         <div id="tituloPaginaLoja" className="mb-6">
                             <p className="mt-1 text-lg text-zinc-400">Gerencie seus eventos</p>
-                            <div className="mt-4 border-b border-zinc-600" />
+                            <div className="mt-2 border-b border-zinc-600 mb-8" />
                         </div>
                         {exibirFormularioEvento ?
                             <FormularioNovoEvento />
@@ -176,7 +180,7 @@ export default function PageEvento() {
                                             <CardEvento
                                                 key={evento.id}
                                                 evento={evento}
-                                                onClick={(e) => console.log("Evento clicado:", e)}
+                                                onClick={(evento) => handleClickCardEvento(evento.id)}
                                             />
                                         ))
                                     ) : (

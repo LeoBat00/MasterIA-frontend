@@ -33,13 +33,27 @@ export interface Jogo {
   tpJogo?: string;
   vlTempoJogo?: number;
   CodigoJogo?: string;
-
   categorias: Categoria[];
   mecanicas: Mecanica[];
   temas: Tema[];
 }
 
 export interface jogoLoja {
+  jogoId: number;
+  nomeJogo: string;
+  codigoJogo: string;
+  lojaId: number;
+  anoPublicacao?: number;
+  qtdDisponivel: number;
+  copias: number;
+  categorias: Categoria[];
+  mecanicas: Mecanica[];
+  temas: Tema[];
+  qtJogadoresMin?: number;
+  qtJogadoresMax?: number;
+}
+
+export interface jogoEvento {
   jogoId: number;
   nomeJogo: string;
   codigoJogo: string;

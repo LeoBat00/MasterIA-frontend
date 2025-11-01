@@ -5,10 +5,10 @@ import { Evento, statusEvento } from "../../../../types/evento";
 import { calcularStatus, tempoRestante } from "../../../util";
 
 const tipoStatusEvento: Record<statusEvento, { id: number, label: string; border: string, estilo: string }> = {
-    Ativo: { id: 1, label: "Faltam", border: "border-l-4 border-[#A7AEFF]", estilo: "text-2xl font-bold" },
-    Encerrado: { id: 2, label: "Evento", border: "border-l-4 border-[#FFDAA7]", estilo: "" },
-    Desativado: { id: 3, label: "Evento", border: "border-l-4 border-[#FF3C26]", estilo: "" },
-    EmAndamento: { id: 4, label: "Em andamento", border: "border-l-4 border-[#26FF3C]", estilo: "" },
+    Ativo: { id: 1, label: "Faltam", border: "border-l-4 border-[var(--cor-status-ativo)]", estilo: "text-2xl font-bold" },
+    Encerrado: { id: 2, label: "Evento", border: "border-l-4 border-[var(--cor-status-encerrado)]", estilo: "" },
+    Desativado: { id: 3, label: "Evento", border: "border-l-4 border-[var(--cor-status-desativado)]", estilo: "" },
+    EmAndamento: { id: 4, label: "Em andamento", border: "border-l-4 border-[var(--cor-status-em-andamento)]", estilo: "" },
 };
 
 type CardEventoProps = {

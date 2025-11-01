@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function FormularioNovoEvento() {
     const { evento, setExibirFormularioEvento, validacaoErro, atualizarEvento, validarFormulario, clear, limparValidacao, salvarEvento } = useEventoStore();
-    const { lojaSelecionada } = usePaginaLojaStore();
+    const { lojaSelecionada, fetchLoja } = usePaginaLojaStore();
     const router = useRouter();
 
     const lojaId = lojaSelecionada?.id;
@@ -40,11 +40,14 @@ export default function FormularioNovoEvento() {
     const handleCadastrarEvento = async () => {
         limparValidacao();
         if (validarFormulario()) {
-            const resultado = await salvarEvento(evento!, lojaId!);
+            const eventoComJogosDaLoja = { ...evento, jogos: (lojaSelecionada?.jogos || []).map(j => ({ codigoJogo: j.codigoJogo })) || [] };
+            const resultado = await salvarEvento(eventoComJogosDaLoja!, lojaId!);
 
             if (!resultado.success) {
                 return;
             }
+
+            await fetchLoja(lojaId!)
 
             setExibirFormularioEvento(false);
             router.push(`/organizadorHome/loja/${lojaId}/eventos`);
