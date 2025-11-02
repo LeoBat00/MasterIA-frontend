@@ -32,15 +32,12 @@ export const useOrganizadorStore = create<OrganizadorState>()(
             loading: false,
             error: null,
             fetchOrganizador: async (id: number) => {
-                try {
-                    set({ loading: true, error: null });
-                    const { data } = await http.get<Organizador>(
-                        endpoints.organizador.getById(id)
-                    );
-                    set({ organizador: data, loading: false }, false, "fetchOrganizador");
-                } catch (error) {
-                    set({ loading: false, error: "Erro ao buscar organizador: " + error });
-                }
+                set({ loading: true, error: null });
+                const { data } = await http.get<Organizador>(
+                    endpoints.organizador.getById(id)
+                );
+                set({ organizador: data, loading: false }, false, "fetchOrganizador");
+
             },
             setOrnanizador: (o) =>
                 set({ organizador: o }, false, "setOrganizador"),

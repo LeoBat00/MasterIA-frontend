@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useAuthStore } from "@/stores/auth";
 
 export default function Header() {
+
+  const { checkAuth } = useAuthStore();
+
   return (
     <header className="w-full flex items-center justify-between px-6 sm:px-10 py-4 bg-[#161622] border-b border-[#2E2A45] shadow-sm z-50">
       <Link href="/" className="flex items-center gap-2">
@@ -27,11 +31,12 @@ export default function Header() {
         </div>
 
         <Link
-          href="/login"
+          href={checkAuth() ? "/organizadorHome" : "/login"}
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-full font-medium shadow-md transition hover:brightness-110 hover:shadow-lg"
         >
-          Login
+          {checkAuth() ? 'Lojas' : 'Login'}
         </Link>
+
       </div>
     </header>
   );

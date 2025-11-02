@@ -26,7 +26,7 @@ type AuthStore = {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (data: Organizador) => Promise<boolean>;
-  checkAuth: () => void;
+  checkAuth: () => boolean;
   initializeAuth: () => void;
 };
 

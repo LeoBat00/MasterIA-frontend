@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { FiLoader } from "react-icons/fi";
 
 export type ButtonSize = "sm" | "md" | "lg";
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "outlineGhost"| "aba" | "abaSelecionada";
+export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "outlineGhost"| "aba" | "abaSelecionada" | "outlineGhostPurple";
 
 export interface ButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -50,6 +50,8 @@ const Button: React.FC<ButtonProps> = ({
             "border-b-6 border-transparent text-[var(--color-purple-2)] hover:text-white cursor-pointer ",
         abaSelecionada:
             "border-b-6 border-[var(--color-purple-1)] text-white cursor-pointer rounded-none ",
+        outlineGhostPurple:
+            "border border-[var(--color-purple-2)] text-[var(--color-purple-2)] bg-transparent hover:bg-[var(--color-purple-2)] hover:text-white cursor-pointer ",
         };
 
     return (

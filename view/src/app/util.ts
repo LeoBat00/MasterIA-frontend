@@ -15,6 +15,11 @@ export const formatarData = (dataStr: string): string => {
     });
 }
 
+export const zerarHoras = (data: Date) => {
+    const d = new Date(data);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
 
 export function calcularStatus(evento: Evento): statusEvento {
     if (!evento.status) return "Desativado";

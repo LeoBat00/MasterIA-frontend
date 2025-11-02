@@ -46,21 +46,14 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="flex gap-4 flex-wrap justify-center sm:justify-start"
               >
-                <button
-                  //onClick={() => setModalOpen(true)}
-                  className="bg-yellow-400 cursor-not-allowed text-black font-semibold px-6 py-2 rounded-xl transition hover:bg-yellow-300"
+                <Link href="/cadastroEventos"
+                  className="bg-yellow-400 text-black font-semibold px-6 py-2 rounded-xl transition hover:bg-yellow-300"
                 >
                   Procurar Mesas
-                </button>
-
-                <Link
-                  href="#"
-                  className="border cursor-not-allowed border-indigo-400 text-indigo-200 px-6 py-2 rounded-xl transition hover:bg-indigo-600 hover:text-white"
-                >
-                  Criar Conta
                 </Link>
 
-                <Link href="/gerarRecomendacao" className="flex items-center gap-2 cursor-pointer text-indigo-200 px-6 py-2 rounded-xl transition hover:bg-indigo-600 hover:text-white">
+                <Link href="/gerarRecomendacao"
+                  className="flex items-center gap-2 cursor-pointer text-indigo-200 px-6 py-2 rounded-xl transition hover:bg-indigo-600 hover:text-white">
                   <FiZap className="text-lg" />
                   Gerar recomendação
                 </Link>

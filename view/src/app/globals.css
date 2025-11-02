@@ -22,11 +22,12 @@
   --color-border-ligh-purple: #A7AEFF;
 
   --color-button-primary: #FDC700;
-  --color-button-secondary: #cfccfc;
+  --color-button-secondary: #616EFF;
 
   --text-color-1: #a6a2ff;
   --text-color-2: #7A19CD;
   --text-color-info: #969997;
+  --text-color-info2: rgba(217, 232, 255, 0.4);
 
   --cor-status-ativo: #A7AEFF;
   --cor-status-encerrado: #FFDAA7;
@@ -57,9 +58,10 @@ body {
 }
 
 .texto-destaque {
-  color: var(--text-color-2 );
+  color: var(--text-color-2);
   font-weight: bold;
 }
+
 .texto-light {
   font-weight: 300;
   font-size: 48px;
@@ -88,6 +90,55 @@ body {
   line-height: 64px;
 }
 
+.titulo-pagina-evento {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 39px;
+  color: #D9E8FF;
+}
+
+.texto-organizador {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 39px;
+  color: #D9E8FF;
+}
+
+.texto-small {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #D9E8FF;
+}
+
+.texto-small-info {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 24px;
+  color: var(--text-color-info2);
+} 
+
+.texto-medium-info {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--text-color-info2);
+} 
+
+
+.titulo-pagina {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 56px;
+  line-height: 64px;
+  color: #D8D8D8;
+}
+
 .page {
   width: 100%;
   min-height: 100vh;
@@ -108,17 +159,21 @@ body {
 }
 
 .custom-scroll::-webkit-scrollbar {
-  width: 8px;   /* largura vertical */
-  height: 8px;  /* altura horizontal */
+  width: 8px;
+  /* largura vertical */
+  height: 8px;
+  /* altura horizontal */
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: #12121B; /* cor do fundo */
+  background: #12121B;
+  /* cor do fundo */
   border-radius: 4px;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-purple-5); /* cor do polegar */
+  background: var(--color-purple-5);
+  /* cor do polegar */
   border-radius: 4px;
 }
 
@@ -136,3 +191,6 @@ body {
   background-color: green;
 }
 
+.min-h-inherit {
+  min-height: inherit;
+}

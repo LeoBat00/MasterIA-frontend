@@ -21,6 +21,7 @@ export type Evento = {
     status: statusEvento;
     qtdLimite?: number;
     lojaId: number;
+    NomeLoja?: string;
     jogos: jogoEvento[];
     grupos: Grupo[];
 };
