@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import GlobalMessage from "@/components/GlobalMessage";
+import Header from "@/components/Header";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,7 +37,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.className} antialiased`}
       >
         <GlobalMessage />
-        {children}
+        <Header />
+        <main className="pt-[var(--header-h,64px)] min-h-[calc(100dvh-var(--header-h,64px))]">
+          {children}
+        </main>
       </body>
     </html>
   );
