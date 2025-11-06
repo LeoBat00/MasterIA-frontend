@@ -18,7 +18,9 @@ export default function SelecionarCidade() {
     { value: "belo-horizonte", label: "Belo Horizonte" },
   ];
 
-  const [cidadesDisponiveis, setCidadesDisponiveis] = useState<CidadeDisponivel[]>([]);
+  const [cidadesDisponiveis, setCidadesDisponiveis] = useState<
+    CidadeDisponivel[]
+  >([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -85,11 +87,19 @@ export default function SelecionarCidade() {
           cidadesRankedByEventos.map((c) => (
             <div
               key={c.cidade}
+              role="button"
               className="p-4 cursor-pointer bg-[#2F2B43] rounded-lg mb-2 hover:bg-white/20 text-[#D9E8FF] flex items-center justify-between"
               tabIndex={0}
               onClick={() => {
                 setCidadeSelecionada(c.cidade);
                 router.push(`/cidade/${c.cidade}`);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setCidadeSelecionada(c.cidade);
+                  router.push(`/cidade/${c.cidade}`);
+                }
               }}
             >
               <span>{formatLabel(c.cidade)}</span>
@@ -105,13 +115,14 @@ export default function SelecionarCidade() {
         <div className="mt-4 border-b border-zinc-600" />
 
         <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outlineGhost" onClick={() => router.push("/") }>
+          <Button variant="outlineGhost" onClick={() => router.push("/")}>
             Voltar
           </Button>
 
           <Button
             onClick={() => {
-              if (cidadeSelecionada) router.push(`/cidade/${cidadeSelecionada}`);
+              if (cidadeSelecionada)
+                router.push(`/cidade/${cidadeSelecionada}`);
             }}
             disabled={!cidadeSelecionada}
           >
@@ -122,4 +133,3 @@ export default function SelecionarCidade() {
     </div>
   );
 }
-
