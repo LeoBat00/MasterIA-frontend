@@ -86,6 +86,7 @@ export default function SelecionarCidade() {
             <div
               key={c.cidade}
               className="p-4 cursor-pointer bg-[#2F2B43] rounded-lg mb-2 hover:bg-white/20 text-[#D9E8FF] flex items-center justify-between"
+              tabIndex={0}
               onClick={() => {
                 setCidadeSelecionada(c.cidade);
                 router.push(`/cidade/${c.cidade}`);
