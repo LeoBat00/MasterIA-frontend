@@ -1,6 +1,4 @@
 "use client";
-
-import Header from "@/components/Header";
 import Link from "next/link";
 import Image from "next/image";
 import { FiCpu, FiSmile, FiClipboard, FiZap } from "react-icons/fi";
@@ -14,7 +12,6 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center font-sans text-gray-100 bg-gradient-to-br from-[#0D0D12] to-[#1A162A]">
       <div className="w-full">
-        <Header />
         <main className="flex flex-col items-center justify-center flex-grow p-6 sm:p-16 w-full">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -46,14 +43,17 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="flex gap-4 flex-wrap justify-center sm:justify-start"
               >
-                <Link href="/cadastroEventos"
+                <Link
+                  href="/cadastroEventos"
                   className="bg-yellow-400 text-black font-semibold px-6 py-2 rounded-xl transition hover:bg-yellow-300"
                 >
                   Procurar Mesas
                 </Link>
 
-                <Link href="/gerarRecomendacao"
-                  className="flex items-center gap-2 cursor-pointer text-indigo-200 px-6 py-2 rounded-xl transition hover:bg-indigo-600 hover:text-white">
+                <Link
+                  href="/gerarRecomendacao"
+                  className="flex items-center gap-2 cursor-not-allowed text-indigo-200 px-6 py-2 rounded-xl transition hover:bg-indigo-600 hover:text-white"
+                >
                   <FiZap className="text-lg" />
                   Gerar recomendação
                 </Link>
@@ -69,7 +69,7 @@ export default function Home() {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="w-full sm:w-[400px] h-auto rounded-xl overflow-hidden shadow-lg flex items-center justify-center"
+              className="w-full sm:w-[400px] h-auto rounded-xl overflow-hidden flex items-center justify-center"
             >
               <Image
                 src="/imagemprincipal.png"
