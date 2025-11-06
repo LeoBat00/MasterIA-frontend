@@ -41,11 +41,15 @@ export default function CidadePage() {
     let eventosFiltrados = [...lista];
 
     if (filtroEventos?.codigoEvento) {
-      eventosFiltrados = eventosFiltrados.filter((evento) =>
-        evento.cdEvento
-          .toLowerCase()
-          .includes(filtroEventos.codigoEvento!.toLowerCase())
-      );
+      const termo = filtroEventos.codigoEvento.toLowerCase();
+      eventosFiltrados = eventosFiltrados.filter((evento) => {
+        const cd = (evento.cdEvento || "").toLowerCase();
+        const nome = (evento.nmEvento || "").toLowerCase();
+        const loja = (evento.nomeLoja || "").toLowerCase();
+        return (
+          cd.includes(termo) || nome.includes(termo) || loja.includes(termo)
+        );
+      });
     }
 
     if (filtroEventos?.inPeriodo) {
@@ -96,7 +100,9 @@ export default function CidadePage() {
   const eventosDaCidade = useMemo(() => {
     const nomeLower = (nome || "").toString().toLowerCase();
     const filtrados = filtrarEventos(eventos || []);
-    return filtrados.filter((e) => (e.cidade || "").toLowerCase() === nomeLower);
+    return filtrados.filter(
+      (e) => (e.cidade || "").toLowerCase() === nomeLower
+    );
   }, [eventos, nome, filtroEventos]);
 
   const mapToEvento = (e: EventoAtivo): Evento => ({
@@ -116,7 +122,7 @@ export default function CidadePage() {
 
   return (
     <div className="min-h-screen pt-20 bg-[#1C172E]">
-      <div className="mx-50 p-8">
+      <div className="mx-4 md:mx-20 px-4 md:px-8 py-8">
         <Button
           variant="outlineGhostPurple"
           className="!rounded-full"
@@ -137,7 +143,7 @@ export default function CidadePage() {
         <p>Filtrar por</p>
         <FiltroEventos />
 
-        <div className="grid grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-4">
           {loading && (
             <div className="col-span-4 p-4 bg-[#2F2B43] rounded-lg text-[#D9E8FF] opacity-70">
               Carregando eventos...
@@ -150,18 +156,19 @@ export default function CidadePage() {
             </div>
           )}
 
-          {!loading && eventosDaCidade.map((evento) => {
-            const eMap = mapToEvento(evento);
-            return (
-              <Link
-                href={`/selecionarCidade/${eMap.id}`}
-                key={eMap.id}
-                className=" hover:scale-105 transition-transform"
-              >
-                <CardCadastroEvento {...eMap} />
-              </Link>
-            );
-          })}
+          {!loading &&
+            eventosDaCidade.map((evento) => {
+              const eMap = mapToEvento(evento);
+              return (
+                <Link
+                  href={`/selecionarCidade/${eMap.id}`}
+                  key={eMap.id}
+                  className=" hover:scale-105 transition-transform"
+                >
+                  <CardCadastroEvento {...eMap} />
+                </Link>
+              );
+            })}
         </div>
       </div>
     </div>
