@@ -44,7 +44,7 @@ export default function Home() {
                 className="flex gap-4 flex-wrap justify-center sm:justify-start"
               >
                 <Link
-                  href="/cadastroEventos"
+                  href="/selecionarCidade"
                   className="bg-yellow-400 text-black font-semibold px-6 py-2 rounded-xl transition hover:bg-yellow-300"
                 >
                   Procurar Mesas

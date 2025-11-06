@@ -16,6 +16,7 @@ export const endpoints = {
     create: "/Evento",
     update: "/Evento", 
     getById: (id: number) => `/Evento/EventoById?Id=${id}`,
+    getCidadesDisponiveis: "/Evento/GetCidadesDisponiveis",
   },
   jogo: {
     getPaginado: "/Jogo/ListarPaginado",
