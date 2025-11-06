@@ -13,7 +13,7 @@ export default function SelecionarCidade() {
   const router = useRouter();
 
   const cidades = [
-    { value: "sao-paulo", label: "Sǜo Paulo" },
+    { value: "sao-paulo", label: "São Paulo" },
     { value: "rio-de-janeiro", label: "Rio de Janeiro" },
     { value: "belo-horizonte", label: "Belo Horizonte" },
   ];
