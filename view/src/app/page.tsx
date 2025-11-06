@@ -10,7 +10,7 @@ import { useState } from "react";
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   return (
-    <div className="min-h-screen flex flex-col items-center font-sans text-gray-100 bg-gradient-to-br from-[#0D0D12] to-[#1A162A]">
+    <div className="min-h-screen flex flex-col items-center font-sans text-gray-100 bg-gradient-to-br from-[#0D0D12] pt-15 to-[#1A162A]">
       <div className="w-full">
         <main className="flex flex-col items-center justify-center flex-grow p-6 sm:p-16 w-full">
           <motion.div

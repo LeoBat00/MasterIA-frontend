@@ -26,6 +26,19 @@ export type Evento = {
     grupos: Grupo[];
 };
 
+export type EventoAtivo = {
+    id: number;
+    nmEvento: string;
+    cdEvento: string;
+    dtFim: string;
+    dtInicio: string;
+    qtdLimite: number;
+    status: boolean;
+    lojaId: number;
+    nomeLoja: string;
+    cidade: string;
+};
+
 export type validacaoNovoEvento = {
     nomeEvento?: string;
     dataInicio?: string;

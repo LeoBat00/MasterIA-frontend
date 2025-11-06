@@ -1,9 +1,19 @@
-import { formatarData } from "@/app/util";
+import { formatarData, zerarHoras } from "@/app/util";
 import { Evento } from "@/types/evento";
 import Image from "next/image";
 import { FaStore } from "react-icons/fa";
 
 export default function CardCadastroEvento(evento: Evento) {
+    const calcularDiasRestantes = (dataInicioStr: string | undefined): number => {
+        if (!dataInicioStr) return 0;
+        const hoje = zerarHoras(new Date());
+        const inicio = zerarHoras(new Date(dataInicioStr));
+        const diffMs = inicio.getTime() - hoje.getTime();
+        const dias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        return Math.max(0, dias);
+    };
+
+    const diasRestantes = calcularDiasRestantes(evento?.dtInicio);
     return (
         <div className="">
             <div className="bg-[#080809] p-4 rounded-lg border-l-1 border-[#A7AEFF]">
@@ -15,7 +25,13 @@ export default function CardCadastroEvento(evento: Evento) {
                         height={210}
                         className="rounded-lg w-3/4"
                     />
-                    <div className="text-right texto-small"> Faltam <br></br> <span className="font-bold text-[21px] ">8 dias</span> </div>
+                    <div className="text-right texto-small">
+                        Faltam
+                        <br />
+                        <span className="font-bold text-[21px] ">
+                            {diasRestantes} {diasRestantes === 1 ? "dia" : "dias"}
+                        </span>
+                    </div>
                 </div>
                 <div className="text-white text-lg text-right mt-10 pr-1">eu quero participar!</div>
             </div>
