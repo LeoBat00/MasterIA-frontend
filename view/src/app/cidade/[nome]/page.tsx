@@ -161,7 +161,7 @@ export default function CidadePage() {
               const eMap = mapToEvento(evento);
               return (
                 <Link
-                  href={`/selecionarCidade/${eMap.id}`}
+                  href={`/inscricao/${eMap.id}`}
                   key={eMap.id}
                   className=" hover:scale-105 transition-transform"
                 >
