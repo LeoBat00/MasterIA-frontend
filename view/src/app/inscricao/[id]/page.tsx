@@ -1,22 +1,15 @@
-"use client";
+﻿"use client";
 import { formatarData, obterEnderecoCompleto } from "@/app/util";
 import { useParams, useRouter } from "next/navigation";
 import { useEventosAtivosStore } from "@/stores/eventosAtivosStore";
-import {
-  FaStore,
-  FaClock,
-  FaCertificate,
-  FaUser,
-  FaPhone,
-  FaEnvelope,
-  FaArrowLeft,
-} from "react-icons/fa";
-import Input from "@/components/UI/Input";
+import { FaStore, FaClock, FaCertificate, FaArrowLeft } from "react-icons/fa";
 import Button from "@/components/UI/Button";
 import { useEffect, useMemo, useState } from "react";
 import { Loja } from "@/types/loja";
 import { http } from "@/api/http";
 import { endpoints } from "@/api/endpoints";
+import StepDadosPessoais from "@/components/Inscricao/StepDadosPessoais";
+import StepPreferencias from "@/components/Inscricao/StepPreferencias";
 
 export default function InscricaoEventoPage() {
   const params = useParams();
@@ -27,6 +20,7 @@ export default function InscricaoEventoPage() {
 
   const [loja, setLoja] = useState<Loja | null>(null);
   const [loadingLoja, setLoadingLoja] = useState<boolean>(false);
+  const [step, setStep] = useState<number>(1);
 
   useEffect(() => {
     if (!eventos || eventos.length === 0) fetch();
@@ -92,8 +86,7 @@ export default function InscricaoEventoPage() {
               <FaClock />
               <span className="whitespace-nowrap">Dia do Evento</span>
               <span className="!text-[#ABB3BF]">
-                {" "}
-                {evento ? formatarData(evento.dtInicio) : ""}{" "}
+                {evento ? formatarData(evento.dtInicio) : ""}
               </span>
             </div>
 
@@ -107,61 +100,24 @@ export default function InscricaoEventoPage() {
           </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-6 flex flex-col justify-center items-center gap-6 px-0 md:px-20">
-          <h1 className="titulo-pagina-evento ">Processo de inscrição</h1>
-          <div className="rounded-full w-fit px-8 py-1 bg-[var(--background-color-3)]">
-            <p className="text-xs text-center bg-[var(--text-color-1)] bg-clip-text text-transparent">
-              {"Passo 2 de 2"}
-            </p>
+        <div className="col-span-12 lg:col-span-6 flex flex-col justify-center items-stretch gap-4 px-0 md:px-20">
+          <h1 className="titulo-pagina-evento text-center">
+            Processo de inscrição
+          </h1>
+          <div className="w-full flex justify-center items-center">
+            <div className="rounded-full w-fit px-8 py-1 bg-[var(--background-color-3)]">
+              <p className="text-xs text-center bg-[var(--text-color-1)] bg-clip-text text-transparent">{`Passo ${step} de 2`}</p>
+            </div>
           </div>
-          <div className="mt-4 w-full h-[1px] bg-zinc-600" />
+          <div className="w-full h-[1px] bg-zinc-600" />
 
-          <Input
-            label="Nome Completo"
-            containerClassName="!text-[#D9E8FF]"
-            rightIcon={<FaUser />}
-            onChange={(value) => {
-              console.log(value);
-            }}
-            value=""
-          />
-
-          <Input
-            label="Email"
-            containerClassName="!text-[#D9E8FF]"
-            rightIcon={<FaEnvelope />}
-            onChange={(value) => {
-              console.log(value);
-            }}
-            value=""
-          />
-
-          <Input
-            label="Telefone"
-            containerClassName="!text-[#D9E8FF]"
-            rightIcon={<FaPhone />}
-            onChange={(value) => {
-              console.log(value);
-            }}
-            value=""
-          />
-
-          <div className=" flex justify-end gap-6 w-full mt-10">
-            <Button
-              variant="outlineGhost"
-              className="min-w-30"
-              onClick={() => router.back()}
-            >
-              Voltar
-            </Button>
-
-            <Button
-              className="min-w-30"
-              onClick={() => console.log("click prosseguir")}
-            >
-              Avançar
-            </Button>
-          </div>
+          {step === 1 && <StepDadosPessoais next={() => setStep(2)} />}
+          {step === 2 && (
+            <StepPreferencias
+              prev={() => setStep(1)}
+              next={() => console.log("enviar inscrição")}
+            />
+          )}
         </div>
       </div>
     </div>
