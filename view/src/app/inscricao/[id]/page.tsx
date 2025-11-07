@@ -26,6 +26,7 @@ export default function InscricaoEventoPage() {
   const id = Number(Array.isArray(idParam) ? idParam[0] : idParam);
 
   const [loja, setLoja] = useState<Loja | null>(null);
+  const [loadingLoja, setLoadingLoja] = useState<boolean>(false);
 
   useEffect(() => {
     if (!eventos || eventos.length === 0) fetch();
@@ -40,12 +41,15 @@ export default function InscricaoEventoPage() {
     const run = async () => {
       if (evento?.lojaId) {
         try {
+          setLoadingLoja(true);
           const { data } = await http.get<Loja>(
             endpoints.loja.getById(evento.lojaId)
           );
           setLoja(data);
         } catch {
           setLoja(null);
+        } finally {
+          setLoadingLoja(false);
         }
       }
     };
@@ -77,8 +81,11 @@ export default function InscricaoEventoPage() {
               <FaStore className="h-5 w-5" />
               <span className="whitespace-nowrap">Local do Evento</span>
               <span className="!text-[#ABB3BF]">
-                {" "}
-                {loja ? obterEnderecoCompleto(loja) : evento?.nomeLoja}{" "}
+                {loadingLoja
+                  ? "Carregando local..."
+                  : loja
+                  ? obterEnderecoCompleto(loja)
+                  : evento?.nomeLoja}
               </span>
             </div>
             <div className="flex items-center gap-2 mb-1 texto-medium-info !text-[#D9E8FF] !text-[18px]">
