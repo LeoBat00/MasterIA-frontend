@@ -2,7 +2,7 @@
 import { formatarData, obterEnderecoCompleto } from '@/app/util';
 import { Evento } from '@/types/evento';
 import { Loja } from '@/types/loja';
-import { FaStore, FaClock, FaCertificate, FaUser, FaPhone, FaVoicemail, FaEnvelope } from 'react-icons/fa';
+import { FaStore, FaClock, FaCertificate, FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
 
@@ -59,7 +59,7 @@ export default function DetalheEventoCadastro() {
                         </span>
                     </div>
                 </div>
-                <div className="col-span-6 flex flex-col justify-center items-center gap-6 px-50">
+                <div className="col-span-6 flex flex-col justify-center items-center gap-6 px-50 ">
                     <h1 className='titulo-pagina-evento '>Processo de inscrição</h1>
                     <div className="rounded-full w-fit px-8 py-1 bg-[var(--background-color-3)]">
                         <p className="text-xs text-center bg-[var(--text-color-1)] bg-clip-text text-transparent">

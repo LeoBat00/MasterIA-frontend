@@ -21,11 +21,10 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full bg-[#1E1E28] border-t border-[#2E2A45] py-6 mt-12 relative">
+    <footer className="w-full bg-[#1E1E28] border-t border-[#2E2A45] py-6 relative">
       <div className="text-center text-sm text-gray-400">
         Repositório GitHub – Universidade de Fortaleza
       </div>
-
 
       {showButton && (
         <button

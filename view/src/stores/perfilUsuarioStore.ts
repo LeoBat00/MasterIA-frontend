@@ -15,6 +15,17 @@ interface PerfilUsuario {
     temasSelecionados: string[];
     buscaMecanica?: string;
     buscaTema?: string;
+    prefereSorteOuEstrategia: string;
+    prefereCompetirOuCooperar: string;
+    curteNegociar: string;
+    gostaDeCriar: string;
+    prefereRitmoJogo: string;
+    gostaDeDesafiosFisicos: string;
+    gostaDeMagia: string;
+    prefereUniversoTecnologico: string;
+    curteAdministracao: string;
+    prefereJogosEngracados: string;
+    gostaDeBatalhas: string;
 }
 
 interface PerfilUsuarioStore {
@@ -36,6 +47,17 @@ export const usePerfilUsuarioStore = create<PerfilUsuarioStore>((set) => ({
         idade: "",
         mecanicasSelecionadas: [],
         temasSelecionados: [],
+        prefereSorteOuEstrategia: "",
+        prefereCompetirOuCooperar: "",
+        curteNegociar: "",
+        gostaDeCriar: "",
+        prefereRitmoJogo: "",
+        gostaDeDesafiosFisicos: "",
+        gostaDeMagia: "",
+        prefereUniversoTecnologico: "",
+        curteAdministracao: "",
+        prefereJogosEngracados: "",
+        gostaDeBatalhas: "",
     },
     setPerfil: (data) => set((state) => ({ perfil: { ...state.perfil, ...data } })),
     resetPerfil: () =>
@@ -52,6 +74,17 @@ export const usePerfilUsuarioStore = create<PerfilUsuarioStore>((set) => ({
                 idade: "",
                 mecanicasSelecionadas: [],
                 temasSelecionados: [],
+                prefereSorteOuEstrategia: "",
+                prefereCompetirOuCooperar: "",
+                curteNegociar: "",
+                gostaDeCriar: "",
+                prefereRitmoJogo: "",
+                gostaDeDesafiosFisicos: "",
+                gostaDeMagia: "",
+                prefereUniversoTecnologico: "",
+                curteAdministracao: "",
+                prefereJogosEngracados: "",
+                gostaDeBatalhas: "",
             },
         }),
 }));
