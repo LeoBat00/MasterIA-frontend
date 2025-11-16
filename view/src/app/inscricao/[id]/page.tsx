@@ -240,6 +240,12 @@ export default function InscricaoEventoPage() {
   const [searchJogos, setSearchJogos] = useState("");
   const [paginaJogos, setPaginaJogos] = useState(1);
   const pageSizeJogos = 5;
+  const [inscricaoFeedback, setInscricaoFeedback] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const isFeedbackLoading = inscricaoFeedback === "loading";
+  const isFeedbackSuccess = inscricaoFeedback === "success";
+  const isFeedbackError = inscricaoFeedback === "error";
 
   const handleSubmit = async () => {
     if (!evento || isSubmitting) {
@@ -249,11 +255,14 @@ export default function InscricaoEventoPage() {
 
     try {
       setIsSubmitting(true);
+      setInscricaoFeedback("loading");
       const payload = buildInscricaoPayload(evento.id, perfil);
       await cadastrarParticipante(payload);
       console.log("Inscrição enviada", payload);
+      setInscricaoFeedback("success");
     } catch (error) {
       console.error("Erro ao cadastrar participante", error);
+      setInscricaoFeedback("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -269,6 +278,17 @@ export default function InscricaoEventoPage() {
   );
 
   const jogosEvento = eventoDetalhes?.jogos ?? [];
+
+  const localEventoFormatado = useMemo(() => {
+    if (loja) return obterEnderecoCompleto(loja);
+    if (evento?.nomeLoja) return evento.nomeLoja;
+    return "Local não informado";
+  }, [loja, evento?.nomeLoja]);
+
+  const dataEventoFormatada = useMemo(
+    () => (evento ? formatarData(evento.dtInicio) : ""),
+    [evento]
+  );
 
   const jogosFiltrados = useMemo(() => {
     if (!jogosEvento.length) return [];
@@ -334,6 +354,132 @@ export default function InscricaoEventoPage() {
     };
     fetchDetalhes();
   }, [id]);
+
+  const handleFinalizarCadastro = () => {
+    setInscricaoFeedback("idle");
+    router.push("/selecionarCidade");
+  };
+
+  const renderLoadingScreen = () => (
+    <div className="min-h-screen bg-[#1C172E] flex flex-col items-center justify-center gap-4 px-6 text-white">
+      <div className="w-12 h-12 border-4 border-[var(--color-purple-2)] border-t-transparent rounded-full animate-spin" />
+      <p className="text-lg font-semibold">Enviando sua inscrição...</p>
+      <p className="text-sm text-zinc-300 text-center">
+        Aguarde um instante enquanto finalizamos tudo para você.
+      </p>
+    </div>
+  );
+
+  const renderSuccessScreen = () => (
+    <div className="min-h-screen bg-[#1C172E] flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-3xl rounded-2xl bg-[#120D26] text-white p-6 md:p-10 flex flex-col md:flex-row gap-8 shadow-2xl">
+        <div className="flex justify-center md:justify-start">
+          <div className="w-40 h-40 md:w-48 md:h-48">
+            <img
+              src="/ilustracao-sucesso.png"
+              alt="Ilustração de inscrição concluída com sucesso"
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-[#616EFF]">
+              {evento?.nmEvento ||
+                "Evento de jogos para com foco em jogadores experientes"}
+            </p>
+            <h2 className="text-2xl font-semibold mt-1">
+              Você foi cadastrado com sucesso
+            </h2>
+            <p className="text-sm text-zinc-300">
+              Estamos ansiosos para te ver!
+            </p>
+          </div>
+
+          <div className="space-y-3 text-sm text-zinc-100">
+            <div className="flex items-start gap-3">
+              <FaStore className="mt-1 text-[#616EFF]" />
+              <div>
+                <p className="font-semibold text-white">Local do evento</p>
+                <p className="text-zinc-300">{localEventoFormatado}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <FaClock className="mt-1 text-[#616EFF]" />
+              <div>
+                <p className="font-semibold text-white">Dia do evento</p>
+                <p className="text-zinc-300">{dataEventoFormatada}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-auto">
+            <Button
+              onClick={handleFinalizarCadastro}
+              className="!rounded-full px-10 !bg-[#FFCB2B] !text-[#120D26] hover:opacity-90"
+            >
+              Finalizar
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderErrorScreen = () => (
+    <div className="min-h-screen bg-[#1C172E] flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-3xl rounded-2xl bg-[#120D26] text-white p-6 md:p-10 flex flex-col md:flex-row gap-8 shadow-2xl">
+        <div className="flex justify-center md:justify-start">
+          <div className="w-40 h-40 md:w-48 md:h-48">
+            <img
+              src="/Ilustracao-erro.png"
+              alt="Ilustração de erro ao finalizar inscrição"
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-4 text-center md:text-left">
+          <div>
+            <h2 className="text-2xl font-semibold">Serviço em manutenção</h2>
+            <p className="text-sm text-zinc-300 mt-1">
+              Nossos serviços estão fora do ar! Tente novamente mais tarde.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-end gap-3 mt-auto">
+            <Button
+              variant="outlineGhostPurple"
+              className="px-8 !text-[#FFCB2B] !border-[#FFCB2B] hover:!bg-transparent hover:!text-[#FFCB2B]"
+              onClick={() => setInscricaoFeedback("idle")}
+            >
+              Voltar
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              className="px-8 !bg-[#FFCB2B] !text-[#120D26] hover:opacity-90"
+            >
+              Tentar novamente
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isFeedbackLoading) {
+    return renderLoadingScreen();
+  }
+
+  if (isFeedbackSuccess) {
+    return renderSuccessScreen();
+  }
+
+  if (isFeedbackError) {
+    return renderErrorScreen();
+  }
 
   return (
     <>
