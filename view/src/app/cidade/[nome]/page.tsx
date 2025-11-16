@@ -127,9 +127,10 @@ export default function CidadePage() {
           variant="outlineGhostPurple"
           className="!rounded-full"
           onClick={() => router.push("/selecionarCidade")}
+          aria-label="Voltar"
         >
           <FaArrowLeft className="h-5 w-5 mr-2" />
-          Voltar
+          <span className="hidden sm:inline">Voltar</span>
         </Button>
 
         <h1 className="titulo-pagina mt-5">

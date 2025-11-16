@@ -15,11 +15,17 @@ import StepEstiloJogo2 from "@/components/Inscricao/StepEstiloJogo2";
 import StepUniverso1 from "@/components/Inscricao/StepUniverso1";
 import StepUniverso2 from "@/components/Inscricao/StepUniverso2";
 import Footer from "@/components/Footer";
-import { usePerfilUsuarioStore, type PerfilUsuario } from "@/stores/perfilUsuarioStore";
+import {
+  usePerfilUsuarioStore,
+  type PerfilUsuario,
+} from "@/stores/perfilUsuarioStore";
 import { MECANICAS_LIST } from "@/enums/mecanicas";
 import { CATEGORIAS_LIST } from "@/enums/categorias";
 import { TEMAS_LIST } from "@/enums/temas";
 import { cadastrarParticipante } from "@/api/participante";
+import { getEventoById } from "@/api/evento";
+import type { Evento } from "@/types/evento";
+import Input from "@/components/UI/Input";
 
 const toNumber = (value?: string | number) => {
   if (typeof value === "number") return value;
@@ -28,10 +34,10 @@ const toNumber = (value?: string | number) => {
 };
 
 const TEMPO_JOGO_MEDIA: Record<string, number> = {
-  "1": 15, 
-  "2": 35, 
-  "3": 55, 
-  "4": 75, 
+  "1": 15,
+  "2": 35,
+  "3": 55,
+  "4": 75,
 };
 
 const tempoJogoValue = (value?: string) => {
@@ -60,11 +66,7 @@ type Associacao = {
 const ASSOCIACOES_OPCOES: Record<string, Record<string, Associacao>> = {
   prefereSorteOuEstrategia: {
     sorte: {
-      mecanicas: [
-        "Rolagem de Dados",
-        "Force sua sorte",
-        "Apostas e Blefes",
-      ],
+      mecanicas: ["Rolagem de Dados", "Force sua sorte", "Apostas e Blefes"],
       categorias: ["Jogo de Dados"],
     },
     estrategia: {
@@ -233,6 +235,11 @@ export default function InscricaoEventoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const totalSteps = 6;
   const { perfil } = usePerfilUsuarioStore();
+  const [eventoDetalhes, setEventoDetalhes] = useState<Evento | null>(null);
+  const [loadingJogos, setLoadingJogos] = useState<boolean>(true);
+  const [searchJogos, setSearchJogos] = useState("");
+  const [paginaJogos, setPaginaJogos] = useState(1);
+  const pageSizeJogos = 5;
 
   const handleSubmit = async () => {
     if (!evento || isSubmitting) {
@@ -261,6 +268,37 @@ export default function InscricaoEventoPage() {
     [eventos, id]
   );
 
+  const jogosEvento = eventoDetalhes?.jogos ?? [];
+
+  const jogosFiltrados = useMemo(() => {
+    if (!jogosEvento.length) return [];
+    const termo = searchJogos.trim().toLowerCase();
+    if (!termo) return jogosEvento;
+    return jogosEvento.filter((jogo) =>
+      jogo.nomeJogo?.toLowerCase().includes(termo)
+    );
+  }, [jogosEvento, searchJogos]);
+
+  const totalPaginasJogos = Math.max(
+    1,
+    Math.ceil(jogosFiltrados.length / pageSizeJogos)
+  );
+  const paginaAtualJogos = Math.min(paginaJogos, totalPaginasJogos);
+  const jogosPagina = useMemo(() => {
+    const start = (paginaAtualJogos - 1) * pageSizeJogos;
+    return jogosFiltrados.slice(start, start + pageSizeJogos);
+  }, [jogosFiltrados, paginaAtualJogos]);
+
+  useEffect(() => {
+    setPaginaJogos(1);
+  }, [searchJogos]);
+
+  useEffect(() => {
+    if (paginaJogos > totalPaginasJogos) {
+      setPaginaJogos(totalPaginasJogos);
+    }
+  }, [paginaJogos, totalPaginasJogos]);
+
   useEffect(() => {
     const run = async () => {
       if (evento?.lojaId) {
@@ -280,6 +318,23 @@ export default function InscricaoEventoPage() {
     run();
   }, [evento?.lojaId]);
 
+  useEffect(() => {
+    const fetchDetalhes = async () => {
+      if (!id) return;
+      try {
+        setLoadingJogos(true);
+        const data = await getEventoById(id);
+        setEventoDetalhes(data);
+      } catch (error) {
+        console.error("Erro ao carregar detalhes do evento", error);
+        setEventoDetalhes(null);
+      } finally {
+        setLoadingJogos(false);
+      }
+    };
+    fetchDetalhes();
+  }, [id]);
+
   return (
     <>
       <div className="min-h-screen bg-[#1C172E] pt-25 pb-10 px-4 md:px-20">
@@ -288,23 +343,26 @@ export default function InscricaoEventoPage() {
             variant="outlineGhostPurple"
             className="!rounded-full"
             onClick={() => router.back()}
+            aria-label="Voltar"
           >
             <FaArrowLeft className="h-5 w-5 mr-2" />
-            Voltar
+            <span className="hidden sm:inline">Voltar</span>
           </Button>
 
           <div className="text-[#616EFF] text-xs">{evento?.cdEvento}</div>
         </div>
 
         <div className="grid grid-cols-12 gap-4 px-0 md:px-4">
-          <div className="col-span-12 lg:col-span-6 flex flex-col gap-2 h-auto justify-between lg:pr-10">
+          <div className="col-span-12 lg:col-span-6 order-2 lg:order-1 flex flex-col gap-2 h-auto justify-between lg:pr-10 text-center lg:text-left">
             <div>
-              <span className="titulo-pagina-evento mb-10">
+              <span className="titulo-pagina-evento block mb-2  md:mb-4">
                 {evento?.nmEvento}
               </span>
-              <div className="flex gap-2 mb-1 texto-medium-info !text-[#D9E8FF]">
-                <FaStore className="h-5 w-5" />
-                <span className="whitespace-nowrap">Local do Evento</span>
+              <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mb-2 texto-medium-info !text-[#D9E8FF]">
+                <div className="flex items-center gap-2 justify-center lg:justify-start">
+                  <FaStore className="h-5 w-5" />
+                  <span className="whitespace-nowrap">Local do Evento</span>
+                </div>
                 <span className="!text-[#ABB3BF]">
                   {loadingLoja
                     ? "Carregando local..."
@@ -313,9 +371,11 @@ export default function InscricaoEventoPage() {
                     : evento?.nomeLoja}
                 </span>
               </div>
-              <div className="flex items-center gap-2 mb-1 texto-medium-info !text-[#D9E8FF] !text-[18px]">
-                <FaClock />
-                <span className="whitespace-nowrap">Dia do Evento</span>
+              <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mb-1 texto-medium-info !text-[#D9E8FF] !text-[18px]">
+                <div className="flex items-center gap-2 justify-center lg:justify-start">
+                  <FaClock />
+                  <span className="whitespace-nowrap">Dia do Evento</span>
+                </div>
                 <span className="!text-[#ABB3BF]">
                   {evento ? formatarData(evento.dtInicio) : ""}
                 </span>
@@ -323,7 +383,89 @@ export default function InscricaoEventoPage() {
 
               <div className="mt-4 border-b border-zinc-600" />
             </div>
-            <div className="texto-organizador flex justify-end gap-2">
+            <div className="mt-2">
+              <div className="flex justify-center lg:justify-start">
+                <p className="mb-3 text-[#ABB3BF]">Jogos neste evento</p>
+              </div>
+              <div className="w-full text-left">
+                <Input
+                  label="Buscar jogo"
+                  placeholder="Digite o nome"
+                  value={searchJogos}
+                  onChange={setSearchJogos}
+                  containerClassName="text-left"
+                />
+              </div>
+
+              <div className="mt-4 border border-[var(--color-border-ligh-purple)] rounded-[8px] p-4 max-h-[280px] overflow-y-auto custom-scroll bg-[var(--background-color-6)]">
+                {loadingJogos ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-8 h-8 border-2 border-[var(--color-purple-2)] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : jogosPagina.length === 0 ? (
+                  <p className="text-sm text-zinc-400">
+                    Nenhum jogo encontrado.
+                  </p>
+                ) : (
+                  jogosPagina.map((jogo) => (
+                    <div
+                      key={jogo.id}
+                      className="flex items-center gap-4 py-3 border-b border-white/5 last:border-b-0"
+                    >
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#0F0F15] flex-shrink-0">
+                        <img
+                          src={jogo.thumb || "/logoalt.png"}
+                          alt={`Capa do jogo ${jogo.nomeJogo}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-white">
+                          {jogo.nomeJogo}
+                        </p>
+                        <p className="text-xs text-zinc-400">
+                          {jogo.qtJogadoresMin && jogo.qtJogadoresMax
+                            ? `${jogo.qtJogadoresMin}-${jogo.qtJogadoresMax} jogadores`
+                            : null}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {jogosFiltrados.length > pageSizeJogos && (
+                <div className="flex items-center justify-between mt-4 text-sm text-zinc-300">
+                  <span>
+                    Página {paginaAtualJogos} de {totalPaginasJogos}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outlineGhostPurple"
+                      size="sm"
+                      onClick={() => setPaginaJogos((p) => Math.max(1, p - 1))}
+                      disabled={paginaAtualJogos === 1}
+                    >
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outlineGhostPurple"
+                      size="sm"
+                      onClick={() =>
+                        setPaginaJogos((p) =>
+                          Math.min(totalPaginasJogos, p + 1)
+                        )
+                      }
+                      disabled={paginaAtualJogos === totalPaginasJogos}
+                    >
+                      Próximo
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="texto-organizador flex justify-end gap-2 mt-8">
               Organizador
               <span className="!font-semibold !text-[#616EFF]  flex items-center gap-1">
                 {evento?.nomeLoja} <FaCertificate />
@@ -331,7 +473,7 @@ export default function InscricaoEventoPage() {
             </div>
           </div>
 
-          <div className="col-span-12 lg:col-span-6 flex flex-col justify-center items-stretch gap-4 px-0 md:px-20">
+          <div className="col-span-12 lg:col-span-6 order-1 lg:order-2 flex flex-col justify-start items-stretch gap-4 px-0 md:px-20">
             <h1 className="titulo-pagina-evento text-center">
               Processo de inscrição
             </h1>
@@ -353,7 +495,10 @@ export default function InscricaoEventoPage() {
               <StepEstiloJogo prev={() => setStep(2)} next={() => setStep(4)} />
             )}
             {step === 4 && (
-              <StepEstiloJogo2 prev={() => setStep(3)} next={() => setStep(5)} />
+              <StepEstiloJogo2
+                prev={() => setStep(3)}
+                next={() => setStep(5)}
+              />
             )}
             {step === 5 && (
               <StepUniverso1 prev={() => setStep(4)} next={() => setStep(6)} />
