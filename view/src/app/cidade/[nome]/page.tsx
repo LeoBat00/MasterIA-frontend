@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   useCadastroEventosStore,
   EventoPeriodo,
@@ -30,15 +30,17 @@ export default function CidadePage() {
   }, [nome, cidadeSelecionada, setCidadeSelecionada]);
 
   const { eventos, loading, fetch } = useEventosAtivosStore();
+  const eventosLength = eventos?.length ?? 0;
 
   useEffect(() => {
-    if (!eventos || eventos.length === 0) {
+    if (!eventosLength) {
       fetch();
     }
-  }, [eventos?.length, fetch]);
+  }, [eventosLength, fetch]);
 
-  const filtrarEventos = (lista: EventoAtivo[]): EventoAtivo[] => {
-    let eventosFiltrados = [...lista];
+  const filtrarEventos = useCallback(
+    (lista: EventoAtivo[]): EventoAtivo[] => {
+      let eventosFiltrados = [...lista];
 
     if (filtroEventos?.codigoEvento) {
       const termo = filtroEventos.codigoEvento.toLowerCase();
@@ -94,8 +96,10 @@ export default function CidadePage() {
       }
     }
 
-    return eventosFiltrados;
-  };
+      return eventosFiltrados;
+    },
+    [filtroEventos]
+  );
 
   const eventosDaCidade = useMemo(() => {
     const nomeLower = (nome || "").toString().toLowerCase();
@@ -103,7 +107,7 @@ export default function CidadePage() {
     return filtrados.filter(
       (e) => (e.cidade || "").toLowerCase() === nomeLower
     );
-  }, [eventos, nome, filtroEventos]);
+  }, [eventos, nome, filtrarEventos]);
 
   const mapToEvento = (e: EventoAtivo): Evento => ({
     id: e.id,

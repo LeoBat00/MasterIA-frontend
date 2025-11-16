@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Image from "next/image";
 export default function AuthLeftPane() {
   return (
     <div className="relative hidden md:flex flex-col h-full justify-start w-full p-8 md:p-0  ">
@@ -24,7 +25,14 @@ export default function AuthLeftPane() {
           }}
           className="mt-10 mb-6 w-full flex justify-center"
         >
-          <img className=" max-w-[303px]" src="/heroMasteria.png"></img>
+          <Image
+            className="max-w-[303px] h-auto w-full"
+            src="/heroMasteria.png"
+            alt="Ilustração MasterIA"
+            width={303}
+            height={280}
+            priority
+          />
         </motion.div>
       </div>
     </div>

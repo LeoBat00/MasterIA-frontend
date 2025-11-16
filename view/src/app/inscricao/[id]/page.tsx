@@ -5,6 +5,7 @@ import { useEventosAtivosStore } from "@/stores/eventosAtivosStore";
 import { FaStore, FaClock, FaCertificate, FaArrowLeft } from "react-icons/fa";
 import Button from "@/components/UI/Button";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Loja } from "@/types/loja";
 import { http } from "@/api/http";
 import { endpoints } from "@/api/endpoints";
@@ -268,16 +269,16 @@ export default function InscricaoEventoPage() {
     }
   };
 
+  const eventosLength = eventos?.length ?? 0;
+
   useEffect(() => {
-    if (!eventos || eventos.length === 0) fetch();
-  }, [eventos?.length, fetch]);
+    if (!eventosLength) fetch();
+  }, [eventosLength, fetch]);
 
   const evento = useMemo(
     () => (eventos || []).find((e) => e.id === id),
     [eventos, id]
   );
-
-  const jogosEvento = eventoDetalhes?.jogos ?? [];
 
   const localEventoFormatado = useMemo(() => {
     if (loja) return obterEnderecoCompleto(loja);
@@ -291,13 +292,14 @@ export default function InscricaoEventoPage() {
   );
 
   const jogosFiltrados = useMemo(() => {
-    if (!jogosEvento.length) return [];
+    const jogos = eventoDetalhes?.jogos ?? [];
+    if (!jogos.length) return [];
     const termo = searchJogos.trim().toLowerCase();
-    if (!termo) return jogosEvento;
-    return jogosEvento.filter((jogo) =>
+    if (!termo) return jogos;
+    return jogos.filter((jogo) =>
       jogo.nomeJogo?.toLowerCase().includes(termo)
     );
-  }, [jogosEvento, searchJogos]);
+  }, [eventoDetalhes, searchJogos]);
 
   const totalPaginasJogos = Math.max(
     1,
@@ -375,10 +377,13 @@ export default function InscricaoEventoPage() {
       <div className="w-full max-w-3xl rounded-2xl bg-[#120D26] text-white p-6 md:p-10 flex flex-col md:flex-row gap-8 shadow-2xl">
         <div className="flex justify-center md:justify-start">
           <div className="w-40 h-40 md:w-48 md:h-48">
-            <img
+            <Image
               src="/ilustracao-sucesso.png"
               alt="Ilustração de inscrição concluída com sucesso"
+              width={192}
+              height={192}
               className="w-full h-full object-contain"
+              priority
             />
           </div>
         </div>
@@ -433,10 +438,13 @@ export default function InscricaoEventoPage() {
       <div className="w-full max-w-3xl rounded-2xl bg-[#120D26] text-white p-6 md:p-10 flex flex-col md:flex-row gap-8 shadow-2xl">
         <div className="flex justify-center md:justify-start">
           <div className="w-40 h-40 md:w-48 md:h-48">
-            <img
+            <Image
               src="/Ilustracao-erro.png"
               alt="Ilustração de erro ao finalizar inscrição"
+              width={192}
+              height={192}
               className="w-full h-full object-contain"
+              priority
             />
           </div>
         </div>
@@ -559,10 +567,13 @@ export default function InscricaoEventoPage() {
                       className="flex items-center gap-4 py-3 border-b border-white/5 last:border-b-0"
                     >
                       <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#0F0F15] flex-shrink-0">
-                        <img
+                        <Image
                           src={jogo.thumb || "/logoalt.png"}
                           alt={`Capa do jogo ${jogo.nomeJogo}`}
+                          width={64}
+                          height={64}
                           className="w-full h-full object-cover"
+                          unoptimized={Boolean(jogo.thumb)}
                         />
                       </div>
                       <div className="flex-1">

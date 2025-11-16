@@ -23,7 +23,8 @@ export const useEventosAtivosStore = create<EventosAtivosState>()(
           set({ loading: true, error: undefined }, false, "fetch:start");
           const data = await getEventosAtivos();
           set({ eventos: data ?? [] }, false, "fetch:success");
-        } catch (e) {
+        } catch (error) {
+          console.error("Erro ao carregar eventos ativos", error);
           set({ error: "Erro ao carregar eventos ativos" }, false, "fetch:error");
         } finally {
           set({ loading: false }, false, "fetch:finally");

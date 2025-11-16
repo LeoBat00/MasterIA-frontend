@@ -3,6 +3,7 @@
 import Header from "@/components/Header";
 import { useRecomendacaoStore } from "@/stores/recomendacaoStore";
 import {motion} from "framer-motion";
+import Image from "next/image";
 
 export default function RecomendacoesPage() {
   const { resumo, jogos } = useRecomendacaoStore();
@@ -41,10 +42,13 @@ export default function RecomendacoesPage() {
             >
               <div className="h-36 bg-[#2A2A38] flex items-center justify-center">
                 {jogo.thumb ? (
-                  <img
+                  <Image
                     src={jogo.thumb}
                     alt={jogo.nmJogo}
+                    width={320}
+                    height={144}
                     className="w-full h-full object-cover"
+                    unoptimized
                   />
                 ) : (
                   <span className="text-gray-500 text-sm">Imagem não disponível</span>

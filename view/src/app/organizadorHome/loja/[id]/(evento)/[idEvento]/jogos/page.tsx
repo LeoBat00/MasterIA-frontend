@@ -28,19 +28,7 @@ export default function JogosEvento() {
     const filtroRef = useRef(filtroBuscaJogos);
     useEffect(() => { filtroRef.current = filtroBuscaJogos; }, [filtroBuscaJogos]);
 
-    useEffect(() => {
-        if (!eventoSelecionado || !lojaSelecionada) {
-            router.push('/organizadorHome');
-            return;
-        }
-        carregarMecanicasETemas();
-    }, []);
-
-    useEffect(() => {
-        buscarPaginadoJogosEvento({ page: 1, pageSize: tamanhoPagina });
-    }, [eventoSelecionado]);
-
-    const carregarMecanicasETemas = async () => {
+    const carregarMecanicasETemas = useCallback(async () => {
         // try {
         //     const [mecanicas, temas] = await Promise.all([getMecanicas(), getTemas()]);
         //     setTodasMecanicas(mecanicas.map((m: any) => ({ value: m.id, label: m.nmMecanica })));
@@ -48,7 +36,15 @@ export default function JogosEvento() {
         // } catch (error) {
         //     console.error('Erro ao carregar mecânicas/temas:', error);
         // }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!eventoSelecionado || !lojaSelecionada) {
+            router.push('/organizadorHome');
+            return;
+        }
+        carregarMecanicasETemas();
+    }, [eventoSelecionado, lojaSelecionada, router, carregarMecanicasETemas]);
 
     // ==== PAGINAÇÃO LOCAL PARA JOGOS DA LOJA ====
     const buscarPaginadoJogosLoja = useCallback(
@@ -69,7 +65,7 @@ export default function JogosEvento() {
                 totalPaginas: Math.ceil(jogos.length / pageSize),
             };
         },
-        [lojaSelecionada]
+        [lojaSelecionada, setIsLoading]
     );
 
     // ==== PAGINAÇÃO LOCAL PARA JOGOS DO EVENTO ====
@@ -92,8 +88,12 @@ export default function JogosEvento() {
                 totalPaginas: Math.ceil(jogos.length / pageSize),
             };
         },
-        [eventoSelecionado]
+        [eventoSelecionado, setIsLoading]
     );
+
+    useEffect(() => {
+        buscarPaginadoJogosEvento({ page: 1, pageSize: tamanhoPagina });
+    }, [buscarPaginadoJogosEvento, tamanhoPagina]);
 
     // ==== ADICIONAR / REMOVER JOGOS NO EVENTO ====
     const handleAdicionarJogoAoEvento = async (jogoId: number) => {
@@ -103,7 +103,11 @@ export default function JogosEvento() {
 
         const jogo = lojaSelecionada?.jogos?.find(j => j.jogoId === jogoId);
         if (!jogo) return;
-        const novosJogos = [...(eventoSelecionado.jogos || []), jogo];
+        const novoJogoEvento: jogoEvento = {
+            ...jogo,
+            id: jogo.jogoId,
+        };
+        const novosJogos = [...(eventoSelecionado.jogos || []), novoJogoEvento];
         const eventoAtualizado = { ...eventoSelecionado, jogos: novosJogos };
         const resultado = await updateEvento(eventoAtualizado);
         if (resultado.success) {

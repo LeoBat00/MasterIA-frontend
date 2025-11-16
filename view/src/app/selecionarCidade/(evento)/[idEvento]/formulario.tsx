@@ -8,7 +8,6 @@ export default function CadastroForm() {
   const totalPassos = 2;
 
   const proximo = () => setPassoAtual((prev) => Math.min(prev + 1, totalPassos));
-  const anterior = () => setPassoAtual((prev) => Math.max(prev - 1, 1));
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md">

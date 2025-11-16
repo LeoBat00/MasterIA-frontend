@@ -7,10 +7,15 @@ export function useAutoDigit(messages: string[], speed = 80, pause = 1200) {
   const [deleting, setDeleting] = useState(false); // estamos apagando?
 
   useEffect(() => {
-    if (index === messages.length) setIndex(0);
+    if (!messages.length) return;
+    if (index >= messages.length) {
+      setIndex(0);
+      return;
+    }
+    const currentMessage = messages[index] ?? "";
 
     // fim da palavra → parar, depois apagar
-    if (!deleting && subIndex === messages[index].length) {
+    if (!deleting && subIndex === currentMessage.length) {
       const timeout = setTimeout(() => setDeleting(true), pause);
       return () => clearTimeout(timeout);
     }
@@ -27,7 +32,7 @@ export function useAutoDigit(messages: string[], speed = 80, pause = 1200) {
     }, speed);
 
     return () => clearTimeout(timeout);
-  }, [subIndex, index, deleting]);
+  }, [subIndex, index, deleting, messages, pause, speed]);
 
   return messages[index].substring(0, subIndex);
 }

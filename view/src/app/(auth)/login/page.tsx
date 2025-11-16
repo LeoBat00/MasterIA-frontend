@@ -11,7 +11,6 @@ import { useAuthStore } from "@/stores/auth";
 type ErroLoginType = { loginInput: string; senha: string };
 
 export default function LoginPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const { login, loading } = useAuthStore();
 

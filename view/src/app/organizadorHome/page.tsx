@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaTrash, FaPen } from 'react-icons/fa';
 import {
@@ -30,16 +30,16 @@ export default function OrganizadorHome() {
         setExibirFormularioLoja(!exibirFormularioLoja);
     }
 
-    const buscarOrganizador = async (organizadorId: number) => {
+    const buscarOrganizador = useCallback(async (organizadorId: number) => {
         await fetchOrganizador(organizadorId).catch(() => {
             logout();
             router.push('/login');
         });
-    }
+    }, [fetchOrganizador, logout, router]);
 
     useEffect(() => {
         setLoja({} as Loja);
-    }, []);
+    }, [setLoja]);
 
     useEffect(() => {
         const run = async () => {
@@ -50,7 +50,7 @@ export default function OrganizadorHome() {
         };
 
         run();
-    }, [claims]);
+    }, [claims, organizador, buscarOrganizador]);
 
     useEffect(() => {
         setLojas(organizador?.lojas || []);

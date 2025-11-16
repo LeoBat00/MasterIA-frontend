@@ -34,15 +34,7 @@ export default function JogosLoja() {
         filtroRef.current = filtroBuscaJogosBanco;
     }, [filtroBuscaJogosBanco]);
 
-    useEffect(() => {
-        if (!lojaSelecionada) {
-            navigater.push('/organizadorHome');
-        }
-        carregarMecanicasETemas();
-    }, []);
-
-
-    const carregarMecanicasETemas = async () => {
+    const carregarMecanicasETemas = useCallback(async () => {
 
         try {
             const [mecanicas, temas] = await Promise.all([getMecanicas(), getTemas()]);
@@ -62,7 +54,15 @@ export default function JogosLoja() {
         } catch (error) {
             console.error("Erro ao carregar mecânicas/temas:", error);
         }
-    };
+    }, []);
+
+
+    useEffect(() => {
+        if (!lojaSelecionada) {
+            navigater.push('/organizadorHome');
+        }
+        carregarMecanicasETemas();
+    }, [lojaSelecionada, navigater, carregarMecanicasETemas]);
 
     const buscarPaginadoJogosLoja = useCallback(
         async ({ page, pageSize }: FetchParams) => {
@@ -181,7 +181,7 @@ export default function JogosLoja() {
                 setIsLoading(false);
             }
         },
-        [fetchJogosPaginado]
+        [fetchJogosPaginado, filtroBuscaJogosBanco, setIsLoading]
     );
 
     const handleChangeMecanicas = (novaMecanica: string | number) => {

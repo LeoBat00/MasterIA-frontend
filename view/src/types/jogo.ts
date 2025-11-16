@@ -54,6 +54,7 @@ export interface jogoLoja {
 }
 
 export interface jogoEvento {
+  id: number;
   jogoId: number;
   nomeJogo: string;
   codigoJogo: string;
@@ -61,6 +62,7 @@ export interface jogoEvento {
   anoPublicacao?: number;
   qtdDisponivel: number;
   copias: number;
+  thumb?: string;
   categorias: Categoria[];
   mecanicas: Mecanica[];
   temas: Tema[];
