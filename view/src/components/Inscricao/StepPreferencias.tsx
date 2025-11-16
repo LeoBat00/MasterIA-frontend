@@ -46,6 +46,7 @@ export default function StepPreferencias({ next, prev }: Props) {
           <FiUsers /> Quantidade de jogadores
         </label>
         <Select
+          animateOptions={true}
           value={perfil.qntPessoas}
           onChange={(v) =>
             typeof v === "string" && setPerfil({ qntPessoas: v })
@@ -69,6 +70,7 @@ export default function StepPreferencias({ next, prev }: Props) {
         </label>
         <Select
           value={perfil.tempoJogo}
+          animateOptions={true}
           onChange={(v) => typeof v === "string" && setPerfil({ tempoJogo: v })}
           options={[
             { label: "Selecione", value: "" },

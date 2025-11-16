@@ -1,5 +1,6 @@
 import React, { useId, useState, useRef, useEffect } from "react";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
 
 export type SelectSize = "sm" | "md" | "lg";
 export type SelectVariant = "default" | "underline";
@@ -25,6 +26,7 @@ export interface SelectSearchProps {
   disabled?: boolean;
   required?: boolean;
   allowTyping?: boolean;
+  animateOptions?: boolean;
 }
 
 const paddingsBySize: Record<SelectSize, string> = {
@@ -37,6 +39,13 @@ const heightBySize: Record<SelectSize, string> = {
   sm: "h-9",
   md: "h-10",
   lg: "h-12",
+};
+
+const dropdownMotion = {
+  initial: { opacity: 0, y: -6, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -6, scale: 0.98 },
+  transition: { duration: 0.18, ease: "easeOut" },
 };
 
 const SelectSearch: React.FC<SelectSearchProps> = ({
@@ -55,6 +64,7 @@ const SelectSearch: React.FC<SelectSearchProps> = ({
   disabled,
   required,
   allowTyping = true,
+  animateOptions = false,
 }) => {
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -150,29 +160,63 @@ const SelectSearch: React.FC<SelectSearchProps> = ({
         </span>
       </div>
 
-      {isOpen && (
-        <ul className="absolute z-10 w-full max-h-48 overflow-y-auto bg-[#12121B] border border-[var(--color-purple-2)] rounded-md mt-1">
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((opt) => (
-              <li
-                key={opt.value}
-                onClick={() => {
-                  onChange?.(opt.value);
-                  setIsOpen(false);
-                  setSearch(""); // limpa filtro -> mostra selecionado
-                }}
-                className={clsx(
-                  "px-3 py-2 cursor-pointer hover:bg-[var(--color-purple-3)]",
-                  opt.value === value && "bg-[var(--color-purple-2)] text-white"
-                )}
-              >
-                {opt.label}
-              </li>
-            ))
-          ) : (
-            <li className="px-3 py-2 text-gray-400">Nenhum resultado</li>
+      {animateOptions ? (
+        <AnimatePresence>
+          {isOpen && (
+            <motion.ul
+              {...dropdownMotion}
+              className="absolute z-10 w-full max-h-48 overflow-y-auto bg-[#12121B] border border-[var(--color-purple-2)] rounded-md mt-1"
+            >
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((opt) => (
+                  <li
+                    key={opt.value}
+                    onClick={() => {
+                      onChange?.(opt.value);
+                      setIsOpen(false);
+                      setSearch("");
+                    }}
+                    className={clsx(
+                      "px-3 py-2 cursor-pointer hover:bg-[var(--color-purple-3)]",
+                      opt.value === value &&
+                        "bg-[var(--color-purple-2)] text-white"
+                    )}
+                  >
+                    {opt.label}
+                  </li>
+                ))
+              ) : (
+                <li className="px-3 py-2 text-gray-400">Nenhum resultado</li>
+              )}
+            </motion.ul>
           )}
-        </ul>
+        </AnimatePresence>
+      ) : (
+        isOpen && (
+          <ul className="absolute z-10 w-full max-h-48 overflow-y-auto bg-[#12121B] border border-[var(--color-purple-2)] rounded-md mt-1">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((opt) => (
+                <li
+                  key={opt.value}
+                  onClick={() => {
+                    onChange?.(opt.value);
+                    setIsOpen(false);
+                    setSearch("");
+                  }}
+                  className={clsx(
+                    "px-3 py-2 cursor-pointer hover:bg-[var(--color-purple-3)]",
+                    opt.value === value &&
+                      "bg-[var(--color-purple-2)] text-white"
+                  )}
+                >
+                  {opt.label}
+                </li>
+              ))
+            ) : (
+              <li className="px-3 py-2 text-gray-400">Nenhum resultado</li>
+            )}
+          </ul>
+        )
       )}
 
       {/* Helper/Erro */}

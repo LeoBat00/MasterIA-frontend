@@ -34,6 +34,7 @@ export default function StepDadosPessoais({ next }: Props) {
       <Select
         label="Genero"
         allowTyping={false}
+        animateOptions={true}
         value={perfil.genero}
         onChange={(v) => {
           if (typeof v === "string") setPerfil({ genero: v });

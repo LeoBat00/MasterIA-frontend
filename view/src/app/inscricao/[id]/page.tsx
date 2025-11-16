@@ -499,7 +499,7 @@ export default function InscricaoEventoPage() {
         </div>
 
         <div className="grid grid-cols-12 gap-4 px-0 md:px-4">
-          <div className="col-span-12 lg:col-span-6 order-2 lg:order-1 flex flex-col gap-2 h-auto justify-between lg:pr-10 text-center lg:text-left">
+          <div className="col-span-12 lg:col-span-6 order-2 lg:order-1 flex flex-col gap-2 h-auto justify-start lg:pr-10 text-center lg:text-left">
             <div>
               <span className="titulo-pagina-evento block mb-2  md:mb-4">
                 {evento?.nmEvento}
@@ -628,7 +628,12 @@ export default function InscricaoEventoPage() {
                 <p className="text-xs text-center bg-[var(--text-color-1)] bg-clip-text text-transparent">{`Passo ${step} de ${totalSteps}`}</p>
               </div>
             </div>
-            <div className="w-full h-[1px] bg-zinc-600" />
+            <div className="w-full h-1 bg-zinc-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[var(--color-purple-2)] transition-all duration-300"
+                style={{ width: `${(step / totalSteps) * 100}%` }}
+              />
+            </div>
 
             {step === 1 && <StepDadosPessoais next={() => setStep(2)} />}
             {step === 2 && (
