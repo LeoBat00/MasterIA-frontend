@@ -7,6 +7,8 @@ import { usePerfilUsuarioStore } from "@/stores/perfilUsuarioStore";
 type StepUniverso2Props = {
   prev: () => void;
   next: () => void;
+  nextLabel?: string;
+  isSubmitting?: boolean;
 };
 
 const perguntas = [
@@ -27,7 +29,12 @@ const opcoesPadrao = [
   { label: "Não sei dizer", value: "indefinido" },
 ];
 
-export default function StepUniverso2({ prev, next }: StepUniverso2Props) {
+export default function StepUniverso2({
+  prev,
+  next,
+  nextLabel = "Avançar",
+  isSubmitting = false,
+}: StepUniverso2Props) {
   const { perfil, setPerfil } = usePerfilUsuarioStore();
 
   const handleSelect = (
@@ -37,13 +44,7 @@ export default function StepUniverso2({ prev, next }: StepUniverso2Props) {
     setPerfil({ [field]: value } as Partial<typeof perfil>);
   };
 
-  const handleNext = () => {
-    if (perguntas.some(({ key }) => !perfil[key])) {
-      alert("Selecione uma opção para cada pergunta.");
-      return;
-    }
-    next();
-  };
+  const canProceed = perguntas.every(({ key }) => Boolean(perfil[key]));
 
   return (
     <div className="flex w-full flex-col gap-[16px] text-[#D9E8FF]">
@@ -67,7 +68,13 @@ export default function StepUniverso2({ prev, next }: StepUniverso2Props) {
         <Button variant="outlineGhostPurple" onClick={prev}>
           Voltar
         </Button>
-        <Button onClick={handleNext}>Avançar</Button>
+        <Button
+          onClick={next}
+          disabled={!canProceed || isSubmitting}
+          isLoading={isSubmitting}
+        >
+          {nextLabel}
+        </Button>
       </div>
     </div>
   );

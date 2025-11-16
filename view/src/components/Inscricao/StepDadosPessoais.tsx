@@ -3,20 +3,23 @@ import { usePerfilUsuarioStore } from "@/stores/perfilUsuarioStore";
 import Input from "@/components/UI/Input";
 import Select from "@/components/UI/Select";
 import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
-import { validateEmail, validateTelefone, formatNumber } from "@/utils/formatar";
+import {
+  validateEmail,
+  validateTelefone,
+  formatNumber,
+} from "@/utils/formatar";
 import Button from "@/components/UI/Button";
 
 type Props = { next: () => void };
 
 export default function StepDadosPessoais({ next }: Props) {
   const { perfil, setPerfil } = usePerfilUsuarioStore();
-
-  const handleNext = () => {
-    if (!perfil.nome?.trim() || !perfil.genero) return alert("Preencha nome e genero.");
-    if (!validateEmail(perfil.email)) return alert("Informe um e-mail valido.");
-    if (!validateTelefone(perfil.telefone)) return alert("Informe um telefone valido.");
-    next();
-  };
+  const nomeValido = Boolean(perfil.nome?.trim());
+  const generoValido = Boolean(perfil.genero);
+  const emailValido = validateEmail(perfil.email);
+  const telefoneValido = validateTelefone(perfil.telefone);
+  const canProceed =
+    nomeValido && generoValido && emailValido && telefoneValido;
 
   return (
     <div className="flex flex-col gap-4">
@@ -30,13 +33,16 @@ export default function StepDadosPessoais({ next }: Props) {
 
       <Select
         label="Genero"
+        allowTyping={false}
         value={perfil.genero}
-        onChange={(v) => { if (typeof v === 'string') setPerfil({ genero: v }); }}
+        onChange={(v) => {
+          if (typeof v === "string") setPerfil({ genero: v });
+        }}
         options={[
-          { label: 'Selecione', value: '' },
-          { label: 'Masculino', value: 'M' },
-          { label: 'Feminino', value: 'F' },
-          { label: 'Outro', value: 'O' },
+          { label: "Selecione", value: "" },
+          { label: "Masculino", value: "M" },
+          { label: "Feminino", value: "F" },
+          { label: "Outro", value: "O" },
         ]}
         placeholder="Selecione"
       />
@@ -54,11 +60,16 @@ export default function StepDadosPessoais({ next }: Props) {
         containerClassName="!text-[#D9E8FF]"
         rightIcon={<FaPhone />}
         value={perfil.telefone}
-        onChange={(v) => setPerfil({ telefone: formatNumber(v) })}
+        onChange={(v) => {
+          const formatted = formatNumber(v).slice(0, 15);
+          setPerfil({ telefone: formatted });
+        }}
       />
 
       <div className="flex justify-end gap-2 w-full mt-4">
-        <Button onClick={handleNext}>Avancar</Button>
+        <Button onClick={next} disabled={!canProceed}>
+          Avançar
+        </Button>
       </div>
     </div>
   );

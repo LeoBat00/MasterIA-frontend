@@ -19,6 +19,9 @@ export const endpoints = {
     getCidadesDisponiveis: "/Evento/GetCidadesDisponiveis",
     getEventosAtivos: "/Evento/GetEventosAtivos",
   },
+  participante: {
+    cadastroEvento: "/Participante/CadastroEvento",
+  },
   jogo: {
     getPaginado: "/Jogo/ListarPaginado",
     getPaginadoComLoja:"Jogo/ListarPaginadoNotInLoja"

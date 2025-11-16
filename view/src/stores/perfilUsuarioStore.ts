@@ -1,7 +1,7 @@
 // src/stores/perfilUsuarioStore.ts
 import { create } from "zustand";
 
-interface PerfilUsuario {
+export interface PerfilUsuario {
     nome: string;
     sobrenome: string;
     genero: string;

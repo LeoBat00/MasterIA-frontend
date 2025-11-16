@@ -24,6 +24,7 @@ export interface SelectSearchProps {
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
+  allowTyping?: boolean;
 }
 
 const paddingsBySize: Record<SelectSize, string> = {
@@ -53,6 +54,7 @@ const SelectSearch: React.FC<SelectSearchProps> = ({
   placeholder = "Selecione...",
   disabled,
   required,
+  allowTyping = true,
 }) => {
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -103,7 +105,7 @@ const SelectSearch: React.FC<SelectSearchProps> = ({
       {label && (
         <label
           htmlFor={id}
-          className="block text-xs font-semibold mb-1"
+          className="block text-xs font-medium mb-1"
         >
           {label} {required && <span className="text-white">*</span>}
         </label>
@@ -123,17 +125,23 @@ const SelectSearch: React.FC<SelectSearchProps> = ({
           id={id}
           type="text"
           disabled={disabled}
+          readOnly={!allowTyping}
           placeholder={placeholder}
           value={search !== "" ? search : selectedOption?.label || ""}
           onChange={(e) => {
+            if (!allowTyping) return;
             setSearch(e.target.value);
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
+          onClick={() => {
+            if (!allowTyping) setIsOpen(true);
+          }}
           className={clsx(
             "w-full outline-none bg-transparent placeholder-[#868686]",
             paddingsBySize[size],
             variant === "underline" && "rounded-none",
+            !allowTyping && "cursor-pointer",
             inputClassName
           )}
         />

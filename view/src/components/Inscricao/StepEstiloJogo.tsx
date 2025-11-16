@@ -49,14 +49,7 @@ export default function StepEstiloJogo({ prev, next }: StepEstiloJogoProps) {
     setPerfil({ [field]: value } as Partial<typeof perfil>);
   };
 
-  const handleNext = () => {
-    const todosRespondidos = perguntas.every(({ key }) => perfil[key]);
-    if (!todosRespondidos) {
-      alert("Selecione uma opção para cada pergunta.");
-      return;
-    }
-    next();
-  };
+  const canProceed = perguntas.every(({ key }) => Boolean(perfil[key]));
 
   return (
     <div className="flex w-full flex-col gap-6 text-[#D9E8FF]">
@@ -80,7 +73,9 @@ export default function StepEstiloJogo({ prev, next }: StepEstiloJogoProps) {
         <Button variant="outlineGhostPurple" onClick={prev}>
           Voltar
         </Button>
-        <Button onClick={handleNext}>Avançar</Button>
+        <Button onClick={next} disabled={!canProceed}>
+          Avançar
+        </Button>
       </div>
     </div>
   );

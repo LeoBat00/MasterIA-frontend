@@ -37,31 +37,32 @@ const Button: React.FC<ButtonProps> = ({
     const baseStyles =
         "inline-flex items-center justify-center rounded-md transition-colors duration-150 cursor-pointer ";
 
-    const variantStyles: Record<ButtonVariant, string> = {
-        primary: "bg-[var(--color-button-primary)] text-black hover:opacity-90",
-        secondary: "bg-[var(--color-button-secondary)] text-black hover:opacity-90",
-        outline:
-            "border border-[var(--color-purple-3)]/23 text-white hover:border-[var(--color-purple-1)] cursor-pointer ",
-        ghost:
-            "bg-transparent text-[var(--color-purple-2)] hover:bg-[var(--color-purple-3)] hover:text-white",
-        outlineGhost:
-            "border border-[var(--color-button-primary)] text-[var(--color-button-primary)] bg-transparent hover:bg-[var(--color-button-primary)] hover:text-black cursor-pointer ",
-        aba:
-            "border-b-6 border-transparent text-[var(--color-purple-2)] hover:text-white cursor-pointer ",
-        abaSelecionada:
-            "border-b-6 border-[var(--color-purple-1)] text-white cursor-pointer rounded-none ",
-        outlineGhostPurple:
-            "border border-[var(--color-purple-2)] text-[var(--color-purple-2)] bg-transparent hover:bg-[var(--color-purple-2)] hover:text-white cursor-pointer ",
-        };
+    const variantStyles: Record<ButtonVariant, { base: string; hover?: string }> = {
+        primary: { base: "bg-[var(--color-button-primary)] text-black", hover: "hover:opacity-90" },
+        secondary: { base: "bg-[var(--color-button-secondary)] text-black", hover: "hover:opacity-90" },
+        outline: { base: "border border-[var(--color-purple-3)]/23 text-white", hover: "hover:border-[var(--color-purple-1)]" },
+        ghost: { base: "bg-transparent text-[var(--color-purple-2)]", hover: "hover:bg-[var(--color-purple-3)] hover:text-white" },
+        outlineGhost: {
+            base: "border border-[var(--color-button-primary)] text-[var(--color-button-primary)] bg-transparent",
+            hover: "hover:bg-[var(--color-button-primary)] hover:text-black",
+        },
+        aba: { base: "border-b-6 border-transparent text-[var(--color-purple-2)]", hover: "hover:text-white" },
+        abaSelecionada: { base: "border-b-6 border-[var(--color-purple-1)] text-white rounded-none" },
+        outlineGhostPurple: {
+            base: "border border-[var(--color-purple-2)] text-[var(--color-purple-2)] bg-transparent",
+            hover: "hover:bg-[var(--color-purple-2)] hover:text-white",
+        },
+    };
 
     return (
         <button
             className={clsx(
                 baseStyles,
                 paddingsBySize[size],
-                variantStyles[variant],
+                variantStyles[variant].base,
+                !(disabled || isLoading) && variantStyles[variant].hover,
                 fullWidth && "w-full",
-                (disabled || isLoading) && "opacity-60 cursor-not-allowed",
+                (disabled || isLoading) && "opacity-60 cursor-default",
                 className
             )}
             disabled={disabled || isLoading}

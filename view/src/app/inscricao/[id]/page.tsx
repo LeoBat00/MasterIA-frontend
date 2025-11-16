@@ -15,6 +15,210 @@ import StepEstiloJogo2 from "@/components/Inscricao/StepEstiloJogo2";
 import StepUniverso1 from "@/components/Inscricao/StepUniverso1";
 import StepUniverso2 from "@/components/Inscricao/StepUniverso2";
 import Footer from "@/components/Footer";
+import { usePerfilUsuarioStore, type PerfilUsuario } from "@/stores/perfilUsuarioStore";
+import { MECANICAS_LIST } from "@/enums/mecanicas";
+import { CATEGORIAS_LIST } from "@/enums/categorias";
+import { TEMAS_LIST } from "@/enums/temas";
+import { cadastrarParticipante } from "@/api/participante";
+
+const toNumber = (value?: string | number) => {
+  if (typeof value === "number") return value;
+  const parsed = Number(value ?? 0);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const TEMPO_JOGO_MEDIA: Record<string, number> = {
+  "1": 15, 
+  "2": 35, 
+  "3": 55, 
+  "4": 75, 
+};
+
+const tempoJogoValue = (value?: string) => {
+  if (!value) return 0;
+  return TEMPO_JOGO_MEDIA[value] ?? toNumber(value);
+};
+
+type ItemLookup = { id: number; descricao: string };
+
+const createLookup = (list: ItemLookup[]) =>
+  list.reduce<Record<string, ItemLookup>>((acc, item) => {
+    acc[item.descricao] = { id: item.id, descricao: item.descricao };
+    return acc;
+  }, {});
+
+const MECANICA_LOOKUP = createLookup(MECANICAS_LIST);
+const CATEGORIA_LOOKUP = createLookup(CATEGORIAS_LIST);
+const TEMA_LOOKUP = createLookup(TEMAS_LIST);
+
+type Associacao = {
+  mecanicas?: string[];
+  categorias?: string[];
+  temas?: string[];
+};
+
+const ASSOCIACOES_OPCOES: Record<string, Record<string, Associacao>> = {
+  prefereSorteOuEstrategia: {
+    sorte: {
+      mecanicas: [
+        "Rolagem de Dados",
+        "Force sua sorte",
+        "Apostas e Blefes",
+      ],
+      categorias: ["Jogo de Dados"],
+    },
+    estrategia: {
+      mecanicas: [
+        "Gerenciamento de Mãos",
+        "Alocação de Trabalhadores",
+        "Pontos de Ação",
+      ],
+      categorias: ["Estratégia Abstrata"],
+    },
+  },
+  prefereCompetirOuCooperar: {
+    competir: {
+      mecanicas: [
+        "Eliminação de Jogadores",
+        "Toma Essa",
+        "Influência / Maioria na Área",
+      ],
+      categorias: ["Jogo de Guerra", "Miniaturas"],
+    },
+    cooperar: {
+      mecanicas: ["Cooperativo", "Jogo em Equipe", "Semi-Cooperativo"],
+      categorias: ["Jogo Festivo", "Destreza"],
+    },
+  },
+  prefereRitmoJogo: {
+    rapidos: {
+      mecanicas: ["Tempo Real", "Toma Essa", "Force sua sorte"],
+      categorias: ["Jogo Festivo", "Jogo de Entrada"],
+    },
+    longos: {
+      mecanicas: [
+        "Alocação de Trabalhadores",
+        "Pontos de Ação",
+        "Seleção de Ação",
+      ],
+      categorias: ["Estratégia Abstrata"],
+    },
+  },
+};
+
+const ASSOCIACOES_SIM: Record<string, Associacao> = {
+  curteNegociar: {
+    mecanicas: ["Negociação", "Leilão / Lances", "Apostas e Blefes"],
+    categorias: ["Jogo de Cartas", "Colecionável"],
+  },
+  gostaDeCriar: {
+    mecanicas: [
+      "Papel e Caneta",
+      "Construção a partir de Modelo",
+      "Colocação de Peças",
+    ],
+    categorias: ["Quebra-Cabeça", "Imprima e Jogue"],
+  },
+  gostaDeDesafiosFisicos: {
+    mecanicas: [
+      "Atuação/Mímica",
+      "Destreza",
+      "Empilhar e Equilibrar",
+      "Cantar",
+      "Batata Quente",
+    ],
+    categorias: ["Jogo Festivo", "Destreza"],
+  },
+  gostaDeMagia: {
+    categorias: ["Dungeon Crawler", "Livro-jogo"],
+    temas: ["Fantasia", "Medieval", "Mitologia"],
+  },
+  prefereUniversoTecnologico: {
+    categorias: ["Integrado com Aplicativo"],
+    temas: ["Ficção Científica"],
+  },
+  curteAdministracao: {
+    categorias: ["Jogo de Cartas", "Colecionável"],
+    temas: ["Economia / Produção"],
+  },
+  prefereJogosEngracados: {
+    categorias: ["Jogo Festivo"],
+    temas: ["Humor", "Cultura Pop ou Geek"],
+  },
+  gostaDeBatalhas: {
+    categorias: ["Jogo de Guerra", "Miniaturas"],
+    temas: ["Guerra", "Luta / Artes Marciais"],
+  },
+};
+
+type TemaPayload = { id: number; nmTema: string };
+type CategoriaPayload = { id: number; nmCategoria: string };
+type MecanicaPayload = { id: number; nmMecanica: string };
+
+const addItems = <T extends { id: number }>(
+  target: T[],
+  candidates: string[] | undefined,
+  lookup: Record<string, ItemLookup>,
+  labelKey: keyof Omit<T, "id">
+) => {
+  candidates?.forEach((nome) => {
+    const found = lookup[nome];
+    if (!found) return;
+    if (target.some((item) => item.id === found.id)) return;
+    target.push({ id: found.id, [labelKey]: found.descricao } as T);
+  });
+};
+
+const applyAssociacao = (
+  associacao: Associacao | undefined,
+  temas: TemaPayload[],
+  categorias: CategoriaPayload[],
+  mecanicas: MecanicaPayload[]
+) => {
+  if (!associacao) return;
+  addItems(mecanicas, associacao.mecanicas, MECANICA_LOOKUP, "nmMecanica");
+  addItems(categorias, associacao.categorias, CATEGORIA_LOOKUP, "nmCategoria");
+  addItems(temas, associacao.temas, TEMA_LOOKUP, "nmTema");
+};
+
+const buildInscricaoPayload = (eventoId: number, perfil: PerfilUsuario) => ({
+  eventoId,
+  participante: {
+    nome: perfil.nome,
+    sobrenome: perfil.sobrenome,
+    genero: perfil.genero,
+    email: perfil.email,
+    telefone: perfil.telefone,
+    perfilParticipante: (() => {
+      const temas: TemaPayload[] = [];
+      const categorias: CategoriaPayload[] = [];
+      const mecanicas: MecanicaPayload[] = [];
+
+      Object.entries(ASSOCIACOES_OPCOES).forEach(([campo, opcoes]) => {
+        const valor = perfil[campo as keyof PerfilUsuario];
+        if (typeof valor === "string") {
+          applyAssociacao(opcoes[valor], temas, categorias, mecanicas);
+        }
+      });
+
+      Object.entries(ASSOCIACOES_SIM).forEach(([campo, associacao]) => {
+        if (perfil[campo as keyof PerfilUsuario] === "sim") {
+          applyAssociacao(associacao, temas, categorias, mecanicas);
+        }
+      });
+
+      return {
+        experiencia: perfil.experience ?? 0,
+        qntPessoas: toNumber(perfil.qntPessoas),
+        tempJogo: tempoJogoValue(perfil.tempoJogo),
+        idade: toNumber(perfil.idade),
+        temas,
+        categorias,
+        mecanicas,
+      };
+    })(),
+  },
+});
 
 export default function InscricaoEventoPage() {
   const params = useParams();
@@ -26,10 +230,26 @@ export default function InscricaoEventoPage() {
   const [loja, setLoja] = useState<Loja | null>(null);
   const [loadingLoja, setLoadingLoja] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const totalSteps = 6;
+  const { perfil } = usePerfilUsuarioStore();
 
-  const handleSubmit = () => {
-    console.log("Enviar inscrição");
+  const handleSubmit = async () => {
+    if (!evento || isSubmitting) {
+      if (!evento) console.warn("Evento não encontrado para montar o payload");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const payload = buildInscricaoPayload(evento.id, perfil);
+      await cadastrarParticipante(payload);
+      console.log("Inscrição enviada", payload);
+    } catch (error) {
+      console.error("Erro ao cadastrar participante", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -139,7 +359,12 @@ export default function InscricaoEventoPage() {
               <StepUniverso1 prev={() => setStep(4)} next={() => setStep(6)} />
             )}
             {step === 6 && (
-              <StepUniverso2 prev={() => setStep(5)} next={handleSubmit} />
+              <StepUniverso2
+                prev={() => setStep(5)}
+                next={handleSubmit}
+                nextLabel="Cadastrar"
+                isSubmitting={isSubmitting}
+              />
             )}
           </div>
         </div>
