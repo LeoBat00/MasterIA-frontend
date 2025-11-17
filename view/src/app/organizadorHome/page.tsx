@@ -141,7 +141,7 @@ export default function OrganizadorHome() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="group space-y-2">
               {exibirFormularioLoja ? (
                 <div>
                   <FormularioNovaLoja />
@@ -150,8 +150,16 @@ export default function OrganizadorHome() {
                 lojasFiltradas.map((l) => (
                   <article
                     onClick={() => handleAcessarLoja(l)}
+                    onKeyDown={(ev) => {
+                      if (ev.key === "Enter" || ev.key === " ") {
+                        ev.preventDefault();
+                        handleAcessarLoja(l);
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
                     key={l.id}
-                    className="rounded-[8px] bg-[#08080C] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] hover:cursor-pointer border-l-[6px] border-b border-[var(--color-purple-2)] hover:border-[var(--color-purple-1)]"
+                    className="rounded-[8px] bg-[#08080C] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#685BFF] border-l-[6px] border-b border-[var(--color-purple-2)] hover:border-[var(--color-purple-1)] transition duration-200 group-hover:opacity-80 hover:!opacity-100"
                   >
                     <div className="flex items-center justify-between">
                       <div className="">
