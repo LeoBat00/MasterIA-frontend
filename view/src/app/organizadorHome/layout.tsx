@@ -33,9 +33,6 @@ export default function useOrganizadorHomeLayout({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <span className="text-sm font-medium text-white/70">
-            Painel do organizador
-          </span>
         </div>
 
         <div className="">{children}</div>

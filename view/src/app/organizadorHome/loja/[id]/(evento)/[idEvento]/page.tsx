@@ -45,6 +45,7 @@ export default function DetalhesEventoPage() {
     const params = useParams();
     const idEventoSelecionado = Number(params?.idEvento);
     const [isLoading, setIsLoading] = useState(true);
+    const [hoveredAtalho, setHoveredAtalho] = useState<string | null>(null);
 
     useEffect(() => {
         const ativo = true;
@@ -126,21 +127,33 @@ export default function DetalhesEventoPage() {
 
                 <p className="texto-medium-sm mb-1">Serviços</p>
 
-                <div className="w-full flex gap-6 justify-between bg-[var(--background-color-6)] rounded-[8px] p-6 mb-6">
+                <div
+                    className="w-full flex gap-6 justify-between bg-[var(--background-color-6)] rounded-[8px] p-6 mb-6"
+                    onMouseLeave={() => setHoveredAtalho(null)}
+                >
                     <CardAtalho
                         onClick={handleClickGerenciasJogos}
                         icon={<FaChessBoard />}
                         label="Jogos do Evento"
+                        onHoverStart={() => setHoveredAtalho('jogos-evento')}
+                        onHoverEnd={() => setHoveredAtalho(null)}
+                        isDimmed={hoveredAtalho !== null && hoveredAtalho !== 'jogos-evento'}
                     />
                     <CardAtalho
                         onClick={handleClickParticipantes}
                         icon={<FaUser />}
                         label="Participantes"
+                        onHoverStart={() => setHoveredAtalho('participantes')}
+                        onHoverEnd={() => setHoveredAtalho(null)}
+                        isDimmed={hoveredAtalho !== null && hoveredAtalho !== 'participantes'}
                     />
                     <CardAtalho
                         onClick={handleClickDadosDoEvento}
                         icon={<FaCalendar />}
                         label="Dados do Evento"
+                        onHoverStart={() => setHoveredAtalho('dados-evento')}
+                        onHoverEnd={() => setHoveredAtalho(null)}
+                        isDimmed={hoveredAtalho !== null && hoveredAtalho !== 'dados-evento'}
                     />
                 </div>
 

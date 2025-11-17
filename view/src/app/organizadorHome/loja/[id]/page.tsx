@@ -5,12 +5,11 @@ import { obterEnderecoCompleto } from "../../../util";
 import { FaStore, FaChessBoard, FaCalendar } from "react-icons/fa";
 import { CardAtalho } from "../../../../components/Cards/CardAtalho";
 import { CardEvento } from "./CardEvento";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { calcularStatus } from "../../../util";
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function PageLoja() {
   const { lojaSelecionada, fetchLoja } = usePaginaLojaStore();
@@ -18,6 +17,7 @@ export default function PageLoja() {
   const lojaId = Number(params?.id);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [hoveredAtalho, setHoveredAtalho] = useState<string | null>(null);
 
   const listaEventosAtivos =
     (lojaSelecionada?.eventos ?? []).filter((evento) => {
@@ -87,30 +87,49 @@ export default function PageLoja() {
                 </div>
               </div>
             </div>
-            <h3 className="font-semibold mb-1 text-[#D9E8FF]">Serviços </h3>
-            <div className="w-full flex gap-4 justify-between bg-[var(--background-color-6)] rounded-[8px] p-4 mb-6">
+            <h3 className="font-semibold mb-2 text-[#D9E8FF]">Serviços </h3>
+            <div
+              className="w-full flex gap-4 justify-between bg-[var(--background-color-6)] rounded-[8px] p-4 mb-6"
+              onMouseLeave={() => setHoveredAtalho(null)}
+            >
               <CardAtalho
                 onClick={handleClickGerenciarEventos}
                 icon={<FaCalendar />}
                 label="Gerenciar Eventos"
+                onHoverStart={() => setHoveredAtalho("gerenciar-eventos")}
+                onHoverEnd={() => setHoveredAtalho(null)}
+                isDimmed={
+                  hoveredAtalho !== null &&
+                  hoveredAtalho !== "gerenciar-eventos"
+                }
               />
               <CardAtalho
                 onClick={handleClickCadastroJogos}
                 icon={<FaChessBoard />}
                 label="Cadastro de Jogos"
+                onHoverStart={() => setHoveredAtalho("cadastro-jogos")}
+                onHoverEnd={() => setHoveredAtalho(null)}
+                isDimmed={
+                  hoveredAtalho !== null && hoveredAtalho !== "cadastro-jogos"
+                }
               />
               <CardAtalho
                 onClick={() => console.log("Dados da loja")}
                 icon={<FaStore />}
                 label="Dados da Loja"
+                onHoverStart={() => setHoveredAtalho("dados-loja")}
+                onHoverEnd={() => setHoveredAtalho(null)}
+                isDimmed={
+                  hoveredAtalho !== null && hoveredAtalho !== "dados-loja"
+                }
               />
             </div>
 
-            <h3 className="font-semibold mb-1 text-[#D9E8FF]">
+            <h3 className="font-semibold mb-2 text-[#D9E8FF]">
               Eventos ativos{" "}
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,300px))] justify-start gap-4 mb-6">
               {listaEventosAtivos.length > 0 ? (
                 listaEventosAtivos.map((evento) => (
                   <CardEvento

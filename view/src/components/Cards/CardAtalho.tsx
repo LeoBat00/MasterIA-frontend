@@ -6,6 +6,9 @@ type CardAtalhoProps = {
   label: string;
   onClick?: () => void;
   className?: string;
+  isDimmed?: boolean;
+  onHoverStart?: () => void;
+  onHoverEnd?: () => void;
 };
 
 export function CardAtalho({
@@ -13,13 +16,19 @@ export function CardAtalho({
   label,
   onClick,
   className,
+  isDimmed = false,
+  onHoverStart,
+  onHoverEnd,
 }: CardAtalhoProps) {
   return (
     <div
       onClick={onClick}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
       className={clsx(
-        "w-full borda-[#616EFF] cursor-pointer rounded-[8px] py-4 flex items-center justify-center text-center transition",
+        "w-full borda-[#616EFF] cursor-pointer rounded-[8px] py-4 flex items-center justify-center text-center transition-opacity duration-200",
         "bg-[#3E368C]",
+        isDimmed ? "opacity-60" : "opacity-100 hover:opacity-100",
         className
       )}
     >

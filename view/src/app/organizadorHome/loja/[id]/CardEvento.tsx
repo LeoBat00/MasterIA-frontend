@@ -11,25 +11,25 @@ const tipoStatusEvento: Record<
   Ativo: {
     id: 1,
     label: "Faltam",
-    border: "border-l-4 border-[var(--cor-status-ativo)]",
-    estilo: "text-2xl font-bold",
+    border: "border-l-2 border-[var(--cor-status-ativo)]",
+    estilo: "text-2xl font-regular",
   },
   Encerrado: {
     id: 2,
     label: "Evento",
-    border: "border-l-4 border-[var(--cor-status-encerrado)]",
+    border: "border-l-2 border-[var(--cor-status-encerrado)]",
     estilo: "",
   },
   Desativado: {
     id: 3,
     label: "Evento",
-    border: "border-l-4 border-[var(--cor-status-desativado)]",
+    border: "border-l-2 border-[var(--cor-status-desativado)]",
     estilo: "",
   },
   EmAndamento: {
     id: 4,
     label: "Em andamento",
-    border: "border-l-4 border-[var(--cor-status-em-andamento)]",
+    border: "border-l-2 border-[var(--cor-status-em-andamento)]",
     estilo: "",
   },
 };
@@ -55,37 +55,62 @@ export function CardEvento({ evento, onClick }: CardEventoProps) {
     <div
       onClick={() => onClick?.(evento)}
       className={clsx(
-        " p-4 rounded-md shadow-md bg-[#12121B] flex flex-col gap-1 cursor-pointer transition hover:bg-[#1c1c28] w-min-[256px]",
-        config.border
+        "p-4 rounded-md shadow-md bg-[#080809] flex flex-col gap-1 cursor-pointer transition duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.35)] hover:bg-[#1c1c28] w-min-[256px]",
+        config.border,
+        statusAtual === "Ativo" || statusAtual === "EmAndamento"
+          ? "opacity-100"
+          : "opacity-60"
       )}
     >
       <div>
         <div className="flex justify-between items-center">
-          <span>{nmEvento}</span>
-          <span>{config.label}</span>
+          <span className="text-[16px] font-semibold text-[#D9E8FF]">
+            {nmEvento}
+          </span>
+          <span className="text-[14px] font-normal text-[#D9E8FF]">
+            {config.label}
+          </span>
         </div>
         <div className="flex justify-end items-left">
-          <span className={config.estilo}>
+          <span className={clsx(config.estilo, "font-semibold text-[#fbfcff]")}>
             {tempoRestante(evento, statusAtual)}
           </span>
         </div>
         <div className="mb-4">
-          <p>Data</p>
-          <span>{dataInicioFormatada}</span>
+          <p className="text-[14px] font-normal text-[#D9E8FF]/70">Data</p>
+          <span className="text-[14px] font-semibold text-[#D9E8FF]/70">
+            {dataInicioFormatada}
+          </span>
         </div>
         <div className="mb-4">
-          <p>Máximo de jogadores</p>
-          <span>{evento.qtdLimite}</span>
+          <p className="text-[14px] font-normal text-[#D9E8FF]/70">
+            Máximo de jogadores
+          </p>
+          <span className="text-[14px] font-semibold text-[#D9E8FF]/70">
+            {evento.qtdLimite}
+          </span>
         </div>
         <div className="mb-4">
-          <p>Código</p>
-          <span>{evento.cdEvento}</span>
+          <p className="text-[14px] font-normal text-[#D9E8FF]/70">Código</p>
+          <span className="text-[14px] font-semibold text-[#D9E8FF]/70">
+            {evento.cdEvento}
+          </span>
         </div>
         <div className="flex justify-end items-center mt-2">
-          <span className="text-sm text-purple-400 flex items-center gap-1 cursor-pointer">
+          <span
+            className={clsx(
+              "text-sm flex items-center gap-1 cursor-pointer",
+              statusAtual === "Encerrado" ? "text-[#FDC700]" : "text-purple-400"
+            )}
+          >
             Acessar evento
           </span>
-          <ChevronRight className="h-5 w-5 text-purple-400 " />
+          <ChevronRight
+            className={clsx(
+              "h-5 w-5",
+              statusAtual === "Encerrado" ? "text-[#FDC700]" : "text-purple-400"
+            )}
+          />
         </div>
       </div>
     </div>
