@@ -1,21 +1,24 @@
-'use client';
+"use client";
 
 import MenuLateral from "@/components/MenuLateral";
 import { useAuthStore } from "@/stores/auth";
 import { useEffect } from "react";
 
-export default function useOrganizadorHomeLayout({ children }: { children: React.ReactNode }) {
+export default function useOrganizadorHomeLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { initializeAuth } = useAuthStore();
 
-    const { initializeAuth } = useAuthStore();
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
-    useEffect(() => {
-        initializeAuth();
-    }, [initializeAuth]);
-
-    return (
-        <div className="flex min-h-screen p-6">
-            <MenuLateral />
-            <main className="flex-1 pl-12">{children}</main>
-        </div>
-    );
+  return (
+    <div className="flex min-h-screen">
+      <MenuLateral />
+      <main className="flex-1">{children}</main>
+    </div>
+  );
 }

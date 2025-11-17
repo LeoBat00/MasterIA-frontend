@@ -8,6 +8,8 @@ export default function ConditionalHeader() {
 
   const hiddenOnPrefixes = [
     "/organizadorHome",
+    "/jogosCadastratos",
+    "/organizador/cadastro",
     "/login",
     "/registro"
   ];
