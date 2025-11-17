@@ -7,7 +7,12 @@ import { useOrganizadorStore } from "@/stores/organizador";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 
-const MenuLateral = () => {
+type MenuLateralProps = {
+  onNavigate?: () => void;
+  className?: string;
+};
+
+const MenuLateral = ({ onNavigate, className }: MenuLateralProps) => {
   const { organizador } = useOrganizadorStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -37,6 +42,7 @@ const MenuLateral = () => {
   const handleClickLogout = () => {
     logout();
     router.push("/");
+    onNavigate?.();
   };
 
   const organizerNameRaw =
@@ -51,7 +57,10 @@ const MenuLateral = () => {
 
   return (
     <aside
-      className="sticky top-0 flex h-screen w-80 shrink-0 flex-col rounded-[12px] border-r border-[#53339A] bg-[#040405] p-5"
+      className={clsx(
+        "sticky top-0 flex h-screen w-80 shrink-0 flex-col rounded-[12px] border-r border-[#53339A] bg-[#040405] p-5",
+        className
+      )}
       aria-label="Menu do organizador"
     >
       <div className="mb-3 flex items-center gap-2">
@@ -87,7 +96,10 @@ const MenuLateral = () => {
           return (
             <button
               key={item.label}
-              onClick={item.onClick}
+              onClick={() => {
+                item.onClick();
+                onNavigate?.();
+              }}
               className={clsx(
                 "flex w-full items-center gap-2 cursor-pointer rounded-lg border text-left text-sm font-medium transition-all duration-200",
                 isActive
