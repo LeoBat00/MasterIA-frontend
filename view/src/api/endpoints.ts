@@ -25,5 +25,8 @@ export const endpoints = {
   jogo: {
     getPaginado: "/Jogo/ListarPaginado",
     getPaginadoComLoja:"Jogo/ListarPaginadoNotInLoja"
+  },
+  cep: {
+    viaCep: (cep: string) => `https://viacep.com.br/ws/${cep}/json/`,
   }
 };

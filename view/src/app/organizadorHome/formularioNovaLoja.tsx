@@ -1,229 +1,236 @@
 import Input from "@/components/UI/Input";
+import Button from "@/components/UI/Button";
+import { Eraser } from "lucide-react";
 import { useLojaStore } from "@/stores/loja";
 import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";
-import { useEffect } from "react";
-import Button from "@/components/UI/Button";
+import { fetchAddressByCep } from "@/services/cepService";
+import { Loja } from "@/types/loja";
+import { useEffect, useState } from "react";
 
 export default function FormularioNovaLoja() {
+  const {
+    loja,
+    atualizarLoja,
+    setExibirFormularioLoja,
+    validacaoErro,
+    validarFormulario,
+    saveLoja,
+    clear,
+    limparValidacao,
+    updateLoja,
+  } = useLojaStore();
+  const { fetchOrganizador } = useOrganizadorStore();
+  const { claims } = useAuthStore();
+  const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [erroCep, setErroCep] = useState<string | null>(null);
+  const [ultimoCepConsultado, setUltimoCepConsultado] = useState("");
 
-    const { loja, atualizarLoja, setExibirFormularioLoja, validacaoErro, validarFormulario, saveLoja, clear, limparValidacao, updateLoja } = useLojaStore();
-    const { fetchOrganizador } = useOrganizadorStore();
-    const { claims } = useAuthStore();
-    const organizadorId = claims?.nameid ? Number(claims.nameid) : undefined;
+  useEffect(() => {
+    limparValidacao();
+  }, [limparValidacao]);
 
-    useEffect(() => {
-        limparValidacao();
-    }, [limparValidacao]);
+  const atualizarCampos = (campos: Partial<Loja>) => {
+    const atual = useLojaStore.getState().loja ?? {};
+    atualizarLoja({ ...atual, ...campos });
+  };
 
-    const hanleChangeCep = (novoCep: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.cep = novoCep;
-        atualizarLoja(copiaLoja);
+  const atualizarCampo = (campo: keyof Loja, valor: string) => {
+    atualizarCampos({ [campo]: valor } as Partial<Loja>);
+  };
+
+  const limparCamposViaCep = () => {
+    atualizarCampos({
+      logradouro: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+    });
+  };
+
+  const handleCepChange = (valor: string) => {
+    atualizarCampo("cep", valor);
+    setErroCep(null);
+    setUltimoCepConsultado("");
+    limparCamposViaCep();
+  };
+
+  const handleLimparFormulario = () => {
+    clear();
+    limparValidacao();
+    setErroCep(null);
+    setUltimoCepConsultado("");
+  };
+
+  const handleSairFormulario = () => {
+    handleLimparFormulario();
+    setExibirFormularioLoja(false);
+  };
+
+  const handleCadastrarLoja = async () => {
+    if (!validarFormulario()) return;
+    if (!organizadorId) {
+      alert("ID do organizador não encontrado. Faça login novamente.");
+      return;
     }
 
-    const handleChandeNome = (novoNome: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.nmLoja = novoNome;
-        atualizarLoja(copiaLoja);
+    const resultado = loja?.id
+      ? await updateLoja(loja!)
+      : await saveLoja(loja!, organizadorId);
+
+    if (!resultado.success) {
+      alert("Erro ao salvar loja. Tente novamente.");
+      return;
     }
 
-    const hanleChangeCidade = (novaCidade: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.cidade = novaCidade;
-        atualizarLoja(copiaLoja);
+    await fetchOrganizador(organizadorId);
+    handleLimparFormulario();
+    setExibirFormularioLoja(false);
+  };
+
+  const handleCepBlur = async () => {
+    const valorAtual = loja?.cep ?? "";
+    const cepLimpo = valorAtual.replace(/\D/g, "");
+    if (!cepLimpo) {
+      setErroCep(null);
+      return;
     }
-
-    const hanleChangeUf = (novoUf: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.uf = novoUf;
-        atualizarLoja(copiaLoja);
+    if (cepLimpo.length !== 8) {
+      setErroCep("CEP deve ter 8 dígitos");
+      return;
     }
-    const hanleChangeLogradouro = (novoLogradouro: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.logradouro = novoLogradouro;
-        atualizarLoja(copiaLoja);
+    if (cepLimpo === ultimoCepConsultado) return;
+
+    setBuscandoCep(true);
+    setErroCep(null);
+    try {
+      const address = await fetchAddressByCep(cepLimpo);
+      setUltimoCepConsultado(cepLimpo);
+      atualizarCampos({
+        logradouro: address.logradouro ?? "",
+        bairro: address.bairro ?? "",
+        cidade: address.localidade ?? "",
+        uf: address.uf ? address.uf.toUpperCase() : "",
+      });
+    } catch (error: any) {
+      setErroCep(error?.message ?? "Não foi possível consultar o CEP");
+    } finally {
+      setBuscandoCep(false);
     }
-    const hanleChangeBairro = (novoBairro: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.bairro = novoBairro;
-        atualizarLoja(copiaLoja);
-    }
+  };
 
-    const handleChangeNumero = (novoNumero: string) => {
-        const copiaLoja = { ...loja };
-        copiaLoja.numero = novoNumero;
-        atualizarLoja(copiaLoja);
-    }
+  return (
+    <div className="rounded-[18px] border border-[var(--color-purple-2)] border-l-[6px] bg-gradient-to-b from-[#0F0F17] to-[#09080F] px-8 py-10 shadow-lg">
+      <h3 className="text-2xl font-semibold text-[#D9E8FF]">
+        {loja?.id ? "Editar informações" : "Cadastrar nova loja"}
+      </h3>
 
-    const handleSairFormulario = () => {
-        clear();
-        limparValidacao();
-        setExibirFormularioLoja(false);
-    }
+      <form
+        className="mt-6 space-y-6"
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          handleCadastrarLoja();
+        }}
+      >
+        <Input
+          label="Nome da loja"
+          placeholder="Nome fantasia ou razão social"
+          value={loja?.nmLoja}
+          onChange={(v) => atualizarCampo("nmLoja", v)}
+          required
+          maxLength={120}
+          error={validacaoErro?.nmLoja}
+        />
 
-    const handleCadastrarLoja = async () => {
+        <hr className="border border-[#1d1a32]" />
 
-        const formValido = validarFormulario();
-        if (!formValido) return;
-        if (!organizadorId) {
-            alert("ID do organizador não encontrado. Faça login novamente.");
-            return;
-        }
+        <Input
+          label="CEP"
+          placeholder="00000-000"
+          value={loja?.cep}
+          onChange={handleCepChange}
+          onBlur={handleCepBlur}
+          mask="00000-000"
+          required
+          error={validacaoErro?.cep || erroCep || undefined}
+          helperText={buscandoCep ? "Consultando CEP..." : undefined}
+        />
 
-        const resultado = loja?.id ? await updateLoja(loja!) : await saveLoja(loja!, organizadorId);
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input
+            label="Cidade"
+            placeholder="Informe a cidade"
+            value={loja?.cidade}
+            required
+            error={validacaoErro?.cidade}
+            readOnly
+            inputClassName="cursor-not-allowed"
+          />
+          <Input
+            label="Estado"
+            placeholder="UF"
+            value={loja?.uf ? String(loja.uf).toUpperCase() : ""}
+            maxLength={2}
+            required
+            error={validacaoErro?.uf}
+            readOnly
+            inputClassName="cursor-not-allowed"
+          />
+        </div>
 
-        if (!resultado.success) {
-            alert("Erro ao cadastrar loja. Tente novamente.");
-            return;
-        }
+        <div className="grid gap-4 md:grid-cols-[3fr_1fr]">
+          <Input
+            label="Endereço ou Logradouro"
+            placeholder="Rua, avenida..."
+            value={loja?.logradouro}
+            required
+            error={validacaoErro?.logradouro}
+            readOnly
+            inputClassName="cursor-not-allowed"
+          />
+          <Input
+            label="Número"
+            placeholder="Nº"
+            value={loja?.numero}
+            onChange={(v) => atualizarCampo("numero", v)}
+            required
+          />
+        </div>
 
-        await fetchOrganizador(organizadorId);
-        atualizarLoja({});
-        setExibirFormularioLoja(false);
-    }
+        <Input
+          label="Bairro"
+          placeholder="Informe o bairro"
+          value={loja?.bairro}
+          required
+          error={validacaoErro?.bairro}
+          readOnly
+          inputClassName="cursor-not-allowed"
+        />
 
-    // const handleLimparCampos = () => {
-    //     clear();
-    //     limparValidacao();
-    // }
-
-    return <div className="py-8 px-32 bg-[var(--background-color-4)] rounded border-r border-b  border-[var(--color-purple-2)] border-l-8 border-l-[var(--color-purple-2)]  ">
-
-        <h3 className="text-lg font-semibold mb-4">{loja?.id ? "Atualizar Loja" : "Cadastrar Nova Loja"}</h3>
-        <form
-            className="flex flex-col gap-2 mt-4 px-8"
-            onSubmit={async (e) => {
-                e.preventDefault();
-                handleCadastrarLoja();
-            }}
-        >
-            <div className="grid grid-cols-1 gap-8">
-
-                <div className="grid grid-cols-1 gap-8">
-                    <div className="grid grid-cols-4 gap-8">
-
-                        <Input
-                            label="Nome da Loja"
-                            autoComplete="nomeLoja"
-                            placeholder="insira o nome da loja"
-                            value={loja?.nmLoja}
-                            onChange={handleChandeNome}
-                            required
-                            maxLength={100}
-                            containerClassName="col-span-3"
-                            error={validacaoErro?.nmLoja}
-                        // disabled={loading}
-                        />
-
-                        <Input
-                            label="Cep"
-                            autoComplete="cep"
-                            placeholder="insira o cep"
-                            value={loja?.cep}
-                            onChange={hanleChangeCep}
-                            mask="00000-000"
-                            required
-                            containerClassName="col-span-1"
-
-                            number
-                            error={validacaoErro?.cep}
-                        // disabled={loading}
-                        />
-
-                    </div>
-                    <div className=" grid grid-cols-6 gap-8">
-
-                        <Input
-                            label="Cidade"
-                            autoComplete="cidade"
-                            placeholder="insira a cidade"
-                            value={loja?.cidade}
-                            onChange={hanleChangeCidade}
-                            containerClassName="col-span-5"
-                            required
-                            error={validacaoErro?.cidade}
-                        // disabled={loading}
-                        />
-
-                        <Input
-                            label="Estado"
-                            autoComplete="estado"
-                            placeholder="Estado"
-                            value={loja?.uf ? String(loja?.uf).toUpperCase() : loja?.uf}
-                            onChange={hanleChangeUf}
-                            required
-                            maxLength={2}
-                            containerClassName="grid-cols-1"
-                            error={validacaoErro?.uf}
-                        // disabled={loading}
-                        />
-                    </div>
-
-                    <div className=" grid grid-cols-4 gap-8">
-
-                        <Input
-                            label="Endereço ou Logradouro"
-                            autoComplete="logradouro"
-                            placeholder="insira o endereço"
-                            value={loja?.logradouro}
-                            onChange={hanleChangeLogradouro}
-                            containerClassName="col-span-3"
-                            required
-                            error={validacaoErro?.logradouro}
-                        // disabled={loading}
-                        />
-
-                        <Input
-                            label="Numero"
-                            autoComplete="numero"
-                            placeholder="insira o numero"
-                            value={loja?.numero}
-                            onChange={handleChangeNumero}
-                            containerClassName="col-span-1"
-                            number
-                        // error={validacaoErro?.num}
-                        // disabled={loading}
-                        />
-                    </div>
-
-                    <div className="">
-                        <Input
-                            label="Bairro"
-                            autoComplete="bairro"
-                            placeholder="insira o bairro"
-                            value={loja?.bairro}
-                            onChange={hanleChangeBairro}
-                            required
-                            error={validacaoErro?.bairro}
-                        // disabled={loading}
-                        />
-                    </div>
-                </div>
-
-                <div className="justify-self-end  self-end space-x-4">
-                    <Button
-                        id="botaoVoltarFornmularioEvento"
-                        variant="outlineGhost"
-                        onClick={handleSairFormulario}>
-                        <span className="px-18">
-                            voltar
-                        </span>
-                    </Button>
-                    <Button
-                        type="submit">
-                        <span className="px-8">
-                            {loja?.id ?  "Atualizar Loja" : "Cadastrar Loja"}
-                        </span>
-                    </Button>
-                </div>
-
-
-            </div>
-
-            {/* {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>} */}
-
-        </form>
-
-    </div>;
+        <div className="flex flex-wrap items-center justify-end gap-4 pt-4">
+          <Button
+            type="button"
+            variant="ghost"
+            className="gap-2 text-[#FDC700]"
+            onClick={handleLimparFormulario}
+          >
+            <Eraser className="h-4 w-4" />
+            Limpar formulário
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="border border-[#FDC700] !text-[#FDC700] hover:bg-[#FDC700]/10 px-8"
+            onClick={handleSairFormulario}
+          >
+            Voltar
+          </Button>
+          <Button variant="primary" type="submit">
+            {loja?.id ? "Atualizar" : "Cadastrar"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
 }

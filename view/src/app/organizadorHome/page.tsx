@@ -117,30 +117,32 @@ export default function OrganizadorHome() {
               )}
             </div>
 
-            <div className="mb-6 max-w-xl">
-              <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/60">
-                  <Search className="h-4 w-4" />
-                </span>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar por nome"
-                  className="h-11 w-full rounded-[8px] border border-[#6F4BFF]/50 bg-[#151129] pl-10 pr-10 text-white placeholder:text-white/60 focus:border-[#7C3FFD] focus:outline-none focus:ring-1 focus:ring-[#7C3FFD]"
-                />
-                {searchTerm && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm("")}
-                    aria-label="Limpar busca"
-                    className="absolute cursor-pointer inset-y-0 right-3 flex items-center text-white/70 hover:text-white"
-                  >
-                    <CloseIcon className="h-4 w-4" />
-                  </button>
-                )}
+            {!exibirFormularioLoja && (
+              <div className="mb-6 max-w-xl">
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/60">
+                    <Search className="h-4 w-4" />
+                  </span>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar por nome"
+                    className="h-11 w-full rounded-[8px] border border-[#6F4BFF]/50 bg-[#151129] pl-10 pr-10 text-white placeholder:text-white/60 focus:border-[#7C3FFD] focus:outline-none focus:ring-1 focus:ring-[#7C3FFD]"
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm("")}
+                      aria-label="Limpar busca"
+                      className="absolute cursor-pointer inset-y-0 right-3 flex items-center text-white/70 hover:text-white"
+                    >
+                      <CloseIcon className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="group space-y-2">
               {exibirFormularioLoja ? (
