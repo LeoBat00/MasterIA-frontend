@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaTrash, FaPen } from "react-icons/fa";
-import { ChevronRight, Plus, Search, X as CloseIcon } from "lucide-react";
+import { Plus, Search, X as CloseIcon } from "lucide-react";
 import { useOrganizadorStore } from "../../stores/organizador";
 import FormularioNovaLoja from "./formularioNovaLoja";
 import { useLojaStore } from "@/stores/loja";
@@ -62,6 +62,7 @@ export default function OrganizadorHome() {
   };
 
   const handleAcessarLoja = (loja: Loja) => {
+    setLoja(loja);
     router.push(`organizadorHome/loja/${loja.id}`);
   };
 
