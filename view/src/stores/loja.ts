@@ -38,9 +38,10 @@ export const useLojaStore = create<LojaState>()(
             setExibirFormularioLoja: (v: boolean) => set({ exibirFormularioLoja: v }, false, "setExibirFormularioLoja"),
             validarFormulario: () => {
                 const validacaoErro: validacaoNovaLoja = {};
-                if (!get().loja?.cep) validacaoErro.cep = "CEP é obrigatório";
+                const cepSomenteDigitos = get().loja?.cep?.replace(/\D/g, "");
+                if (!cepSomenteDigitos) validacaoErro.cep = "CEP é obrigatório";
                 if (!get().loja?.nmLoja) validacaoErro.nmLoja = "Nome da loja é obrigatório";
-                if (get().loja?.cep && get().loja?.cep?.length !== 8) validacaoErro.cep = "CEP inválido";
+                if (cepSomenteDigitos && cepSomenteDigitos.length !== 8) validacaoErro.cep = "CEP inválido";
                 if (!get().loja?.cidade) validacaoErro.cidade = "Cidade é obrigatória";
                 if (!get().loja?.uf) validacaoErro.uf = "UF é obrigatório";
                 if (get().loja?.uf && get().loja?.uf?.length !== 2) validacaoErro.uf = "UF inválido";

@@ -6,7 +6,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useOrganizadorStore } from "@/stores/organizador";
 import { fetchAddressByCep } from "@/services/cepService";
 import { Loja } from "@/types/loja";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function FormularioNovaLoja() {
   const {
@@ -26,6 +26,23 @@ export default function FormularioNovaLoja() {
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [erroCep, setErroCep] = useState<string | null>(null);
   const [ultimoCepConsultado, setUltimoCepConsultado] = useState("");
+  const camposObrigatorios: Array<keyof Pick<
+    Loja,
+    "nmLoja" | "cep" | "cidade" | "uf" | "logradouro" | "numero" | "bairro"
+  >> = ["nmLoja", "cep", "cidade", "uf", "logradouro", "numero", "bairro"];
+
+  const isFormComplete = useMemo(() => {
+    return camposObrigatorios.every((campo) => {
+      const valor = loja?.[campo];
+      if (typeof valor === "string") {
+        return valor.trim().length > 0;
+      }
+      if (typeof valor === "number") {
+        return !Number.isNaN(valor);
+      }
+      return Boolean(valor);
+    });
+  }, [loja, camposObrigatorios]);
 
   useEffect(() => {
     limparValidacao();
@@ -226,7 +243,7 @@ export default function FormularioNovaLoja() {
           >
             Voltar
           </Button>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" disabled={!isFormComplete}>
             {loja?.id ? "Atualizar" : "Cadastrar"}
           </Button>
         </div>
