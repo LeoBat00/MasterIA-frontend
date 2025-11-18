@@ -58,7 +58,7 @@ const MenuLateral = ({ onNavigate, className }: MenuLateralProps) => {
   return (
     <aside
       className={clsx(
-        "sticky top-0 flex h-screen w-80 shrink-0 flex-col rounded-[12px] border-r border-[#53339A] bg-[#040405] p-5",
+        "sticky top-0 flex h-screen w-70 shrink-0 flex-col rounded-[12px] border-r border-[#53339A] bg-[#040405] p-5",
         className
       )}
       aria-label="Menu do organizador"

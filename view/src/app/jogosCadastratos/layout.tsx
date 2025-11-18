@@ -32,7 +32,7 @@ export default function JogosCadastratosLayout({
           </span>
         </div>
 
-        <div className="px-4 py-6 lg:px-8">{children}</div>
+        <div className="">{children}</div>
       </main>
 
       {isMenuOpen && (
