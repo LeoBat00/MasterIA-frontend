@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import {
   calcularStatus,
   formatarData,
-  getCorStatusEvento,
   tempoRestante,
 } from "@/app/util";
 import { useEventoStore } from "@/stores/evento";
@@ -55,9 +54,8 @@ export default function DetalhesEventoPage() {
   const status = eventoSelecionado
     ? calcularStatus(eventoSelecionado)
     : undefined;
-  const corStatus = status ? getCorStatusEvento(status) : "#8F8FFF";
 
-  const grupos = eventoSelecionado?.grupos || [];
+  const grupos = useMemo(() => eventoSelecionado?.grupos || [], [eventoSelecionado?.grupos]);
 
   const participantes = useMemo(() => {
     return grupos.flatMap((grupo) =>
