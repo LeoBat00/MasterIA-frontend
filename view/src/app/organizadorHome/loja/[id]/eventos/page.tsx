@@ -11,6 +11,12 @@ import Input from "@/components/UI/Input";
 import { filtroEvento, statusEvento, Evento } from "@/types/evento";
 import { calcularStatus } from "../../../../util";
 
+const isStatusTrue = (evento: Evento) => {
+  const statusValue = evento.status as unknown;
+  if (typeof statusValue === "boolean") return statusValue;
+  return evento.status === "Ativo" || evento.status === "EmAndamento";
+};
+
 export default function PageEvento() {
   const { lojaSelecionada } = usePaginaLojaStore();
   const {
@@ -26,6 +32,7 @@ export default function PageEvento() {
     { value: "inativos", label: "Inativos" },
     { value: "emAndamento", label: "Em Andamento" },
     { value: "finalizados", label: "Finalizados" },
+    { value: "encerrados", label: "Encerrados" },
   ];
 
   const optionsOrdem = [
@@ -46,29 +53,40 @@ export default function PageEvento() {
     if (!filtroEvento || listaEventos?.length === 0) return listaEventos;
 
     let eventosFiltrados = listaEventos;
-    // Filtrar por nome do evento
+    // Filtrar por nome ou código do evento
     if (filtroEvento.nomeEvento) {
-      eventosFiltrados = eventosFiltrados.filter((evento) =>
-        evento.nmEvento
-          .toLowerCase()
-          .includes(filtroEvento.nomeEvento!.toLowerCase())
-      );
-    }
-
-    // Filtrar por código do evento
-    if (filtroEvento.codigoEvento) {
-      eventosFiltrados = eventosFiltrados.filter((evento) =>
-        evento.cdEvento
-          .toLowerCase()
-          .includes(filtroEvento.codigoEvento!.toLowerCase())
+      const termo = filtroEvento.nomeEvento.toLowerCase();
+      eventosFiltrados = eventosFiltrados.filter(
+        (evento) =>
+          evento.nmEvento.toLowerCase().includes(termo) ||
+          evento.cdEvento.toLowerCase().includes(termo)
       );
     }
 
     // Filtrar por status
     if (filtroEvento.status && filtroEvento.status !== "todos") {
-      eventosFiltrados = eventosFiltrados.filter(
-        (evento) => calcularStatus(evento) === filtroEvento.status
-      );
+      const agora = new Date();
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      if (filtroEvento.status === "encerrados") {
+        eventosFiltrados = eventosFiltrados.filter((evento) => {
+          const fim = new Date(evento.dtFim);
+          return fim < agora;
+        });
+      } else if (filtroEvento.status === "ativos") {
+        eventosFiltrados = eventosFiltrados.filter((evento) =>
+          isStatusTrue(evento)
+        );
+      } else if (filtroEvento.status === "emAndamento") {
+        eventosFiltrados = eventosFiltrados.filter((evento) => {
+          const inicio = new Date(evento.dtInicio);
+          return isStatusTrue(evento) && inicio >= hoje;
+        });
+      } else {
+        eventosFiltrados = eventosFiltrados.filter(
+          (evento) => calcularStatus(evento) === filtroEvento.status
+        );
+      }
     }
 
     // Ordenar
@@ -126,10 +144,6 @@ export default function PageEvento() {
     atualizarFiltroEvento({ ...filtroEvento, nomeEvento: novoNome });
   };
 
-  const handleChangeCódigoEvento = (novoCodigo: string) => {
-    atualizarFiltroEvento({ ...filtroEvento, codigoEvento: novoCodigo });
-  };
-
   const handleClickCardEvento = (idEvento: number) => {
     router.push(`/organizadorHome/loja/${lojaSelecionada?.id}/${idEvento}`);
   };
@@ -138,69 +152,53 @@ export default function PageEvento() {
       {lojaSelecionada ? (
         <div className="pb-8">
           <div className="flex-1">
-            <div id="tituloPaginaLoja" className="mb-6">
-              <p className="mt-1 text-lg text-zinc-400">
+            <div id="tituloPaginaLoja" className="">
+              <p className="mt-1 text-lg text-zinc-400 text-[14px]">
                 Gerencie seus eventos
               </p>
-              <div className="mt-2 border-b border-zinc-600 mb-8" />
+              <div className="mt-2 border-b border-zinc-600 mb-4" />
             </div>
             {exibirFormularioEvento ? (
               <FormularioNovoEvento />
             ) : (
               <div>
-                <div className="mb-6">
-                  <span className="texto-medium-md">Gerencias Eventos </span>
-                  <p className="mt-1 text-lg text-zinc-400">
-                    Cadastre eventos para a sua loja e defina nome, datas,
-                    limite de participantes e status.
-                  </p>
-                </div>
-
-                <div className="mb-6">
-                  <span className="texto-medium-md">
+                <div className="mb-2">
+                  <span className="text-[24px] font-semibold text-[#D9E8FF]">
                     Eventos cadastrados{" "}
-                    <span className="text-lg text-zinc-400">
+                    <span className="text-lg text-zinc-400/65">
                       {"( " + quantidadeEventos + " )"}
                     </span>
                   </span>
                 </div>
 
-                <div className="grid grid-cols-12 gap-4 mb-6">
-                  <div className="col-span-3">
-                    <Select
-                      label="Status"
-                      value={filtroEvento?.status || "todos"}
-                      onChange={handleChangeFiltroStatus}
-                      options={optionsStatus}
-                      placeholder="Digite para filtrar..."
-                      helperText="Você pode digitar para filtrar, mas só escolhe clicando."
-                    />
-                  </div>
-                  <div className="col-span-3">
-                    <Select
-                      label="Ordem"
-                      value={filtroEvento?.ordem || "maisRecente"}
-                      onChange={handleChangeFiltroOrdem}
-                      options={optionsOrdem}
-                      placeholder="Digite para filtrar..."
-                      helperText="Você pode digitar para filtrar, mas só escolhe clicando."
-                    />
-                  </div>
-                  <div className="col-span-3">
+                <div className="grid grid-cols-12 gap-4 items-end mb-6">
+                  <div className="col-span-12 md:col-span-6">
                     <Input
-                      label="nome do evento"
+                      label="Nome ou código do evento"
                       placeholder="Pesquisar evento"
                       value={filtroEvento?.nomeEvento || ""}
                       onChange={handleChangeNomeEvento}
                     />
                   </div>
-
-                  <div className="col-span-3">
-                    <Input
-                      label="Código do evento"
-                      placeholder="Pesquisar pelo código"
-                      value={filtroEvento?.codigoEvento || ""}
-                      onChange={handleChangeCódigoEvento}
+                  <div className="col-span-6 md:col-span-3">
+                    <Select
+                      label="Status"
+                      animateOptions={true}
+                      allowTyping={false}
+                      value={filtroEvento?.status || "todos"}
+                      onChange={handleChangeFiltroStatus}
+                      options={optionsStatus}
+                    />
+                  </div>
+                  <div className="col-span-6 md:col-span-3">
+                    <Select
+                      label="Ordem"
+                      animateOptions={true}
+                      allowTyping={false}
+                      value={filtroEvento?.ordem || "maisRecente"}
+                      onChange={handleChangeFiltroOrdem}
+                      options={optionsOrdem}
+                      placeholder="Digite para filtrar..."
                     />
                   </div>
                 </div>

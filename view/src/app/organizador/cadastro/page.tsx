@@ -36,10 +36,7 @@ export default function CadastroOrganizadorPage() {
       <header>
         <h1>
           <span className="text-zinc-200 font-light text-[38px]">
-            Bem vindo ao{" "}
-          </span>{" "}
-          <span className="bg-gradient-to-r font-semibold text-[38px] from-[#685BFF] via-[#951FFB] to-[#7C3AED] bg-clip-text text-transparent">
-            MasterIA!
+            Meu Cadastro
           </span>
         </h1>
 

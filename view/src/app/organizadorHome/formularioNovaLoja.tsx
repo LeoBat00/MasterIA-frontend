@@ -8,6 +8,10 @@ import { fetchAddressByCep } from "@/services/cepService";
 import { Loja } from "@/types/loja";
 import { useEffect, useMemo, useState } from "react";
 
+const CAMPOS_OBRIGATORIOS: Array<
+  keyof Pick<Loja, "nmLoja" | "cep" | "cidade" | "uf" | "logradouro" | "numero" | "bairro">
+> = ["nmLoja", "cep", "cidade", "uf", "logradouro", "numero", "bairro"];
+
 export default function FormularioNovaLoja() {
   const {
     loja,
@@ -26,13 +30,8 @@ export default function FormularioNovaLoja() {
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [erroCep, setErroCep] = useState<string | null>(null);
   const [ultimoCepConsultado, setUltimoCepConsultado] = useState("");
-  const camposObrigatorios: Array<keyof Pick<
-    Loja,
-    "nmLoja" | "cep" | "cidade" | "uf" | "logradouro" | "numero" | "bairro"
-  >> = ["nmLoja", "cep", "cidade", "uf", "logradouro", "numero", "bairro"];
-
   const isFormComplete = useMemo(() => {
-    return camposObrigatorios.every((campo) => {
+    return CAMPOS_OBRIGATORIOS.every((campo) => {
       const valor = loja?.[campo];
       if (typeof valor === "string") {
         return valor.trim().length > 0;
@@ -42,7 +41,7 @@ export default function FormularioNovaLoja() {
       }
       return Boolean(valor);
     });
-  }, [loja, camposObrigatorios]);
+  }, [loja]);
 
   useEffect(() => {
     limparValidacao();
