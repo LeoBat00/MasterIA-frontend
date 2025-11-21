@@ -1,7 +1,7 @@
-import LoadingOverlay from '@/components/UI/LoadingOverlay';
-
 export default function Loading() {
-    return (
-        <LoadingOverlay />
-    );
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#685BFF]/40 border-t-[#685BFF]" />
+    </div>
+  );
 }

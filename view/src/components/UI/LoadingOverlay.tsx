@@ -1,34 +1,20 @@
 'use client';
+type LoadingOverlayProps = {
+  fullscreen?: boolean;
+};
 
-export default function LoadingOverlay() {
-    return (
-        <div
-            className="absolute inset-0 z-50 flex items-center justify-center bg-[#0D0D12]/70 text-white rounded-[8px]"
-            role="status"
-            aria-live="polite"
-            aria-label="Carregando conteúdo"
-        >
-            <svg
-                className="h-10 w-10 animate-spin"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-            >
-                <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                />
-                <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                />
-            </svg>
-            <span className="sr-only">Carregando…</span>
-        </div>
-    );
+export default function LoadingOverlay({ fullscreen = true }: LoadingOverlayProps) {
+  return (
+    <div
+      className={`${
+        fullscreen ? 'fixed inset-0' : 'absolute inset-0'
+      } z-[999] flex items-center justify-center bg-[linear-gradient(to_bottom_left,_rgba(14,14,21,0.92)_0%,_rgba(20,20,31,0.92)_100%)] text-white`}
+      role="status"
+      aria-live="polite"
+      aria-label="Carregando conteúdo"
+    >
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#685BFF]/40 border-t-[#685BFF]" />
+      <span className="sr-only">Carregando…</span>
+    </div>
+  );
 }

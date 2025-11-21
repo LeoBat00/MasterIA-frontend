@@ -9,4 +9,5 @@ export type Grupo = {
     lojaId: number;
     participantes: participanteGrupo[];
     jogosGrupos: Jogo[];
+    idJogosEventos?: number[];
 };

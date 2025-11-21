@@ -126,7 +126,7 @@ export default function PageLoja() {
             </div>
 
             <h3 className="font-semibold mb-2 text-[#D9E8FF]">
-              Eventos ativos{" "}
+              Eventos Ativos{" "}
             </h3>
 
             <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,300px))] justify-start gap-4 mb-6">

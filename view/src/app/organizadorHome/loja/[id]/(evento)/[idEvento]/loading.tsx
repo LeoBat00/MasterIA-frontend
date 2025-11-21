@@ -1,9 +1,7 @@
-import LoadingScreen from "@/components/UI/LoadingScreen";
-
 export default function LoadingDetalhesEvento() {
-    return (
-        <div className='page'>
-            <LoadingScreen />
-        </div>
-    );
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#685BFF]/40 border-t-[#685BFF]" />
+    </div>
+  );
 }

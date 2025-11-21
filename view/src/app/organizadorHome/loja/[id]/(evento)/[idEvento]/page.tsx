@@ -1,184 +1,358 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { calcularStatus, formatarData, getCorStatusEvento } from '@/app/util';
-import { useEventoStore } from '@/stores/evento';
-import { CardAtalho } from '@/components/Cards/CardAtalho';
-import { FaUser, FaChessBoard, FaCalendar } from 'react-icons/fa';
-import LoadingOverlay from '@/components/UI/LoadingOverlay';
-import { Grupo } from '@/types/grupo';
-
-const gruposMockados: Grupo[] = [
-    {
-        id: 1,
-        nmGrupo: "Grupo A",
-        qntMaxima: 10,
-        descricao: "Descrição do Grupo A",
-        lojaId: 1,
-        participantes: [],
-        jogosGrupos: [],
-    },
-    {
-        id: 2,
-        nmGrupo: "Grupo B",
-        qntMaxima: 15,
-        descricao: "Descrição do Grupo B",
-        lojaId: 1,
-        participantes: [],
-        jogosGrupos: [],
-    },
-];
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import {
+  calcularStatus,
+  formatarData,
+  getCorStatusEvento,
+  tempoRestante,
+} from "@/app/util";
+import { useEventoStore } from "@/stores/evento";
+import Button from "@/components/UI/Button";
+import Input from "@/components/UI/Input";
+import { FiChevronDown, FiChevronUp, FiEdit3, FiSearch } from "react-icons/fi";
+import { FaBox, FaUsers, FaChessBoard } from "react-icons/fa";
+import { jogoEvento } from "@/types/jogo";
+import { getGroupColorByIndex } from "@/utils/groupColors";
 
 export default function DetalhesEventoPage() {
-    const EnumStateEvento = {
-        Ativo: 'Ativo',
-        Encerrado: 'Encerrado',
-        Desativado: 'Desativado',
-        EmAndamento: 'Em andamento',
+  const { eventoSelecionado, getEventoById, setEventoSelecionado } =
+    useEventoStore();
+  const router = useRouter();
+  const params = useParams();
+  const idEventoSelecionado = Number(params?.idEvento);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [buscaParticipante, setBuscaParticipante] = useState("");
+  const [gruposExpandidos, setGruposExpandidos] = useState<
+    Record<number, boolean>
+  >({});
+
+  useEffect(() => {
+    let ativo = true;
+    setIsLoading(true);
+
+    if (idEventoSelecionado && getEventoById) {
+      getEventoById(idEventoSelecionado)
+        .then((evento) => {
+          if (ativo && evento) {
+            setEventoSelecionado(evento);
+          }
+        })
+        .finally(() => {
+          if (ativo) setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
+    }
+
+    return () => {
+      ativo = false;
     };
+  }, [idEventoSelecionado, getEventoById, setEventoSelecionado]);
 
-    const { eventoSelecionado, getEventoById, setEventoSelecionado, clear, } = useEventoStore();
+  const status = eventoSelecionado
+    ? calcularStatus(eventoSelecionado)
+    : undefined;
+  const corStatus = status ? getCorStatusEvento(status) : "#8F8FFF";
 
-    const router = useRouter();
+  const grupos = eventoSelecionado?.grupos || [];
 
-    const params = useParams();
-    const idEventoSelecionado = Number(params?.idEvento);
-    const [isLoading, setIsLoading] = useState(true);
-    const [hoveredAtalho, setHoveredAtalho] = useState<string | null>(null);
-
-    useEffect(() => {
-        const ativo = true;
-        setIsLoading(true);
-
-        if (idEventoSelecionado && getEventoById) {
-            getEventoById(idEventoSelecionado)
-                .then((evento) => {
-                    if (ativo && evento) {
-                        setEventoSelecionado(evento);
-                    }
-                })
-                .finally(() => {
-                    if (ativo) setIsLoading(false);
-                });
-        }
-
-    }, [idEventoSelecionado, getEventoById, setEventoSelecionado, clear]);
-
-    if (isLoading) {
-        return <LoadingOverlay />;
-    }
-
-    if (!eventoSelecionado) {
-        return <div className="page">Evento não encontrado!</div>;
-    }
-
-    const status = calcularStatus(eventoSelecionado);
-    const corStatus = getCorStatusEvento(status);
-
-    const handleClickGerenciasJogos = () => {
-        router.push(`/organizadorHome/loja/${eventoSelecionado.lojaId}/${eventoSelecionado.id}/jogos`);
-    }
-
-    const handleClickParticipantes = () => {
-        router.push(`/organizadorHome/loja/${eventoSelecionado.lojaId}/${eventoSelecionado.id}/participantes`);
-    }
-
-    const handleClickDadosDoEvento = () => {
-        console.log("Dados do Evento");
-    }
-
-    return (
-        <div className="page">
-            <div className="flex-1">
-                <p className="mt-1 text-lg text-zinc-400">Gerencie seu evento</p>
-                <div className="mt-2 border-b border-zinc-600 mb-8" />
-
-                <p className="texto-medium-md mb-1">{eventoSelecionado.nmEvento}</p>
-
-                <div className="flex items-start p-2 rounded-[8px] border border-[var(--color-border-ligh-purple)] px-4 mb-6">
-                    <div className="text-lg font-medium text-[var(--text-color-info)]">
-                        <div className="grid grid-cols-2 gap-y-1 gap-x-4 p-3">
-                            <span>
-                                Código: <span className="px-2">{eventoSelecionado.cdEvento}</span>
-                            </span>
-
-                            <span>
-                                Status:{' '}
-                                <span className="px-2 font-semibold" style={{ color: corStatus }}>
-                                    {EnumStateEvento[status as keyof typeof EnumStateEvento]}
-                                </span>
-                            </span>
-
-                            <span>
-                                Pessoas Cadastradas:{' '}
-                                <span className="px-2">{eventoSelecionado.qtdLimite}</span>
-                            </span>
-
-                            <span>
-                                Data:{' '}
-                                <span className="px-2">
-                                    {formatarData(eventoSelecionado.dtInicio)}
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <p className="texto-medium-sm mb-1">Serviços</p>
-
-                <div
-                    className="w-full flex gap-6 justify-between bg-[var(--background-color-6)] rounded-[8px] p-6 mb-6"
-                    onMouseLeave={() => setHoveredAtalho(null)}
-                >
-                    <CardAtalho
-                        onClick={handleClickGerenciasJogos}
-                        icon={<FaChessBoard />}
-                        label="Jogos do Evento"
-                        onHoverStart={() => setHoveredAtalho('jogos-evento')}
-                        onHoverEnd={() => setHoveredAtalho(null)}
-                        isDimmed={hoveredAtalho !== null && hoveredAtalho !== 'jogos-evento'}
-                    />
-                    <CardAtalho
-                        onClick={handleClickParticipantes}
-                        icon={<FaUser />}
-                        label="Participantes"
-                        onHoverStart={() => setHoveredAtalho('participantes')}
-                        onHoverEnd={() => setHoveredAtalho(null)}
-                        isDimmed={hoveredAtalho !== null && hoveredAtalho !== 'participantes'}
-                    />
-                    <CardAtalho
-                        onClick={handleClickDadosDoEvento}
-                        icon={<FaCalendar />}
-                        label="Dados do Evento"
-                        onHoverStart={() => setHoveredAtalho('dados-evento')}
-                        onHoverEnd={() => setHoveredAtalho(null)}
-                        isDimmed={hoveredAtalho !== null && hoveredAtalho !== 'dados-evento'}
-                    />
-                </div>
-
-                <p className="texto-medium-sm mb-1">Grupos</p>
-
-                {/* {eventoSelecionado.grupos && eventoSelecionado.grupos.length > 0 && ( */}
-                {gruposMockados && gruposMockados.length > 0 && (
-                    <div>
-                        <div className="grid grid-cols-1 gap-4">
-                            {gruposMockados.map((grupo) => (
-                                <div
-                                    key={grupo.id}
-                                    className="p-4 border rounded-lg bg-[var(--background-color-6)]"
-                                >
-                                    <p className="font-semibold text-lg mb-2">{grupo.nmGrupo}</p>
-                                    <p className="text-zinc-400 mb-2">{grupo.descricao}</p>
-                                    <p className="text-sm">
-                                        Participantes: {grupo.participantes.length} / {grupo.qntMaxima}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
+  const participantes = useMemo(() => {
+    return grupos.flatMap((grupo) =>
+      (grupo.participantes || []).map((participante) => ({
+        ...participante,
+        grupoId: grupo.id,
+      }))
     );
+  }, [grupos]);
+
+  const participantesFiltrados = participantes.filter((p) => {
+    if (!buscaParticipante.trim()) return true;
+    const termo = buscaParticipante.toLowerCase();
+    return (
+      p.nome.toLowerCase().includes(termo) ||
+      (p.sobrenome || "").toLowerCase().includes(termo) ||
+      (p.email || "").toLowerCase().includes(termo)
+    );
+  });
+
+  const qtdParticipantes = participantes.length;
+
+  const jogosPorId = useMemo(() => {
+    const mapa = new Map<number, jogoEvento>();
+    (eventoSelecionado?.jogos || []).forEach((jogo) => {
+      if (jogo?.id) mapa.set(jogo.id, jogo);
+    });
+    return mapa;
+  }, [eventoSelecionado?.jogos]);
+
+  const corGrupoPorId = useMemo(() => {
+    const mapa = new Map<number, string>();
+    grupos.forEach((grupo, idx) => {
+      mapa.set(grupo.id, getGroupColorByIndex(idx));
+    });
+    return mapa;
+  }, [grupos]);
+
+  const toggleGrupo = (id: number) => {
+    setGruposExpandidos((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleClickGerenciarJogos = () => {
+    router.push(
+      `/organizadorHome/loja/${eventoSelecionado?.lojaId}/${eventoSelecionado?.id}/jogos`
+    );
+  };
+
+  const handleVoltar = () => {
+    router.back();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#685BFF]/40 border-t-[#685BFF]" />
+      </div>
+    );
+  }
+
+  if (!eventoSelecionado) {
+    return <div className="page">Evento não encontrado!</div>;
+  }
+
+  return (
+    <div className="page">
+      <div className="flex items-start justify-between mb-6 gap-4">
+        <div>
+          <p className="text-zinc-400 text-sm">Gerencie seu evento</p>
+          <p className="texto-medium-md text-[#D9E8FF]">
+            {eventoSelecionado.nmEvento}
+          </p>
+        </div>
+      </div>
+      <h3 className="font-semibold mb-2 text-[#D9E8FF]">Detalhes do Evento</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.9fr] gap-6">
+        <div className="space-y-4">
+          <div className="rounded-[12px] border border-white/10 bg-gradient-to-b from-[#0F0F17] to-[#09080F] p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-zinc-400">Código</p>
+                <p className="text-lg font-semibold text-white">
+                  {eventoSelecionado.cdEvento}
+                </p>
+                <p className="text-sm text-zinc-400 mt-2">Data</p>
+                <p className="text-base text-[#D9E8FF]">
+                  {formatarData(eventoSelecionado.dtInicio)}
+                </p>
+              </div>
+              <div className="text-right flex flex-col items-end gap-2">
+                <p className="text-xs text-zinc-400 uppercase">Faltam</p>
+                <p className="text-2xl font-bold text-white">
+                  {status ? tempoRestante(eventoSelecionado, status) : "-"}
+                </p>
+                <div className="mt-2 flex items-center text-sm font-regular border-2 border-[#72D999]/10 w-fit rounded-[8px] px-2 py-0.5 text-[#72D999] bg-[#72D999]/10">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Status</span>
+                    <span className="font-light">
+                      {status
+                        ? status === "EmAndamento"
+                          ? "Em andamento"
+                          : status
+                        : "-"}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-sm text-zinc-300">
+                  Limite de participantes: {eventoSelecionado.qtdLimite ?? "-"}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="outlineGhostPurple"
+                  size="sm"
+                  leftIcon={<FiEdit3 />}
+                  onClick={() =>
+                    router.push(
+                      `/organizadorHome/loja/${eventoSelecionado.lojaId}/${eventoSelecionado.id}`
+                    )
+                  }
+                >
+                  Editar Evento
+                </Button>
+                <Button
+                  variant="outlineGhostPurple"
+                  size="sm"
+                  leftIcon={<FaChessBoard />}
+                  onClick={handleClickGerenciarJogos}
+                >
+                  Jogos do Evento
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[12px] border border-white/10 bg-[#0F0F17] p-5">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <FaUsers className="text-[#8F8FFF]" />
+                <p className="font-semibold text-[#D9E8FF]">
+                  Pessoas Cadastradas {qtdParticipantes ?? 0}
+                </p>
+              </div>
+            </div>
+
+            <Input
+              placeholder="Buscar por nome ou email"
+              value={buscaParticipante}
+              onChange={setBuscaParticipante}
+              leftIcon={<FiSearch />}
+              containerClassName="mb-3"
+            />
+
+                        <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                          {participantesFiltrados.length > 0 ? (
+                            participantesFiltrados.map((p) => (
+                              <div
+                                key={p.id}
+                                className="flex items-center justify-between rounded-[8px] border border-white/5 bg-[#12121B] px-3 py-2"
+                                style={{
+                                  borderLeftColor: corGrupoPorId.get(
+                                    p.grupoId ?? -1
+                                  ),
+                                  borderLeftWidth: "6px",
+                                  borderLeftStyle: "solid",
+                                }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="h-8 w-8 flex items-center justify-center rounded-full bg-[#1F1F2B] text-white/80">
+                                    {p.nome.charAt(0).toUpperCase()}
+                                  </div>
+                      <div>
+                        <p className="text-sm text-white">
+                          {p.nome} {p.sobrenome}
+                        </p>
+                        <p className="text-xs text-zinc-400">{p.email}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-zinc-500">{p.telefone}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-zinc-400">
+                  Nenhum participante encontrado.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[12px] border border-white/10 bg-[#0F0F17] p-5 h-fit">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <FaBox className="text-[#8F8FFF]" />
+              <p className="font-semibold text-[#D9E8FF]">
+                Grupos Criados ({(eventoSelecionado.grupos || []).length})
+              </p>
+            </div>
+          </div>
+
+                    <div className="space-y-2">
+                        {grupos.length > 0 ? (
+                            grupos.map((grupo, idx) => {
+                                const jogosDoGrupo = (grupo.idJogosEventos || [])
+                                    .map((id) => jogosPorId.get(id))
+                                    .filter(Boolean);
+
+                                const expandido = gruposExpandidos[grupo.id] ?? false;
+
+                return (
+                                    <div
+                                        key={grupo.id}
+                                        className="rounded-[10px] border border-white/5 bg-[#12121B] px-3 py-2"
+                                        style={{
+                                            borderLeftColor: getGroupColorByIndex(idx),
+                                            borderLeftWidth: "6px",
+                                            borderLeftStyle: "solid",
+                                        }}
+                                    >
+                    <button
+                      type="button"
+                      onClick={() => toggleGrupo(grupo.id)}
+                      className="flex w-full items-center justify-between text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white font-semibold">
+                          {grupo.nmGrupo}
+                        </span>
+                        <span className="text-xs text-zinc-400">
+                          {grupo.participantes.length} participantes
+                        </span>
+                      </div>
+                      {expandido ? (
+                        <FiChevronUp className="text-zinc-400" />
+                      ) : (
+                        <FiChevronDown className="text-zinc-400" />
+                      )}
+                    </button>
+
+                    {expandido && (
+                      <div className="mt-3 space-y-2 max-h-56 overflow-y-auto pr-1">
+                        {jogosDoGrupo.length > 0 ? (
+                          jogosDoGrupo.map((jogo) => (
+                            <div
+                              key={jogo!.id}
+                              className="flex items-center gap-3 rounded-[8px] bg-[#0F0F17] border border-white/5 px-3 py-2"
+                            >
+                              {jogo?.thumb ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={jogo.thumb}
+                                  alt={jogo.nomeJogo}
+                                  className="h-10 w-10 rounded-md object-cover"
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded-md bg-[#1F1F2B]" />
+                              )}
+                              <div>
+                                <p className="text-sm text-white">
+                                  {jogo?.nomeJogo}
+                                </p>
+                                <p className="text-xs text-zinc-400">
+                                  {jogo?.qtJogadoresMin} -{" "}
+                                  {jogo?.qtJogadoresMax} jogadores
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-zinc-400">
+                            Nenhum jogo associado a este grupo.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-sm text-zinc-400">
+                Nenhum grupo criado para este evento.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <Button variant="outlineGhost" onClick={handleVoltar}>
+          Voltar
+        </Button>
+      </div>
+    </div>
+  );
 }

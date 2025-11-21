@@ -159,20 +159,20 @@ body {
 }
 
 .custom-scroll::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
   /* largura vertical */
-  height: 8px;
+  height: 4px;
   /* altura horizontal */
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: #12121B;
+  background: #181722;
   /* cor do fundo */
   border-radius: 4px;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-purple-5);
+  background: #616EFF;
   /* cor do polegar */
   border-radius: 4px;
 }
@@ -184,7 +184,31 @@ body {
 /* Firefox */
 .custom-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-purple-5) #12121B;
+  scrollbar-color: #616EFF #181722;
+}
+
+/* Scroll padrão da aplicação */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #616EFF #181722;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #181722;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #616EFF;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-purple-3);
 }
 
 .scrollbar-none {
