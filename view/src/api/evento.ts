@@ -1,6 +1,7 @@
 import { http } from "./http";
 import { endpoints } from "./endpoints";
 import type { EventoAtivo, Evento } from "../types/evento";
+import { mapGameIdsToEnum } from "@/utils/mapGameIdsToEnum";
 
 export type CidadeDisponivel = {
   cidade: string;
@@ -23,5 +24,6 @@ export async function getEventosAtivos() {
 
 export async function getEventoById(id: number) {
   const { data } = await http.get<Evento>(endpoints.evento.getById(id));
-  return data;
+  const jogosHydrated = (data.jogos || []).map((j) => mapGameIdsToEnum(j));
+  return { ...data, jogos: jogosHydrated };
 }

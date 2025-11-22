@@ -21,6 +21,7 @@ export const endpoints = {
   },
   participante: {
     cadastroEvento: "/Participante/CadastroEvento",
+    recomendacaoPerfil: (id: number) => `/Participante/RecomendacaoPerfil?Id=${id}`,
   },
   jogo: {
     getPaginado: "/Jogo/ListarPaginado",

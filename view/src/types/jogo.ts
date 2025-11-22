@@ -36,6 +36,9 @@ export interface Jogo {
   categorias: Categoria[];
   mecanicas: Mecanica[];
   temas: Tema[];
+  categoriasIds?: number[];
+  mecanicasIds?: number[];
+  temasIds?: number[];
 }
 
 export interface jogoLoja {
@@ -68,4 +71,7 @@ export interface jogoEvento {
   temas: Tema[];
   qtJogadoresMin?: number;
   qtJogadoresMax?: number;
+  categoriasIds?: number[];
+  mecanicasIds?: number[];
+  temasIds?: number[];
 }

@@ -2,18 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  calcularStatus,
-  formatarData,
-  tempoRestante,
-} from "@/app/util";
+import { calcularStatus, formatarData, tempoRestante } from "@/app/util";
 import { useEventoStore } from "@/stores/evento";
 import Button from "@/components/UI/Button";
 import Input from "@/components/UI/Input";
 import { FiChevronDown, FiChevronUp, FiEdit3, FiSearch } from "react-icons/fi";
-import { FaBox, FaUsers, FaChessBoard } from "react-icons/fa";
+import { FaBox, FaUsers, FaChessBoard, FaBolt } from "react-icons/fa";
 import { jogoEvento } from "@/types/jogo";
 import { getGroupColorByIndex } from "@/utils/groupColors";
+import { participanteGrupo } from "@/types/participante";
+import { getRecomendacaoPerfil, RecomendacaoJogo } from "@/api/participante";
 
 export default function DetalhesEventoPage() {
   const { eventoSelecionado, getEventoById, setEventoSelecionado } =
@@ -27,6 +25,11 @@ export default function DetalhesEventoPage() {
   const [gruposExpandidos, setGruposExpandidos] = useState<
     Record<number, boolean>
   >({});
+  const [recomendacoes, setRecomendacoes] = useState<RecomendacaoJogo[]>([]);
+  const [loadingRecomendacao, setLoadingRecomendacao] = useState(false);
+  const [participanteSelecionado, setParticipanteSelecionado] =
+    useState<participanteGrupo | null>(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   useEffect(() => {
     let ativo = true;
@@ -55,7 +58,10 @@ export default function DetalhesEventoPage() {
     ? calcularStatus(eventoSelecionado)
     : undefined;
 
-  const grupos = useMemo(() => eventoSelecionado?.grupos || [], [eventoSelecionado?.grupos]);
+  const grupos = useMemo(
+    () => eventoSelecionado?.grupos || [],
+    [eventoSelecionado?.grupos]
+  );
 
   const participantes = useMemo(() => {
     return grupos.flatMap((grupo) =>
@@ -98,6 +104,28 @@ export default function DetalhesEventoPage() {
     setGruposExpandidos((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const abrirModalRecomendacao = async (participante: participanteGrupo) => {
+    setParticipanteSelecionado(participante);
+    setMostrarModal(true);
+    setLoadingRecomendacao(true);
+    setRecomendacoes([]);
+    try {
+      const data = await getRecomendacaoPerfil(participante.id);
+      setRecomendacoes(data.recommendations || []);
+    } catch (error) {
+      console.error("Erro ao buscar recomendações", error);
+    } finally {
+      setLoadingRecomendacao(false);
+    }
+  };
+
+  const fecharModalRecomendacao = () => {
+    setMostrarModal(false);
+    setParticipanteSelecionado(null);
+    setRecomendacoes([]);
+    setLoadingRecomendacao(false);
+  };
+
   const handleClickGerenciarJogos = () => {
     router.push(
       `/organizadorHome/loja/${eventoSelecionado?.lojaId}/${eventoSelecionado?.id}/jogos`
@@ -130,6 +158,70 @@ export default function DetalhesEventoPage() {
           </p>
         </div>
       </div>
+
+      {mostrarModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="relative w-full max-w-2xl rounded-[12px] border border-white/10 bg-[#0F0F17] p-5 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-zinc-400">Recomendações para</p>
+                <p className="text-lg font-semibold text-white">
+                  {participanteSelecionado?.nome}{" "}
+                  {participanteSelecionado?.sobrenome}
+                </p>
+              </div>
+              <button
+                className="h-9 w-9 rounded-full bg-[#1C1C2D] border border-white/10 text-white cursor-pointer hover:opacity-80"
+                onClick={fecharModalRecomendacao}
+              >
+                ✕
+              </button>
+            </div>
+
+            {loadingRecomendacao ? (
+              <div className="flex min-h-[160px] items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#685BFF]/40 border-t-[#685BFF]" />
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-[420px] overflow-y-auto custom-scroll pr-1">
+                {recomendacoes.length > 0 ? (
+                  recomendacoes.map((rec) => (
+                    <div
+                      key={rec.id_mysql}
+                      className="flex items-center gap-3 rounded-[10px] border border-white/5 bg-[#12121B] p-3"
+                    >
+                      {rec.thumb ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={rec.thumb}
+                          alt={rec.nmJogo}
+                          className="h-14 w-14 rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="h-14 w-14 rounded-md bg-[#1F1F2B]" />
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-white">
+                          {rec.nmJogo}
+                        </p>
+                        <p className="text-xs text-zinc-400">
+                          Semântica: {rec.semantic_score.toFixed(2)} |
+                          Popularidade: {rec.popularity_score.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-zinc-400">
+                    Nenhuma recomendação encontrada para este participante.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <h3 className="font-semibold mb-2 text-[#D9E8FF]">Detalhes do Evento</h3>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.9fr] gap-6">
         <div className="space-y-4">
@@ -212,24 +304,22 @@ export default function DetalhesEventoPage() {
               containerClassName="mb-3"
             />
 
-                        <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
-                          {participantesFiltrados.length > 0 ? (
-                            participantesFiltrados.map((p) => (
-                              <div
-                                key={p.id}
-                                className="flex items-center justify-between rounded-[8px] border border-white/5 bg-[#12121B] px-3 py-2"
-                                style={{
-                                  borderLeftColor: corGrupoPorId.get(
-                                    p.grupoId ?? -1
-                                  ),
-                                  borderLeftWidth: "6px",
-                                  borderLeftStyle: "solid",
-                                }}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="h-8 w-8 flex items-center justify-center rounded-full bg-[#1F1F2B] text-white/80">
-                                    {p.nome.charAt(0).toUpperCase()}
-                                  </div>
+            <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+              {participantesFiltrados.length > 0 ? (
+                participantesFiltrados.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between rounded-[8px] border border-white/5 bg-[#12121B] px-3 py-2"
+                    style={{
+                      borderLeftColor: corGrupoPorId.get(p.grupoId ?? -1),
+                      borderLeftWidth: "6px",
+                      borderLeftStyle: "solid",
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 flex items-center justify-center rounded-full bg-[#1F1F2B] text-white/80">
+                        {p.nome.charAt(0).toUpperCase()}
+                      </div>
                       <div>
                         <p className="text-sm text-white">
                           {p.nome} {p.sobrenome}
@@ -237,7 +327,19 @@ export default function DetalhesEventoPage() {
                         <p className="text-xs text-zinc-400">{p.email}</p>
                       </div>
                     </div>
-                    <span className="text-xs text-zinc-500">{p.telefone}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-zinc-500">
+                        {p.telefone}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => abrirModalRecomendacao(p)}
+                        className="h-8 w-8 rounded-full bg-[#0B0A0E] border cursor-pointer border-[#685BFF]/60 flex items-center justify-center text-[#D9E8FF] hover:opacity-90 transition"
+                        title="Recomendação rápida de jogos"
+                      >
+                        <FaBolt />
+                      </button>
+                    </div>
                   </div>
                 ))
               ) : (
@@ -259,29 +361,29 @@ export default function DetalhesEventoPage() {
             </div>
           </div>
 
-                    <div className="space-y-2">
-                        {grupos.length > 0 ? (
-                            grupos.map((grupo, idx) => {
-                                const jogosDoGrupo = (grupo.idJogosEventos || [])
-                                    .map((id) => jogosPorId.get(id))
-                                    .filter(Boolean);
+          <div className="space-y-2">
+            {grupos.length > 0 ? (
+              grupos.map((grupo, idx) => {
+                const jogosDoGrupo = (grupo.idJogosEventos || [])
+                  .map((id) => jogosPorId.get(id))
+                  .filter(Boolean);
 
-                                const expandido = gruposExpandidos[grupo.id] ?? false;
+                const expandido = gruposExpandidos[grupo.id] ?? false;
 
                 return (
-                                    <div
-                                        key={grupo.id}
-                                        className="rounded-[10px] border border-white/5 bg-[#12121B] px-3 py-2"
-                                        style={{
-                                            borderLeftColor: getGroupColorByIndex(idx),
-                                            borderLeftWidth: "6px",
-                                            borderLeftStyle: "solid",
-                                        }}
-                                    >
+                  <div
+                    key={grupo.id}
+                    className="rounded-[10px] border  border-white/5 bg-[#12121B] px-3 py-2"
+                    style={{
+                      borderLeftColor: getGroupColorByIndex(idx),
+                      borderLeftWidth: "6px",
+                      borderLeftStyle: "solid",
+                    }}
+                  >
                     <button
                       type="button"
                       onClick={() => toggleGrupo(grupo.id)}
-                      className="flex w-full items-center justify-between text-left"
+                      className="flex w-full cursor-pointer items-center justify-between text-left"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-white font-semibold">

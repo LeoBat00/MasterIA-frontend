@@ -1,5 +1,6 @@
 import { http } from "./http";
 import { endpoints } from "./endpoints";
+import { Categoria, Mecanica, Tema } from "@/types/jogo";
 
 export type CadastroParticipantePayload = {
   eventoId: number;
@@ -23,4 +24,27 @@ export type CadastroParticipantePayload = {
 
 export async function cadastrarParticipante(payload: CadastroParticipantePayload) {
   await http.post(endpoints.participante.cadastroEvento, payload);
+}
+
+export type RecomendacaoJogo = {
+  id_mysql: number;
+  nmJogo: string;
+  semantic_score: number;
+  popularity_score: number;
+  thumb: string;
+  categorias?: Categoria[];
+  mecanicas?: Mecanica[];
+  temas?: Tema[];
+};
+
+export type RecomendacaoPerfilResponse = {
+  recommendations: RecomendacaoJogo[];
+  query: string;
+};
+
+export async function getRecomendacaoPerfil(participanteId: number) {
+  const { data } = await http.get<RecomendacaoPerfilResponse>(
+    endpoints.participante.recomendacaoPerfil(participanteId)
+  );
+  return data;
 }

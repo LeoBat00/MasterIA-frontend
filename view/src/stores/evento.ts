@@ -6,6 +6,7 @@ import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
 import { filtroBuscaPaginadaJogo } from "../types/jogo";
 import { Grupo } from "@/types/grupo";
+import { getEventoById as fetchEventoById } from "@/api/evento";
 
 type EventoState = {
     evento: novoEvento | null;
@@ -52,8 +53,8 @@ export const useEventoStore = create<EventoState>()(
             setEventoSelecionado: (e: Evento | undefined) => set({ eventoSelecionado: e }, false, "setEventoSelecionado"),
             getEventoById: async (id: number): Promise<Evento | null> => {
                 try {
-                    const response = await http.get<Evento>(endpoints.evento.getById(id));
-                    return response.data;
+                    const data = await fetchEventoById(id);
+                    return data;
                 } catch (error) {
                     console.error("Erro ao buscar evento por ID", error);
                     return null;
