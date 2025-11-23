@@ -1,22 +1,16 @@
 "use client";
 
 import { useCadastroEventosStore } from "@/stores/cadastroEventos";
-import Select from "@/components/UI/Select";
 import Button from "@/components/UI/Button";
 import { FaChevronRight } from "react-icons/fa";
 import { useEffect, useMemo, useState } from "react";
 import { getCidadesDisponiveis, CidadeDisponivel } from "@/api/evento";
 import { useRouter } from "next/navigation";
+import { slugifyCidade } from "@/app/util";
 
 export default function SelecionarCidade() {
   const { cidadeSelecionada, setCidadeSelecionada } = useCadastroEventosStore();
   const router = useRouter();
-
-  const cidades = [
-    { value: "sao-paulo", label: "São Paulo" },
-    { value: "rio-de-janeiro", label: "Rio de Janeiro" },
-    { value: "belo-horizonte", label: "Belo Horizonte" },
-  ];
 
   const [cidadesDisponiveis, setCidadesDisponiveis] = useState<
     CidadeDisponivel[]
@@ -51,24 +45,10 @@ export default function SelecionarCidade() {
       .join(" ");
   };
 
-  const handleChangeCidade = (cidade: string | number) => {
-    if (typeof cidade === "string") {
-      setCidadeSelecionada(cidade);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-8 bg-[#1C172E]">
       <div className="w-[600px] bg-[#1E1B2E] p-6 rounded-lg shadow-lg border border-white/10">
         <h1 className="text-2xl font-bold mb-4">Seleciona sua cidade</h1>
-        <Select
-          options={cidades}
-          value={cidadeSelecionada}
-          onChange={(value) => handleChangeCidade(value)}
-          placeholder="Buscar por nome"
-          containerClassName="mb-10"
-        />
-
         <p className="mb-5 text-[#D9E8FFA6]">Eventos que estão ativos agora!</p>
 
         {loading && (
@@ -91,14 +71,16 @@ export default function SelecionarCidade() {
               className="p-4 cursor-pointer bg-[#2F2B43] rounded-lg mb-2 hover:bg-white/20 text-[#D9E8FF] flex items-center justify-between"
               tabIndex={0}
               onClick={() => {
+                const slug = slugifyCidade(c.cidade);
                 setCidadeSelecionada(c.cidade);
-                router.push(`/cidade/${c.cidade}`);
+                router.push(`/cidade/${slug}`);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
+                  const slug = slugifyCidade(c.cidade);
                   setCidadeSelecionada(c.cidade);
-                  router.push(`/cidade/${c.cidade}`);
+                  router.push(`/cidade/${slug}`);
                 }
               }}
             >
@@ -121,8 +103,10 @@ export default function SelecionarCidade() {
 
           <Button
             onClick={() => {
-              if (cidadeSelecionada)
-                router.push(`/cidade/${cidadeSelecionada}`);
+              if (cidadeSelecionada) {
+                const slug = slugifyCidade(cidadeSelecionada);
+                router.push(`/cidade/${slug}`);
+              }
             }}
             disabled={!cidadeSelecionada}
           >

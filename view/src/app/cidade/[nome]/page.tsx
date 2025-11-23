@@ -12,7 +12,7 @@ import FiltroEventos from "@/app/selecionarCidade/filtro";
 import { Evento, EventoAtivo } from "@/types/evento";
 import CardCadastroEvento from "@/components/Cards/CardCadastroEvento";
 import Link from "next/link";
-import { zerarHoras } from "@/app/util";
+import { zerarHoras, slugifyCidade } from "@/app/util";
 import { useEventosAtivosStore } from "@/stores/eventosAtivosStore";
 
 export default function CidadePage() {
@@ -21,13 +21,25 @@ export default function CidadePage() {
   const { cidadeSelecionada, setCidadeSelecionada, filtroEventos } =
     useCadastroEventosStore();
   const nomeParam = params?.nome as string | string[] | undefined;
-  const nome = Array.isArray(nomeParam) ? nomeParam[0] : nomeParam ?? "";
+  const nomeSlug = Array.isArray(nomeParam)
+    ? decodeURIComponent(nomeParam[0] ?? "")
+    : decodeURIComponent(nomeParam ?? "");
+
+  const nomeCidade = useMemo(() => {
+    const base = cidadeSelecionada || nomeSlug;
+    if (!base) return "";
+    return base
+      .replace(/-/g, " ")
+      .split(" ")
+      .map((p) => (p ? p[0].toUpperCase() + p.slice(1) : ""))
+      .join(" ");
+  }, [cidadeSelecionada, nomeSlug]);
 
   useEffect(() => {
-    if (nome && cidadeSelecionada !== nome) {
-      setCidadeSelecionada(nome);
+    if (nomeSlug && cidadeSelecionada !== nomeSlug) {
+      setCidadeSelecionada(nomeSlug);
     }
-  }, [nome, cidadeSelecionada, setCidadeSelecionada]);
+  }, [nomeSlug, cidadeSelecionada, setCidadeSelecionada]);
 
   const { eventos, loading, fetch } = useEventosAtivosStore();
   const eventosLength = eventos?.length ?? 0;
@@ -102,12 +114,12 @@ export default function CidadePage() {
   );
 
   const eventosDaCidade = useMemo(() => {
-    const nomeLower = (nome || "").toString().toLowerCase();
+    const nomeLower = slugifyCidade((nomeSlug || "").toString());
     const filtrados = filtrarEventos(eventos || []);
     return filtrados.filter(
-      (e) => (e.cidade || "").toLowerCase() === nomeLower
+      (e) => slugifyCidade(e.cidade || "") === nomeLower
     );
-  }, [eventos, nome, filtrarEventos]);
+  }, [eventos, nomeSlug, filtrarEventos]);
 
   const mapToEvento = (e: EventoAtivo): Evento => ({
     id: e.id,
@@ -141,7 +153,8 @@ export default function CidadePage() {
           Eventos acontecendo <br /> em
           <span className="text-[#616EFF] font-bold">
             {" "}
-            {nome?.toUpperCase()}{" "}
+            {nomeCidade || nomeSlug}
+            {" "}
           </span>
         </h1>
 

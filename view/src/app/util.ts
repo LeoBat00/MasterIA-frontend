@@ -67,3 +67,13 @@ export function tempoRestante(evento: Evento, status: statusEvento): string {
     }
     return "";
 }
+
+export function slugifyCidade(nome?: string): string {
+    if (!nome) return "";
+    return nome
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .replace(/\s+/g, "-")
+        .replace(/_+/g, "-")
+        .toLowerCase();
+}
